@@ -25,6 +25,7 @@ const compared = {
   ],
 };
 export const Overview: StoryObj = {
+  name: 'Comparisons',
   render: () =>
     chooseSpec('Comparison', {
       'This year only': orderSpec,

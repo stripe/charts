@@ -10,6 +10,7 @@ const meta: Meta = {
 };
 export default meta;
 export const Overview: StoryObj = {
+  name: 'Money and units',
   render: () =>
     chooseSpec('Units', {
       'USD · minor units': {

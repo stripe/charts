@@ -57,6 +57,7 @@ const previous: Series = {
  * page might combine them. The last week drops, so the change is negative.
  */
 export const Overview: StoryObj<Args> = {
+  name: 'Dashboard',
   ...shot('08-showcase', 800, 600),
   args: {
     kpis: [

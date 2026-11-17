@@ -6,6 +6,7 @@ import {moneySpec} from './support/specs';
 const meta: Meta = {title: 'Features/Provenance', beforeEach: cleanUpCharts};
 export default meta;
 export const Overview: StoryObj = {
+  name: 'Provenance',
   render: () =>
     guideChart({
       ...moneySpec,

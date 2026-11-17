@@ -9,6 +9,7 @@ const meta: Meta = {
 };
 export default meta;
 export const Overview: StoryObj = {
+  name: 'Dates and time zones',
   render: () =>
     chooseSpec(
       'Reporting zone',

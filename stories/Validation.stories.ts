@@ -10,6 +10,7 @@ const meta: Meta = {
 };
 export default meta;
 export const Overview: StoryObj = {
+  name: 'Validation',
   render: () =>
     chooseSpec('Spec', {
       'Missing currency units': {

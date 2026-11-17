@@ -45,14 +45,16 @@ const withView: Decorator = (storyFn, context) => {
     return story;
   }
   const guide = guideFor(context.title);
+  const section = context.title.split('/').at(-1) ?? context.title;
+  const isOverview = context.name === 'Overview' || context.name === section;
   if (guide && (view !== 'code' || context.parameters.viewToggle === false))
     return guidePage(
-      `${context.title.split('/').at(-1)} / ${context.name}`,
+      isOverview ? section : `${section} / ${context.name}`,
       guide,
       story,
       snippet,
       custom === undefined,
-      context.title === 'Intro' || context.name === 'Overview',
+      context.title === 'Intro' || isOverview,
     );
   if (snippet === null)
     return guide ? guidePage(context.title, guide, story, null, false) : story;
