@@ -257,7 +257,7 @@ The comparison series is drawn as a muted dashed line under the primary one.
 ```
 
 Bars of the same slot sit side by side in series order, primary first; up to
-4 series get colors from the series palette, and comparison series keep the
+12 series get colors from the series palette, and comparison series keep the
 muted style. The y axis of a bar chart always includes zero; a line chart's
 axis fits the data.
 
@@ -420,7 +420,7 @@ are in the TypeScript types and the JSON Schema.
 | `chart.axes` | object | none | Axis label settings. See [Axes](#axes). |
 | `chart.incomplete` | `{from, message?}` | none | Marks the slots from `from` (a primary x) to the end as not final yet. See [Annotations, incomplete periods and forecasts](#annotations-incomplete-periods-and-forecasts). |
 | `chart.stacking` | `"grouped"` or `"stacked"` | `"grouped"` | How bar series share a slot: side by side, or stacked (positive values up from zero, negative values down). Only allowed when `chart.type` is `"bar"`; comparison series can't be stacked. |
-| `series` | array of 1 to 4 | required unless `chart.type` is `"kpi"` or `loading` is `true` | The series to plot. Put the primary series first. |
+| `series` | array of 1 to 12 | required unless `chart.type` is `"kpi"` or `loading` is `true` | The series to plot. Put the primary series first. |
 | `series[].label` | string, 1 to 200 characters | required | Series name, shown in the tooltip and the chart's accessible summary. |
 | `series[].color` | `#rgb` or `#rrggbb` | palette | The series' color for its marks, legend, tooltip and sparkline. |
 | `series[].comparison` | boolean | `false` | `true` draws the series in the muted comparison style, for example last year. |
@@ -444,13 +444,13 @@ are in the TypeScript types and the JSON Schema.
 
 ## Performance and data size
 
-The supported limits are 1000 points per series and 4 series. Timing depends
+The supported limits are 1000 points per series and 12 series. Timing depends
 on the browser, device, data, and enabled interactions. See the
 [benchmark harness and measurement method](../bench/README.md) to measure
 your workload; no cross-device timing guarantee is implied.
 
 - **Use reporting-sized data.** The spec allows up to 1000 points per
-  series and 4 series.
+  series and 12 series.
 - **Aggregate before charting.** A line reads best with about one point per
   3px of plot: about 100 points at 360px wide, 250 at 800px, 450 at 1440px.
   Denser lines are thinned per pixel column automatically, keeping their
@@ -481,9 +481,9 @@ your workload; no cross-device timing guarantee is implied.
 
 Non-comparison series take colors from the series palette in order;
 comparison series share one muted color (dashed for lines). The palette has
-4 colors and every comparison series looks the same, so for clarity use at
-most one comparison series per chart, for example this year against last
-year.
+9 distinct colors across 12 slots; slots 10–12 repeat the first three.
+Every comparison series uses the same muted color, so for clarity use at
+most one comparison series per chart, for example this year against last year.
 
 `series[].color` sets a series' color and, in bar charts, `data[].color`
 one bar's, as `#rgb` or `#rrggbb` hex. Prefer the default palette, and check
@@ -491,7 +491,7 @@ custom colors for contrast against the background.
 
 **Legend.** By default (`chart.legend: "auto"`) charts with 1 or 2 series
 have no legend, because the tooltip and the details table name them, and
-charts with 3 or 4 series, any forecast points or any `projected` values
+charts with 3 or more series, any forecast points or any `projected` values
 show a wrapping legend row below the plot, in series order. `"show"` always
 shows it and `"hide"` never does; KPI cards never have one. Each entry is a
 toggle button:
@@ -707,9 +707,17 @@ fails while it is out of date.
 | Property | Default | Styles |
 |---|---|---|
 | `--sc-series-primary-0` | `#9966FF` | primary, color 1 |
-| `--sc-series-primary-1` | `#1BAF7A` | primary, color 2 |
-| `--sc-series-primary-2` | `#EB6834` | primary, color 3 |
-| `--sc-series-primary-3` | `#2A78D6` | primary, color 4 |
+| `--sc-series-primary-1` | `#0055BC` | primary, color 2 |
+| `--sc-series-primary-2` | `#00A1C2` | primary, color 3 |
+| `--sc-series-primary-3` | `#ED6804` | primary, color 4 |
+| `--sc-series-primary-4` | `#B3063D` | primary, color 5 |
+| `--sc-series-primary-5` | `#1C5A0D` | primary, color 6 |
+| `--sc-series-primary-6` | `#FA4A67` | primary, color 7 |
+| `--sc-series-primary-7` | `#922700` | primary, color 8 |
+| `--sc-series-primary-8` | `#3DA00B` | primary, color 9 |
+| `--sc-series-primary-9` | `#9966FF` | primary, color 10 |
+| `--sc-series-primary-10` | `#0055BC` | primary, color 11 |
+| `--sc-series-primary-11` | `#00A1C2` | primary, color 12 |
 | `--sc-series-comparison` | `#95A4BA` | comparison |
 | `--sc-series-comparison-dash` | `6 10` | comparison dash |
 | `--sc-series-bar-group-ratio` | `0.8` | bar group ratio |
@@ -1148,10 +1156,10 @@ Every problem names the field path and what was expected. Common ones:
 | `series[0].color: expected a hex color like "#635bff" or "#fff", got "red"` | Use `#rgb` or `#rrggbb` hex. |
 | `details: expected true or false, got "no"` | Use a JSON boolean. Close alternatives such as `showDetails` or `infoButton` are pointed to `details`. |
 | `chart.type: expected one of "line", "bar", "kpi", got "area"` | Use a supported type. |
-| `series: required unless chart.type is "kpi" or loading is true; expected an array of 1 to 4 series` | Add `series`, use `"chart": {"type": "kpi"}`, or set `loading: true` until the data arrives. |
+| `series: required unless chart.type is "kpi" or loading is true; expected an array of 1 to 12 series` | Add `series`, use `"chart": {"type": "kpi"}`, or set `loading: true` until the data arrives. |
 | `chart.stacking: only allowed when chart.type is "bar"; got chart.type "line"` | Remove `stacking`, or use a bar chart. |
 | `series[1].comparison: comparison series can't be stacked; use chart.stacking "grouped" or remove "comparison"` | Group the bars, or drop `comparison`. |
-| `series: expected 1 to 4 items, got 0` | Give at least one series. To show "No data", pass series with empty `data` arrays. |
+| `series: expected 1 to 12 items, got 0` | Give at least one series. To show "No data", pass series with empty `data` arrays. |
 | `series[0].data[0].x: expected an ISO date like "2026-11-27" or a date-time like "2026-11-27T18:00:00Z", got "Nov 27"` | Send ISO dates. Date-times need `Z` or an offset. |
 | `series[0].data[1].y: expected a finite number or null, got "338950.80"` | Send a JSON number, not a string; `null` marks a gap. |
 | `provenance.fetchedAt: expected an ISO 8601 date-time like "2026-11-27T18:00:00Z", got "2026-11-27"` | Include a time and a zone; a date alone is not accepted here. |

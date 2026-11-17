@@ -53,7 +53,7 @@ const guides: Record<string, Guide> = {
     fields: [
       ['chart.type', 'line', 'Set bar for a bar chart.'],
       ['chart.stacking', 'grouped', 'Set stacked to stack compatible series.'],
-      ['series', 'No data', 'Up to four series; units must be consistent.'],
+      ['series', 'No data', 'Up to twelve series; units must be consistent.'],
     ],
     notes: [
       'A comparison series remains a comparison rather than becoming another contribution to the stack.',

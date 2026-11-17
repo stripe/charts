@@ -19,9 +19,14 @@ export const primitives = {
     gray750: '#414552',
     gray900: '#1A2C44',
     purple500: '#9966FF',
-    aqua500: '#1BAF7A',
-    orange500: '#EB6834',
-    blue500: '#2A78D6',
+    chartBlue: '#0055BC',
+    chartCyan: '#00A1C2',
+    chartOrange: '#ED6804',
+    chartMagenta: '#B3063D',
+    chartDarkGreen: '#1C5A0D',
+    chartPink: '#FA4A67',
+    chartBrown: '#922700',
+    chartGreen: '#3DA00B',
     green700: '#217005',
     red700: '#C0123C',
     transparent: 'transparent',
@@ -760,15 +765,22 @@ export const tokens: Tokens = {
   series: {
     strokeWidth: p.stroke.regular,
     /**
-     * Colors for non-comparison series, in assignment order. Validated as a
-     * categorical set for lightness, chroma and color-vision separation on
-     * a white surface.
+     * Categorical colors in assignment order: nine distinct colors, then
+     * the first three repeated in slots ten through twelve.
      */
     primary: [
       p.color.purple500,
-      p.color.aqua500,
-      p.color.orange500,
-      p.color.blue500,
+      p.color.chartBlue,
+      p.color.chartCyan,
+      p.color.chartOrange,
+      p.color.chartMagenta,
+      p.color.chartDarkGreen,
+      p.color.chartPink,
+      p.color.chartBrown,
+      p.color.chartGreen,
+      p.color.purple500,
+      p.color.chartBlue,
+      p.color.chartCyan,
     ],
     comparison: p.color.gray400,
     comparisonDash: '6 10',

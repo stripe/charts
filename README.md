@@ -90,7 +90,7 @@ or a [complete recap page](https://stripe.github.io/charts/examples/dashboards/s
 | Show where a number came from | [Provenance](https://stripe.github.io/charts/?path=/story/features-provenance--overview) |
 | Understand a rejected spec | [Validation](https://stripe.github.io/charts/?path=/story/features-validation--overview) |
 
-Use up to 4 series and 1000 points per series. Aggregate dense data before
+Use up to 12 series and 1000 points per series. Aggregate dense data before
 charting. See [data-size guidance](docs/reference.md#performance-and-data-size)
 and the [benchmark method](bench/README.md) for measuring your own workload.
 

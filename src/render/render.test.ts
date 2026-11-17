@@ -85,6 +85,60 @@ afterEach(() => {
 });
 
 describe('render', () => {
+  it.each(['line', 'bar'] as const)(
+    'renders twelve %s series with the full categorical palette',
+    (type) => {
+      const colors = [
+        '#9966FF',
+        '#0055BC',
+        '#00A1C2',
+        '#ED6804',
+        '#B3063D',
+        '#1C5A0D',
+        '#FA4A67',
+        '#922700',
+        '#3DA00B',
+        '#9966FF',
+        '#0055BC',
+        '#00A1C2',
+      ];
+      const onPointHover = jest.fn();
+      const handle = render(
+        element,
+        {
+          title: 'Series palette',
+          chart: {type},
+          series: colors.map((_, index) => ({
+            label: `Series ${index + 1}`,
+            data: [
+              {x: '2026-10-01', y: index + 1},
+              {x: '2026-10-02', y: index + 2},
+            ],
+          })),
+        },
+        {onPointHover},
+      );
+      resizeAll(1200, 500);
+      pressKey(plotArea(element), 'Home');
+      expect(
+        onPointHover.mock.calls
+          .at(-1)?.[0]
+          .series.map((series: {color: string}) => series.color),
+      ).toEqual(colors);
+      // Repeated colors still have independent theme slots.
+      element
+        .querySelector<HTMLElement>('.sc-root')
+        ?.style.setProperty('--sc-series-primary-11', '#123456');
+      pressKey(plotArea(element), 'End');
+      expect(
+        onPointHover.mock.calls
+          .at(-1)?.[0]
+          .series.map((series: {color: string}) => series.color),
+      ).toEqual([...colors.slice(0, 11), '#123456']);
+      handle.destroy();
+    },
+  );
+
   it('shows markup in spec strings as literal text', () => {
     const title = '<img src=x onerror="alert(1)">';
     const label = '<b>2026</b>';

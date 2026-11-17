@@ -324,7 +324,7 @@ export type Provenance = {
 
 /**
  * A declarative description of one chart card: a title, an optional headline
- * KPI, and a line or bar chart of up to 4 series over time. Unknown fields
+ * KPI, and a line or bar chart of up to 12 series over time. Unknown fields
  * are rejected.
  *
  * A comparison series (for example last year) lines up with the primary
@@ -359,7 +359,7 @@ export type ChartSpec = {
   /** Chart options. Defaults to `{type: "line"}`. */
   chart?: ChartOptions;
   /**
-   * 1 to 4 series to plot. Required unless `chart.type` is `"kpi"` or
+   * 1 to 12 series to plot. Required unless `chart.type` is `"kpi"` or
    * `loading` is `true`; on a `"kpi"` chart they are optional and drawn as a
    * sparkline beside the value. Put the primary series (for example this
    * year) first and mark others such as last year with `comparison: true`.
@@ -472,7 +472,7 @@ export const FORMAT_STYLES: readonly ValueFormat['style'][] = [
 export const LIMITS: {
   /** Fewest series when `series` is given. */
   readonly minSeries: number;
-  /** Most series; more than this is unreadable in one card. */
+  /** Most series supported in one card. */
   readonly maxSeries: number;
   /** Most points per series. */
   readonly maxPoints: number;
@@ -497,7 +497,7 @@ export const LIMITS: {
   readonly maxNoteLength: number;
 } = {
   minSeries: 1,
-  maxSeries: 4,
+  maxSeries: 12,
   maxPoints: 1000,
   maxDetails: 12,
   maxLabelLength: 200,

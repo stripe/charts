@@ -28,6 +28,20 @@ const meta: Meta<Args> = {
 
 export default meta;
 
+export const Palette: StoryObj<Args> = {
+  args: {
+    spec: {
+      title: 'Series palette',
+      chart: {type: 'bar', legend: 'show'},
+      series: Array.from({length: 12}, (_, index) => ({
+        label: `Series ${index + 1}`,
+        data: [{x: '2026-10-01', y: 100}],
+      })),
+    },
+  },
+  render: ({spec}) => chart(spec, {width: '100%', height: 400}),
+};
+
 const DAYS = dates('2026-11-01', 30);
 
 function regionSeries(

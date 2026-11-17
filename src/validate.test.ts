@@ -30,6 +30,21 @@ describe('validate', () => {
     expect(validate(valid)).toEqual({ok: true, spec: valid});
   });
 
+  it('accepts twelve series and rejects a thirteenth', () => {
+    const series = Array.from({length: 12}, (_, index) => ({
+      label: `Series ${index + 1}`,
+      data: [{x: '2026-10-01', y: index + 1}],
+    }));
+    expect(validate({title: 'Series palette', series}).ok).toBe(true);
+    expect(
+      errorsFor({
+        title: 'Series palette',
+        series: [...series, {label: 'Series 13', data: []}],
+      }),
+    ).toEqual([{path: 'series', message: 'expected 1 to 12 items, got 13'}]);
+    expect(schema.properties.series.maxItems).toBe(LIMITS.maxSeries);
+  });
+
   it('reports every realistic mistake with its path and what was expected', () => {
     const {title: _title, ...noTitle} = valid;
     const errors = errorsFor({
