@@ -52,7 +52,7 @@ const withView: Decorator = (storyFn, context) => {
       isOverview ? section : `${section} / ${context.name}`,
       guide,
       story,
-      snippet,
+      context.parameters.codePanel === false ? null : snippet,
       custom === undefined,
       context.title === 'Intro' || isOverview,
     );

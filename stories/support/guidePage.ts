@@ -34,7 +34,6 @@ export function guidePage(
     .sc-guide-fields th{background:#f4f7fa}.sc-guide-fields td:first-child{font-family:ui-monospace,monospace}
     .sc-guide-notes{max-width:800px;padding-left:20px}.sc-guide-notes li{margin:8px 0}
     .sc-guide details{margin-top:24px;border-top:1px solid #ecf1f6;padding-top:12px}.sc-guide summary{cursor:pointer;color:#50617a}
-    .sc-guide>p:last-child{font-size:12px;color:#667691;margin-top:24px}
     .sc-example-controls{display:flex;gap:16px;flex-wrap:wrap;margin:0 0 16px;font:14px/1.6 system-ui,sans-serif}
     .sc-example-controls label{display:flex;align-items:center;gap:8px}.sc-example-controls select{font:inherit;padding:4px 8px}
   `;
@@ -83,14 +82,6 @@ export function guidePage(
     details.appendChild(notes);
     page.appendChild(details);
   }
-  const links = text('p', '');
-  const reference = text('a', 'API and spec');
-  reference.href = `https://github.com/stripe/charts/blob/main/docs/reference.md#${guide.reference ?? 'spec-reference'}`;
-  const development = text('a', 'Setup');
-  development.href =
-    'https://github.com/stripe/charts/blob/main/docs/development.md';
-  links.append(reference, document.createTextNode(' · '), development);
-  page.appendChild(links);
   return page;
 }
 
