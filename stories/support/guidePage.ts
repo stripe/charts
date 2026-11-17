@@ -16,7 +16,6 @@ export function guidePage(
   guide: Guide,
   story: Node,
   snippet: string | null,
-  downloadHtml: string | null,
   showIntroduction = false,
 ): HTMLElement {
   const page = document.createElement('article');
@@ -46,7 +45,7 @@ export function guidePage(
   canvas.setAttribute('aria-label', 'Interactive example');
   canvas.appendChild(story);
   demo.appendChild(canvas);
-  if (snippet) demo.appendChild(codeView(snippet, downloadHtml, true));
+  if (snippet) demo.appendChild(codeView(snippet, true));
   page.appendChild(demo);
   if (guide.fields?.length) {
     const details = document.createElement('details');

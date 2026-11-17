@@ -1,7 +1,7 @@
 // "Show code" support: stories record each chart they render, and the
-// preview turns the records into rendering JavaScript and a downloadable
-// HTML page. Both use the specs actually rendered, so they cannot drift
-// from the story.
+// preview turns the records into rendering JavaScript, or a complete HTML
+// page for the intro. Both use the specs actually rendered, so they cannot
+// drift from the story.
 
 import {PACKAGE_NAME} from '../src/meta';
 

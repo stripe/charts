@@ -25,10 +25,7 @@ evolves. Examples use fictional data.
 ## Try it
 
 Open the [gallery](https://stripe.github.io/charts/) to see charts alongside
-copyable code. **Download HTML** saves a complete example that loads the
-browser bundle from the gallery. To work offline, download the
-[browser bundle](https://stripe.github.io/charts/dist/stripe-charts.min.js)
-and point the script tag at your local copy.
+copyable code.
 
 This is a complete first chart—one series, three dates:
 

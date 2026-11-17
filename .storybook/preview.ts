@@ -39,15 +39,13 @@ const withView: Decorator = (storyFn, context) => {
   const records = takeRecords();
   const view = viewOf(context.globals);
   const custom = storyCode(context.parameters.code);
-  const downloadHtml =
-    custom === undefined && records.length > 0 ? buildSnippet(records) : null;
   const snippet =
     custom?.source ??
-    (context.title === 'Intro'
-      ? downloadHtml
-      : records.length > 0
-        ? buildJavaScript(records)
-        : null);
+    (records.length > 0
+      ? context.title === 'Intro'
+        ? buildSnippet(records)
+        : buildJavaScript(records)
+      : null);
   if (view === 'screenshot' || typeof story === 'string') {
     return story;
   }
@@ -60,11 +58,10 @@ const withView: Decorator = (storyFn, context) => {
       guide,
       story,
       context.parameters.codePanel === false ? null : snippet,
-      downloadHtml,
       context.title === 'Intro' || isOverview,
     );
   if (snippet === null)
-    return guide ? guidePage(context.title, guide, story, null, null) : story;
+    return guide ? guidePage(context.title, guide, story, null) : story;
   const code = view === 'code';
   const toggle = viewToggle(code, () =>
     addons.getChannel().emit(UPDATE_GLOBALS, {
@@ -74,7 +71,7 @@ const withView: Decorator = (storyFn, context) => {
   const frame = document.createElement('div');
   if (code) {
     cleanUpCharts()();
-    frame.append(codeView(snippet, downloadHtml), toggle);
+    frame.append(codeView(snippet), toggle);
   } else {
     frame.append(story, toggle);
   }

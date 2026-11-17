@@ -62,17 +62,14 @@ export function viewToggle(code: boolean, onToggle: () => void): HTMLElement {
 }
 
 /**
- * Copyable code and an HTML download, either inline or filling the frame.
+ * Copyable code, either inline or filling the frame.
  */
-export function codeView(
-  snippet: string,
-  downloadHtml: string | null,
-  inline = false,
-): HTMLElement {
+export function codeView(snippet: string, inline = false): HTMLElement {
   const view = document.createElement('section');
   view.dataset.sbCode = '';
   view.setAttribute('aria-label', 'Code for this story');
   Object.assign(view.style, {
+    position: 'relative',
     display: 'flex',
     flexDirection: 'column',
     height: inline
@@ -85,40 +82,23 @@ export function codeView(
     borderRadius: '6px',
   });
 
-  const bar = document.createElement('div');
-  Object.assign(bar.style, {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    // Room on the right for the fixed toggle.
-    padding: inline ? '8px 12px' : '8px 120px 8px 12px',
-    flexWrap: 'wrap',
-    borderBottom: BORDER,
-    font: UI_FONT,
+  const copyButton = controlButton('Copy');
+  Object.assign(copyButton.style, {
+    position: 'absolute',
+    top: '6px',
+    right: inline ? '6px' : '120px',
+    padding: '2px 6px',
+    minHeight: '24px',
+    borderRadius: '4px',
+    background: '#f6f8fa',
     color: '#57606a',
   });
-  const copyButton = controlButton('Copy');
-  bar.append(copyButton);
-  if (downloadHtml !== null) {
-    const download = controlButton('Download HTML');
-    download.addEventListener('click', () => {
-      const url = URL.createObjectURL(
-        new Blob([downloadHtml], {type: 'text/html'}),
-      );
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'stripe-chart.html';
-      link.click();
-      setTimeout(() => URL.revokeObjectURL(url), COPIED_MS);
-    });
-    bar.append(download);
-  }
 
   const pre = document.createElement('pre');
   Object.assign(pre.style, {
     flex: '1',
     margin: '0',
-    padding: '12px',
+    padding: '36px 12px 12px',
     overflow: 'auto',
     font: FONT,
     color: '#24292f',
@@ -135,6 +115,6 @@ export function codeView(
     }, COPIED_MS);
   });
 
-  view.append(bar, pre);
+  view.append(copyButton, pre);
   return view;
 }

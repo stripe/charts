@@ -12,7 +12,7 @@ afterEach(() => {
   document.body.replaceChildren();
 });
 
-test('changing units keeps the rendered chart and downloadable code in sync', () => {
+test('changing units keeps the rendered chart and copyable code in sync', () => {
   const page = Units.render();
   document.body.appendChild(page);
   const select = page.querySelector('select');
@@ -51,25 +51,21 @@ test('the validation guide can recover from the deliberately invalid example', (
   );
 });
 
-test('the first guide shows the live example, API fields, and a complete HTML download', () => {
+test('the first guide shows the live example, API fields, and copyable HTML', () => {
   const story = GettingStarted.render();
   const records = takeRecords();
   expect(records).toHaveLength(1);
   const html = buildSnippet(records);
   expect(html).toContain('http://localhost/dist/stripe-charts.min.js');
   expect(html).not.toContain('cdn.jsdelivr.net');
-  const page = guidePage(
-    'Getting started',
-    guideFor('Intro'),
-    story,
-    html,
-    html,
-  );
+  const page = guidePage('Getting started', guideFor('Intro'), story, html);
   expect(page.querySelector('.sc-root')).not.toBeNull();
   expect(page.querySelector('table').textContent).toContain('series');
   expect(
-    [...page.querySelectorAll('button')].map((b) => b.textContent),
-  ).toContain('Download HTML');
+    [...page.querySelectorAll('[data-sb-code] button')].map(
+      (b) => b.textContent,
+    ),
+  ).toEqual(['Copy']);
   expect(page.querySelector('[data-sb-code] code').textContent).toContain(
     'Orders',
   );

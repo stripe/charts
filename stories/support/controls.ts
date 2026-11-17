@@ -1,4 +1,4 @@
-import {buildJavaScript, buildSnippet} from '../../.storybook/code';
+import {buildJavaScript} from '../../.storybook/code';
 import {codeView} from '../../.storybook/codeView';
 import {chart, track} from './mount';
 import type {ChartSpec} from '../../src/index';
@@ -38,15 +38,13 @@ export function chooseSpec(
     try {
       current = track(render(host, spec));
     } catch (error) {
-      // Error examples retain their card and expose the same downloadable spec.
+      // Error examples retain their card and show the same spec in the code.
       if (!(error instanceof SpecError)) throw error;
       current = error.chart;
       if (current) track(current);
     }
     const records = [{spec, width: '100%', height: 320}];
-    code.replaceChildren(
-      codeView(buildJavaScript(records), buildSnippet(records), true),
-    );
+    code.replaceChildren(codeView(buildJavaScript(records), true));
   };
   select.addEventListener('change', show);
   show();
