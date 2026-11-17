@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- An empty icon, so the browser does not request /favicon.ico. -->
+    <link rel="icon" href="data:," />
+    <title>Gross volume, Thanksgiving through Cyber Monday</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 24px;
+      }
+      #chart {
+        max-width: 640px;
+        height: 400px;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <body>
+    <!--
+      A complete page using the self-contained browser build: one script
+      tag, one element, one JSON spec. Build first (`dist/` is generated),
+      then open this file directly or serve the package directory.
+    -->
+    <div id="chart"></div>
+    <script src="../dist/stripe-charts.min.js"></script>
+    <script>
+      const spec = {
+        title: 'Gross volume',
+        description:
+          'Thanksgiving through Cyber Monday, compared with last year',
+        format: {style: 'currency', currency: 'usd', unit: 'minor'},
+        timeZone: 'America/New_York',
+        kpi: {basis: 'total', value: 179431180, comparisonValue: 156955125},
+        chart: {type: 'line'},
+        series: [
+          {
+            label: '2026',
+            data: [
+              {x: '2026-11-26', y: 28641025},
+              {x: '2026-11-27', y: 41200025},
+              {x: '2026-11-28', y: 33895080},
+              {x: '2026-11-29', y: 30122040},
+              {x: '2026-11-30', y: 45573010},
+            ],
+          },
+          {
+            label: '2025',
+            comparison: true,
+            data: [
+              {x: '2025-11-27', y: 25180000},
+              {x: '2025-11-28', y: 35010000},
+              {x: '2025-11-29', y: 29740050},
+              {x: '2025-11-30', y: 26895000},
+              {x: '2025-12-01', y: 40130075},
+            ],
+          },
+        ],
+        provenance: {
+          source: 'Stripe Data API',
+          fetchedAt: '2026-12-01T14:05:00Z',
+          details: [
+            {label: 'Metric', value: 'gross_volume'},
+            {label: 'Period', value: 'Nov 26 to Nov 30, 2026'},
+            {
+              label: 'Compared with',
+              value: 'Nov 27 to Dec 1, 2025 (same weekdays)',
+            },
+            {label: 'Time zone', value: 'America/New_York'},
+          ],
+        },
+      };
+
+      StripeCharts.render(document.getElementById('chart'), spec);
+    </script>
+  </body>
+</html>

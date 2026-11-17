@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- An empty icon, so the browser does not request /favicon.ico. -->
+    <link rel="icon" href="data:," />
+    <title>Little Kiln Coffee: the 2026 year in review</title>
+    <!--
+      Example page: an editorial, long-form year in review, written the way an
+      agent would turn a merchant's payment data into a story for its team.
+      The shop and every number are made up.
+
+      Everything the prose says is computed in the script at the bottom from
+      the same arrays that are passed to the charts, so the words and the
+      charts cannot disagree. Money is in cents (minor units), as the API
+      returns it. Charts are drawn when they scroll into view.
+
+      The library is loaded with one script tag. This copy points at the local
+      build so it can be opened from a checkout (build first; `dist/` is
+      generated). In an artifact, use the published file instead:
+
+        <script src="https://cdn.jsdelivr.net/npm/@stripe/charts@0.1.0/dist/stripe-charts.min.js"></script>
+    -->
+    <style>
+      :root {
+        --paper: #f7f2e8;
+        --ink: #2b221c;
+        --ink-soft: #55483e;
+        --ink-faint: #6f6155;
+        --rule: #d9cfbe;
+        --accent: #b4471f;
+        --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia,
+          'Times New Roman', serif;
+        --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          Helvetica, Arial, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        background: var(--paper);
+      }
+      body {
+        margin: 0;
+        color: var(--ink);
+        font-family: var(--serif);
+        font-size: 20px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Documented theming: the series palette, set on the chart root. */
+      body .sc-root {
+        --sc-series-primary-0: #b4471f;
+        --sc-series-primary-1: #3a2c24;
+        --sc-series-primary-2: #c79a6b;
+        --sc-series-primary-3: #6f7f5c;
+        --sc-series-comparison: #a79d8f;
+      }
+
+      .progress {
+        position: fixed;
+        inset: 0 0 auto 0;
+        z-index: 10;
+        height: 3px;
+        background: var(--accent);
+        transform: scaleX(0);
+        transform-origin: left;
+      }
+
+      .masthead {
+        max-width: 54rem;
+        margin: 0 auto;
+        padding: 2rem 1.25rem 0;
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        border-bottom: 1px solid var(--rule);
+        padding-bottom: 0.9rem;
+        font-family: var(--sans);
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+      }
+      .masthead strong {
+        color: var(--ink);
+        font-weight: 700;
+      }
+
+      article {
+        max-width: 54rem;
+        margin: 0 auto;
+        padding: 0 1.25rem 4rem;
+      }
+      .hero {
+        padding: 5rem 0 3rem;
+      }
+      .kicker {
+        margin: 0 0 1.25rem;
+        font-family: var(--sans);
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+      h1 {
+        margin: 0;
+        max-width: 14em;
+        font-size: clamp(2.6rem, 8vw, 5.4rem);
+        line-height: 1.02;
+        font-weight: 400;
+        letter-spacing: -0.02em;
+      }
+      h1 em {
+        color: var(--accent);
+      }
+      .lede {
+        max-width: 34rem;
+        margin: 2rem 0 0;
+        font-size: 1.3rem;
+        line-height: 1.5;
+        color: var(--ink-soft);
+      }
+      .byline {
+        margin: 2rem 0 0;
+        font-family: var(--sans);
+        font-size: 13px;
+        color: var(--ink-faint);
+      }
+
+      section {
+        padding-top: 4.5rem;
+      }
+      .chapter {
+        display: block;
+        margin-bottom: 0.4rem;
+        font-family: var(--sans);
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+      h2 {
+        max-width: 17em;
+        margin: 0 0 1.5rem;
+        font-size: clamp(1.9rem, 5vw, 3rem);
+        line-height: 1.1;
+        font-weight: 400;
+        letter-spacing: -0.015em;
+      }
+      p {
+        max-width: 36rem;
+        margin: 0 0 1.4rem;
+      }
+      .dropcap::first-letter {
+        float: left;
+        margin: 0.08em 0.1em 0 0;
+        font-size: 4.2em;
+        line-height: 0.8;
+        color: var(--accent);
+      }
+      .num {
+        font-variant-numeric: lining-nums tabular-nums;
+        white-space: nowrap;
+      }
+
+      blockquote.stat {
+        max-width: 36rem;
+        margin: 2.5rem 0;
+        padding: 0 0 0 1.5rem;
+        border-left: 3px solid var(--accent);
+      }
+      blockquote.stat .big {
+        display: block;
+        font-size: clamp(3.2rem, 11vw, 6rem);
+        line-height: 1;
+        letter-spacing: -0.03em;
+        font-variant-numeric: lining-nums;
+      }
+      blockquote.stat .cap {
+        display: block;
+        margin-top: 0.7rem;
+        font-family: var(--sans);
+        font-size: 14px;
+        line-height: 1.45;
+        color: var(--ink-soft);
+      }
+
+      figure {
+        margin: 2.5rem 0 3rem;
+      }
+      figcaption {
+        max-width: 36rem;
+        margin-top: 0.9rem;
+        font-family: var(--sans);
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--ink-faint);
+      }
+      .chart {
+        height: 400px;
+      }
+      .pair {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.25rem;
+      }
+      .pair .chart {
+        height: 340px;
+      }
+      .rule {
+        height: 1px;
+        margin: 4.5rem 0 0;
+        border: 0;
+        background: var(--rule);
+      }
+      .method {
+        max-width: 36rem;
+        font-family: var(--sans);
+        font-size: 14px;
+        line-height: 1.55;
+        color: var(--ink-faint);
+      }
+      .method p {
+        font-size: inherit;
+      }
+
+      .js .reveal {
+        opacity: 0;
+        transform: translateY(16px);
+        transition: opacity 600ms ease-out, transform 600ms ease-out;
+      }
+      .js .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .js .reveal {
+          opacity: 1;
+          transform: none;
+          transition: none;
+        }
+      }
+      @media (max-width: 760px) {
+        body {
+          font-size: 18px;
+        }
+        .hero {
+          padding-top: 3rem;
+        }
+        .pair {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .chart {
+          height: 340px;
+        }
+        .pair .chart {
+          height: 320px;
+        }
+        .masthead span:last-child {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="progress" id="progress"></div>
+    <div class="masthead">
+      <strong>Little Kiln Coffee Roasters</strong>
+      <span>The 2026 year in review</span>
+    </div>
+
+    <article>
+      <header class="hero">
+        <p class="kicker">Prepared for the team &middot; November 16, 2026</p>
+        <h1>The year the <em>regulars</em> took over</h1>
+        <p class="lede">
+          Little Kiln has taken <span class="num" data-v="ytd26"></span> so far
+          this year, <span class="num" data-v="ytdGrowth"></span> more than the
+          same stretch of 2025. This is where it came from, in six short
+          chapters, written from your Stripe data.
+        </p>
+        <p class="byline">
+          Written by Claude from the shop's payments &middot; US dollars,
+          Pacific time
+        </p>
+      </header>
+
+      <section class="reveal">
+        <span class="chapter">One &middot; Revenue</span>
+        <h2>Every month beat last year, and October was the best yet</h2>
+        <p class="dropcap">
+          Take any month of 2026 and set it beside the same month of 2025: it
+          is ahead, all eleven of them. The shop closed October at
+          <span class="num" data-v="oct26"></span>, up
+          <span class="num" data-v="octGrowth"></span> on October 2025 and the
+          best full month of 2026.
+        </p>
+        <p>
+          The first real step came in April, when the cold-brew cans went on
+          sale: revenue rose <span class="num" data-v="aprStep"></span> on
+          March, the biggest jump of the spring. In October the early-bird
+          holiday sale added another <span class="num" data-v="sepToOct"></span>
+          on September.
+        </p>
+        <blockquote class="stat">
+          <span class="big" data-v="ytd26"></span>
+          <span class="cap">
+            taken from January through November 16, against
+            <span class="num" data-v="ytd25"></span> in the same period of
+            2025.
+          </span>
+        </blockquote>
+        <figure>
+          <div class="chart" id="revenue"></div>
+          <figcaption>
+            Revenue by month. November is still open: the line stops at
+            the $83,610 taken so far (the marker) and its dotted tail runs to
+            where the month is on pace to end. 2025 shows its full November.
+            The shaded stretch is the early-bird sale.
+          </figcaption>
+        </figure>
+        <p>
+          November so far stands at <span class="num" data-v="novMtd"></span>,
+          up <span class="num" data-v="novMtdGrowth"></span> on the same sixteen days last year, before Black Friday has happened. Last year
+          the first sixteen days made up <span class="num" data-v="novShare25"></span>
+          of the month. At that pace November finishes near
+          <span class="num" data-v="novProjected"></span>.
+        </p>
+      </section>
+
+      <section class="reveal">
+        <span class="chapter">Two &middot; Subscriptions</span>
+        <h2>More than four in every ten dollars now arrive on a schedule</h2>
+        <p>
+          In January, <span class="num" data-v="subShareJan"></span> of revenue
+          came from people on a subscription. By October it was
+          <span class="num" data-v="subShareOct"></span>, and November has
+          started at <span class="num" data-v="subShareNov"></span>.
+        </p>
+        <p>
+          Subscription revenue grew <span class="num" data-v="subGrowth"></span>
+          between January and October. One-time orders grew
+          <span class="num" data-v="oneTimeGrowth"></span> over the same months:
+          still growing, but no longer the whole story.
+        </p>
+        <figure>
+          <div class="chart" id="subscriptions"></div>
+          <figcaption>
+            Revenue by month, split into subscription renewals and one-time
+            orders. Each bar adds up to the month's revenue above.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="reveal">
+        <span class="chapter">Three &middot; Trust</span>
+        <h2>Fewer refunds, and far fewer disputes</h2>
+        <p>
+          Customers asked for their money back less often as the year went
+          on. The refund rate averaged
+          <span class="num" data-v="refundAvg26"></span> of payments this year,
+          against <span class="num" data-v="refundAvg25"></span> in 2025, and
+          it has not been above <span class="num" data-v="refundMax26"></span>
+          in any month.
+        </p>
+        <blockquote class="stat">
+          <span class="big" data-v="disputeAvg26"></span>
+          <span class="cap">
+            of payments were disputed on average this year, down from
+            <span class="num" data-v="disputeAvg25"></span> in 2025. November's
+            disputes arrive weeks late, so its figure will still move.
+          </span>
+        </blockquote>
+        <figure>
+          <div class="pair">
+            <div class="chart" id="refunds"></div>
+            <div class="chart" id="disputes"></div>
+          </div>
+          <figcaption>
+            Share of payments refunded and disputed, by month. Lower is better,
+            so a fall is shown in green. The averages are the plain mean of the
+            monthly rates.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="reveal">
+        <span class="chapter">Four &middot; Baskets</span>
+        <h2>The average order got bigger by itself</h2>
+        <p>
+          A typical order was <span class="num" data-v="aovJan"></span> in
+          January and <span class="num" data-v="aovOct"></span> in October, a
+          rise of <span class="num" data-v="aovGrowth"></span>. It moves with the
+          subscription share in chapter two, which is the pattern you would
+          expect when regulars take the larger bag.
+        </p>
+        <figure>
+          <div class="chart" id="aov"></div>
+          <figcaption>
+            Average order value by month: revenue divided by paid orders.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="reveal">
+        <span class="chapter">Five &middot; Checkout</span>
+        <h2>Apple Pay is gaining on cards</h2>
+        <p>
+          Cards still carry most payments, <span class="num" data-v="cardsNov"></span>
+          so far in November, but their share has fallen from
+          <span class="num" data-v="cardsJan"></span> in January. Most of it
+          went to Apple Pay, which grew from
+          <span class="num" data-v="appleJan"></span> to
+          <span class="num" data-v="appleNov"></span>. Google Pay rose from
+          <span class="num" data-v="googleJan"></span> to
+          <span class="num" data-v="googleNov"></span>, while bank debit
+          drifted from <span class="num" data-v="achJan"></span> to
+          <span class="num" data-v="achNov"></span>.
+        </p>
+        <figure>
+          <div class="chart" id="methods"></div>
+          <figcaption>
+            Share of payments by payment method. Cards dominate, so click
+            Cards in the legend to hide them and the wallets fill the chart;
+            double-click a name to look at one method alone.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="reveal">
+        <span class="chapter">Six &middot; Ahead</span>
+        <h2>The next three months should bring in about <span data-v="forecastTotalShort"></span></h2>
+        <p>
+          If the rest of the year keeps pace, the shop should take about
+          <span class="num" data-v="forecastTotal"></span> from December through February, between <span class="num" data-v="forecastLow"></span>
+          and <span class="num" data-v="forecastHigh"></span>. The same three
+          months a year earlier brought <span class="num" data-v="priorTotal"></span>.
+        </p>
+        <figure>
+          <div class="chart" id="forecast"></div>
+          <figcaption>
+            Dashed segments are forecasts and the band is the likely range.
+            November is still open, so its marker shows the month so far and
+            the dotted tail where it is on pace to end.
+          </figcaption>
+        </figure>
+        <div class="method">
+          <p>
+            <strong>How the numbers ahead work.</strong> November's
+            projection takes the revenue so far and divides it by the share of
+            the month that last year's first sixteen days made up
+            (<span class="num" data-v="novShare25"></span>). Each forecast month is the same
+            month of last year multiplied by this year's growth over January
+            through October (<span class="num" data-v="growthFactor"></span>),
+            with a range of seven percent either side. Neither knows about a
+            promotion you have not told it about.
+          </p>
+        </div>
+        <hr class="rule" />
+        <p style="margin-top: 2rem">
+          Thank you for a year of early mornings. See you in the new one.
+        </p>
+      </section>
+    </article>
+
+    <script src="../../dist/stripe-charts.min.js"></script>
+    <script>
+      // ---- Data -------------------------------------------------------------
+      // Money is in cents (integer minor units), as the API returns it; the
+      // specs say so with unit: 'minor'. Rates are ratios (0.0212 is 2.12%).
+      // Index 0 is January. November (index 10) is month to date, through the
+      // 16th, in both years.
+
+      const TIME_ZONE = 'America/Los_Angeles';
+      const FETCHED_AT = '2026-11-16T17:30:00Z';
+      const FORMAT_USD = {style: 'currency', currency: 'usd', unit: 'minor'};
+
+      // 2025 revenue; index 10 is the full month and NOV_2025_MTD is the first
+      // sixteen days of it. Index 11 is December.
+      const revenue2025 = [
+        8421540, 7988025, 8843010, 9126475, 9531060, 9387230, 9045590, 9410845,
+        9976215, 10742080, 13865435, 16421070,
+      ];
+      const NOV_2025_MTD = 6682090;
+      const revenue2026 = [
+        9638020, 9211575, 10487040, 11294315, 12150860, 11896490, 11730235,
+        12387605, 12945570, 14172230, 8361045,
+      ];
+      const subscriptionShare = [
+        0.312, 0.32, 0.331, 0.34, 0.352, 0.366, 0.377, 0.389, 0.402, 0.418,
+        0.431,
+      ];
+      const aov2025 = [
+        3340, 3365, 3392, 3410, 3425, 3388, 3371, 3402, 3450, 3518, 3590,
+      ];
+      const aov2026 = [
+        3612, 3655, 3701, 3760, 3815, 3842, 3868, 3921, 3987, 4064, 4112,
+      ];
+      const refund2025 = [
+        0.0242, 0.0238, 0.0251, 0.0236, 0.0244, 0.0229, 0.0233, 0.0227, 0.0231,
+        0.0238, 0.0247,
+      ];
+      const refund2026 = [
+        0.0221, 0.0214, 0.0209, 0.0203, 0.0198, 0.0194, 0.0196, 0.0189, 0.0185,
+        0.0187, 0.0181,
+      ];
+      const dispute2025 = [
+        0.0061, 0.0058, 0.0064, 0.006, 0.0057, 0.0059, 0.0055, 0.0058, 0.0056,
+        0.0054, 0.0057,
+      ];
+      const dispute2026 = [
+        0.0049, 0.0047, 0.0044, 0.0046, 0.0042, 0.0041, 0.0043, 0.0039, 0.0038,
+        0.0036, 0.0035,
+      ];
+      const apple = [
+        0.176, 0.181, 0.187, 0.192, 0.199, 0.205, 0.212, 0.218, 0.226, 0.231,
+        0.238,
+      ];
+      const google = [
+        0.082, 0.084, 0.085, 0.088, 0.09, 0.093, 0.095, 0.098, 0.1, 0.102,
+        0.105,
+      ];
+      const bank = [
+        0.094, 0.095, 0.093, 0.092, 0.09, 0.089, 0.088, 0.086, 0.085, 0.083,
+        0.082,
+      ];
+      const cards = apple.map(
+        (a, i) => Math.round((1 - a - google[i] - bank[i]) * 1e4) / 1e4,
+      );
+
+      const subscriptionRevenue = revenue2026.map((v, i) =>
+        Math.round(v * subscriptionShare[i]),
+      );
+      const oneTimeRevenue = revenue2026.map((v, i) => v - subscriptionRevenue[i]);
+
+      // ---- Helpers ----------------------------------------------------------
+      const sum = (values) => values.reduce((total, v) => total + v, 0);
+      const mean = (values) => sum(values) / values.length;
+      const pad = (n) => String(n + 1).padStart(2, '0');
+      const monthStart = (year, i) => `${year + Math.floor(i / 12)}-${pad(i % 12)}-01`;
+      const dated = (year, values, from = 0) =>
+        values.map((y, i) => ({x: monthStart(year, from + i), y}));
+
+      const usd0 = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: 0,
+      });
+      const usd2 = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+      });
+      const money = (cents) => usd0.format(cents / 100);
+      const money2 = (cents) => usd2.format(cents / 100);
+      const nearest10k = (cents) => money(Math.round(cents / 1e6) * 1e6);
+      const share = (ratio, digits = 1) => `${(ratio * 100).toFixed(digits)}%`;
+      const grew = (now, before) => share(now / before - 1);
+      const signed = (now, before) => `+${grew(now, before)}`;
+
+      // ---- What the prose says ----------------------------------------------
+      const ytd26 = sum(revenue2026);
+      const ytd25 = sum(revenue2025.slice(0, 10)) + NOV_2025_MTD;
+
+      // The forecast: last year's month times this year's growth so far.
+      const growthFactor = sum(revenue2026.slice(0, 10)) / sum(revenue2025.slice(0, 10));
+      const novShare25 = NOV_2025_MTD / revenue2025[10];
+      const novProjected = Math.round(revenue2026[10] / novShare25);
+      const novSubsProjected = Math.round(novProjected * subscriptionShare[10]);
+      const priorYear = [revenue2025[11], revenue2026[0], revenue2026[1]];
+      const forecast = priorYear.map((v) => {
+        const y = Math.round(v * growthFactor);
+        return {y, low: Math.round(y * 0.93), high: Math.round(y * 1.07)};
+      });
+      const forecastTotal = sum(forecast.map((f) => f.y));
+
+      const facts = {
+        ytd26: money(ytd26),
+        ytd25: money(ytd25),
+        ytdGrowth: grew(ytd26, ytd25),
+        oct26: money(revenue2026[9]),
+        octGrowth: grew(revenue2026[9], revenue2025[9]),
+        aprStep: grew(revenue2026[3], revenue2026[2]),
+        sepToOct: grew(revenue2026[9], revenue2026[8]),
+        novMtd: money(revenue2026[10]),
+        novMtdGrowth: grew(revenue2026[10], NOV_2025_MTD),
+        subShareJan: share(subscriptionShare[0]),
+        subShareOct: share(subscriptionShare[9]),
+        subShareNov: share(subscriptionShare[10]),
+        subGrowth: grew(subscriptionRevenue[9], subscriptionRevenue[0]),
+        oneTimeGrowth: grew(oneTimeRevenue[9], oneTimeRevenue[0]),
+        refundAvg26: share(mean(refund2026), 2),
+        refundAvg25: share(mean(refund2025), 2),
+        refundMax26: share(Math.max(...refund2026), 2),
+        disputeAvg26: share(mean(dispute2026), 2),
+        disputeAvg25: share(mean(dispute2025), 2),
+        aovJan: money2(aov2026[0]),
+        aovOct: money2(aov2026[9]),
+        aovGrowth: grew(aov2026[9], aov2026[0]),
+        cardsJan: share(cards[0]),
+        cardsNov: share(cards[10]),
+        appleJan: share(apple[0]),
+        appleNov: share(apple[10]),
+        googleJan: share(google[0]),
+        googleNov: share(google[10]),
+        achJan: share(bank[0]),
+        achNov: share(bank[10]),
+        novShare25: share(novShare25),
+        novProjected: money(novProjected),
+        forecastTotal: money(forecastTotal),
+        forecastTotalShort: nearest10k(forecastTotal),
+        forecastLow: money(sum(forecast.map((f) => f.low))),
+        forecastHigh: money(sum(forecast.map((f) => f.high))),
+        priorTotal: money(sum(priorYear)),
+        growthFactor: `${growthFactor.toFixed(3)}×`,
+      };
+      // Claims in the prose that the data has to back up.
+      console.assert(
+        revenue2026.every((v, i) => i === 10 ? v > NOV_2025_MTD : v > revenue2025[i]),
+        'every month should beat last year',
+      );
+      console.assert(
+        Math.max(...revenue2026.slice(0, 10)) === revenue2026[9],
+        'October should be the best full month',
+      );
+      console.assert(
+        revenue2026[3] / revenue2026[2] >
+          Math.max(revenue2026[4] / revenue2026[3], revenue2026[5] / revenue2026[4]),
+        'April should be the biggest step of the spring',
+      );
+      for (const element of document.querySelectorAll('[data-v]')) {
+        const key = element.getAttribute('data-v');
+        if (!(key in facts)) {
+          console.error('no value for ' + key);
+          continue;
+        }
+        element.textContent = facts[key];
+      }
+
+      // ---- Charts -----------------------------------------------------------
+      const NOV = '2026-11-01';
+      const provenance = (metric) => ({
+        source: 'Stripe Data API',
+        fetchedAt: FETCHED_AT,
+        details: [
+          {label: 'Metric', value: metric},
+          {label: 'Period', value: 'January to November 16, 2026'},
+          {label: 'Time zone', value: TIME_ZONE},
+        ],
+      });
+      const monthAxis = {x: {labels: 'month'}};
+      const comparisonSeries = (values) => {
+        const data = dated(2025, values);
+        return {label: '2025', comparison: true, data};
+      };
+      const rate = (maximumFractionDigits) => ({
+        style: 'percent',
+        unit: 'ratio',
+        maximumFractionDigits,
+      });
+
+      const specs = {
+        revenue: {
+          title: 'Revenue by month',
+          description: 'Payments taken through November 16, against the same days of 2025',
+          timeZone: TIME_ZONE,
+          format: FORMAT_USD,
+          // 2025's November is the full month, so the KPI compares the same days.
+          kpi: {basis: 'custom', value: ytd26, comparisonValue: ytd25},
+          chart: {type: 'line', axes: monthAxis, incomplete: {from: NOV}},
+          series: [
+            {
+              label: '2026',
+              data: dated(2026, revenue2026).map((point, i) =>
+                i === 10 ? {...point, projected: novProjected} : point,
+              ),
+            },
+            comparisonSeries(revenue2025.slice(0, 11)),
+          ],
+          annotations: [
+            {
+              label: 'Cold-brew cans launch',
+              description: 'The first month the cans were on sale',
+              at: '2026-04-01',
+              series: '2026',
+            },
+            {
+              label: 'Early-bird holiday sale',
+              description: 'October, ahead of the holiday rush',
+              from: '2026-10-01',
+              to: NOV,
+            },
+          ],
+          provenance: provenance('payments_volume'),
+        },
+        subscriptions: {
+          title: 'Subscriptions and one-time orders',
+          description: 'Revenue by month, split by how the customer paid',
+          timeZone: TIME_ZONE,
+          format: FORMAT_USD,
+          chart: {
+            type: 'bar',
+            stacking: 'stacked',
+            legend: 'show',
+            axes: monthAxis,
+            incomplete: {from: NOV},
+          },
+          series: [
+            {
+              label: 'Subscriptions',
+              data: dated(2026, subscriptionRevenue).map((point, i) =>
+                i === 10 ? {...point, projected: novSubsProjected} : point,
+              ),
+            },
+            {
+              label: 'One-time orders',
+              data: dated(2026, oneTimeRevenue).map((point, i) =>
+                i === 10
+                  ? {...point, projected: novProjected - novSubsProjected}
+                  : point,
+              ),
+            },
+          ],
+          provenance: provenance('payments_volume_by_billing_type'),
+        },
+        refunds: {
+          title: 'Refund rate',
+          description: 'Share of payments refunded',
+          timeZone: TIME_ZONE,
+          format: rate(2),
+          kpi: {
+            basis: 'average',
+            value: mean(refund2026),
+            comparisonValue: mean(refund2025),
+            goodDirection: 'down',
+          },
+          chart: {type: 'line', axes: monthAxis, incomplete: {from: NOV}},
+          series: [
+            {label: '2026', data: dated(2026, refund2026)},
+            comparisonSeries(refund2025),
+          ],
+          provenance: provenance('refund_rate'),
+        },
+        disputes: {
+          title: 'Dispute rate',
+          description: 'Share of payments disputed',
+          timeZone: TIME_ZONE,
+          format: rate(2),
+          kpi: {
+            basis: 'average',
+            value: mean(dispute2026),
+            comparisonValue: mean(dispute2025),
+            goodDirection: 'down',
+          },
+          chart: {type: 'line', axes: monthAxis, incomplete: {from: NOV}},
+          series: [
+            {label: '2026', data: dated(2026, dispute2026)},
+            comparisonSeries(dispute2025),
+          ],
+          provenance: provenance('dispute_rate'),
+        },
+        aov: {
+          title: 'Average order value',
+          description: 'Revenue per paid order',
+          timeZone: TIME_ZONE,
+          format: FORMAT_USD,
+          kpi: {basis: 'latest', value: aov2026[10], comparisonValue: aov2025[10]},
+          chart: {type: 'line', axes: monthAxis, incomplete: {from: NOV}},
+          series: [
+            {label: '2026', data: dated(2026, aov2026)},
+            comparisonSeries(aov2025),
+          ],
+          provenance: provenance('average_order_value'),
+        },
+        methods: {
+          title: 'Payment methods',
+          description: 'Share of payments by method',
+          timeZone: TIME_ZONE,
+          format: rate(1),
+          chart: {type: 'line', legend: 'show', axes: monthAxis, incomplete: {from: NOV}},
+          series: [
+            {label: 'Apple Pay', data: dated(2026, apple)},
+            {label: 'Cards', data: dated(2026, cards)},
+            {label: 'Google Pay', data: dated(2026, google)},
+            {label: 'Bank debit', data: dated(2026, bank)},
+          ],
+          provenance: provenance('payments_by_method'),
+        },
+        forecast: {
+          title: 'Revenue, next three months',
+          description: 'June to November so far, then a forecast with its range',
+          timeZone: TIME_ZONE,
+          format: FORMAT_USD,
+          chart: {type: 'line', axes: monthAxis, incomplete: {from: NOV}},
+          series: [
+            {
+              label: '2026',
+              data: [
+                ...dated(2026, revenue2026.slice(5, 10), 5),
+                {x: NOV, y: revenue2026[10], projected: novProjected},
+                ...forecast.map((f, i) => ({
+                  x: monthStart(2026, 11 + i),
+                  y: f.y,
+                  low: f.low,
+                  high: f.high,
+                  forecast: true,
+                })),
+              ],
+            },
+            {
+              label: 'Previous year',
+              comparison: true,
+              data: [
+                ...dated(2025, revenue2025.slice(5, 11), 5),
+                ...dated(2025, priorYear, 11),
+              ],
+            },
+          ],
+          provenance: provenance('payments_volume_forecast'),
+        },
+      };
+
+      // Draw each chart as it scrolls into view, so its entrance animation
+      // plays when the reader gets there.
+      const charts = [];
+      const draw = (element) => {
+        try {
+          charts.push(StripeCharts.render(element, specs[element.id]));
+        } catch (error) {
+          console.error(element.id, error.message);
+        }
+      };
+      const chartObserver = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            chartObserver.unobserve(entry.target);
+            draw(entry.target);
+          }
+        },
+        {rootMargin: '0px 0px -8% 0px'},
+      );
+      for (const element of document.querySelectorAll('.chart')) {
+        chartObserver.observe(element);
+      }
+
+      // Fade sections in, and track reading progress.
+      document.documentElement.classList.add('js');
+      const revealObserver = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            revealObserver.unobserve(entry.target);
+            entry.target.classList.add('in');
+          }
+        },
+        {rootMargin: '0px 0px -5% 0px'},
+      );
+      for (const element of document.querySelectorAll('.reveal')) {
+        revealObserver.observe(element);
+      }
+      const progress = document.getElementById('progress');
+      const updateProgress = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        progress.style.transform = `scaleX(${max > 0 ? window.scrollY / max : 0})`;
+      };
+      window.addEventListener('scroll', updateProgress, {passive: true});
+      updateProgress();
+    </script>
+  </body>
+</html>

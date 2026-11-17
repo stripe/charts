@@ -1,0 +1,92 @@
+{
+  "title": "Orders",
+  "timeZone": "America/New_York",
+  "description": "Successful payments per day, Thanksgiving through Cyber Monday",
+  "format": {
+    "style": "number",
+    "maximumFractionDigits": 0
+  },
+  "kpi": {
+    "basis": "total",
+    "value": 22300,
+    "comparisonValue": 20283
+  },
+  "chart": {
+    "type": "bar"
+  },
+  "series": [
+    {
+      "label": "2026",
+      "data": [
+        {
+          "x": "2026-11-26",
+          "y": 3412
+        },
+        {
+          "x": "2026-11-27",
+          "y": 5208
+        },
+        {
+          "x": "2026-11-28",
+          "y": 4110
+        },
+        {
+          "x": "2026-11-29",
+          "y": 3694
+        },
+        {
+          "x": "2026-11-30",
+          "y": 5876
+        }
+      ]
+    },
+    {
+      "label": "2025",
+      "comparison": true,
+      "data": [
+        {
+          "x": "2025-11-27",
+          "y": 3050
+        },
+        {
+          "x": "2025-11-28",
+          "y": 4710
+        },
+        {
+          "x": "2025-11-29",
+          "y": 3820
+        },
+        {
+          "x": "2025-11-30",
+          "y": 3402
+        },
+        {
+          "x": "2025-12-01",
+          "y": 5301
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "source": "Stripe Data API",
+    "fetchedAt": "2026-12-01T14:05:00Z",
+    "details": [
+      {
+        "label": "Metric",
+        "value": "successful_payments_count"
+      },
+      {
+        "label": "Period",
+        "value": "Nov 26 to Nov 30, 2026"
+      },
+      {
+        "label": "Compared with",
+        "value": "Nov 27 to Dec 1, 2025 (same weekdays)"
+      },
+      {
+        "label": "Time zone",
+        "value": "America/New_York"
+      }
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": [],
+    "rootDir": ".",
+    "noEmit": true,
+    "declaration": false,
+    "isolatedDeclarations": false
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.json",
+    "stories/**/*.ts",
+    ".storybook/*.ts"
+  ],
+  "exclude": [
+    "src/**/*.test.ts"
+  ]
+}

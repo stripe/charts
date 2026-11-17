@@ -1,0 +1,39 @@
+{
+  "title": "Gross volume, Black Friday through Cyber Monday",
+  "timeZone": "America/New_York",
+  "format": {
+    "style": "currency",
+    "currency": "usd",
+    "unit": "minor"
+  },
+  "kpi": {
+    "basis": "total",
+    "value": 150790155,
+    "comparisonValue": 131775125
+  },
+  "chart": {
+    "type": "kpi"
+  },
+  "provenance": {
+    "source": "Stripe Data API",
+    "fetchedAt": "2026-12-01T14:05:00Z",
+    "details": [
+      {
+        "label": "Metric",
+        "value": "gross_volume"
+      },
+      {
+        "label": "Period",
+        "value": "Nov 27 to Nov 30, 2026"
+      },
+      {
+        "label": "Compared with",
+        "value": "Nov 28 to Dec 1, 2025 (same weekdays)"
+      },
+      {
+        "label": "Time zone",
+        "value": "America/New_York"
+      }
+    ]
+  }
+}

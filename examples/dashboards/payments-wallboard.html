@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- An empty icon, so the browser does not request /favicon.ico. -->
+    <link rel="icon" href="data:," />
+    <title>Forkful payments wallboard</title>
+    <!--
+      Example dashboard: a dark "live operations" wallboard for a made-up
+      food-delivery marketplace, laid out to fill one 1920x1080 TV without
+      scrolling and to stack on a phone. It shows today so far, hour by hour,
+      against the same weekday last week, with the current hour incomplete.
+      The data is made up and sits in this file; a real wallboard would fetch
+      fresh rows every minute and call `chart.update(spec)`.
+
+      The dark look comes only from the documented `--sc-*` custom properties,
+      set on `.sc-root`. The library is loaded with one script tag. This copy
+      points at the local build so it can be opened from a checkout (build
+      first; `dist/` is generated). In an artifact, use the published file:
+
+        <script src="https://cdn.jsdelivr.net/npm/@stripe/charts@0.1.0/dist/stripe-charts.min.js"></script>
+    -->
+    <style>
+      :root {
+        --page: #060d1c;
+        --panel: #0d1932;
+        --panel-raised: #12213f;
+        --border: #1d2e50;
+        --text: #e6edf8;
+        --text-secondary: #aebbd3;
+        --text-muted: #8a9bba;
+        --good: #4ade80;
+        --warn: #fbbf24;
+        --bad: #fb7185;
+        --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+          'Segoe UI Symbol';
+        --gap: 12px;
+        color-scheme: dark;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--page);
+        color: var(--text);
+        font-family: var(--font);
+        font-size: 14px;
+        line-height: 20px;
+      }
+      .wall {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: var(--gap);
+        padding: 16px;
+      }
+      .wall > * {
+        min-width: 0;
+        min-height: 0;
+      }
+
+      /* Header strip */
+      .bar {
+        grid-column: 1 / -1;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px 24px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .mark {
+        display: grid;
+        place-items: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #2dd4bf, #38bdf8);
+        color: #04101f;
+        font-size: 20px;
+        font-weight: 800;
+      }
+      h1 {
+        margin: 0;
+        font-size: 22px;
+        line-height: 26px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+      .sub {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 12px;
+        line-height: 16px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .status {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 12px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        font-variant-numeric: tabular-nums;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 12px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--panel);
+        color: var(--text-secondary);
+        font-size: 13px;
+        line-height: 18px;
+      }
+      .chip strong {
+        color: var(--text);
+        font-weight: 600;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--good);
+        box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6);
+        animation: pulse 2s ease-out infinite;
+      }
+      .dot.amber {
+        background: var(--warn);
+        box-shadow: none;
+        animation: none;
+      }
+      @keyframes pulse {
+        to {
+          box-shadow: 0 0 0 8px rgba(74, 222, 128, 0);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .dot {
+          animation: none;
+        }
+      }
+
+      /* Placement on the 12-column grid */
+      .tile {
+        grid-column: span 3;
+        border-left: 3px solid var(--accent);
+        border-radius: 12px;
+      }
+      .span-7 {
+        grid-column: span 7;
+      }
+      .span-5 {
+        grid-column: span 5;
+      }
+      .panel {
+        padding: 14px 16px;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+      }
+      .chart {
+        height: 100%;
+      }
+
+      /* Dark theme: documented custom properties only. */
+      .wall .sc-root {
+        --sc-color-surface: var(--panel);
+        --sc-color-text-primary: var(--text);
+        --sc-color-text-secondary: var(--text-secondary);
+        --sc-color-text-muted: var(--text-muted);
+        --sc-color-good: var(--good);
+        --sc-color-bad: var(--bad);
+        --sc-color-focus-ring: #7dd3fc;
+
+        --sc-tile-background: var(--panel-raised);
+        --sc-tile-border-color: var(--border);
+        --sc-tile-label-color: var(--text-secondary);
+        --sc-tile-value-color: var(--text);
+        --sc-tile-change-color: var(--text-secondary);
+        --sc-kpi-value-color: var(--text);
+        --sc-kpi-compact-value-color: var(--text);
+        --sc-kpi-change-color: var(--text-secondary);
+        --sc-header-title-color: var(--text);
+        --sc-header-description-color: var(--text-muted);
+
+        --sc-axis-label-color: var(--text-muted);
+        --sc-axis-baseline-color: #364a74;
+        --sc-grid-color: #2a3d66;
+        --sc-grid-opacity: 1;
+        --sc-crosshair-color: #8a9bba;
+        --sc-marker-ring-color: var(--panel);
+        --sc-series-comparison: #7f91b5;
+
+        --sc-tooltip-background: #1b2d52;
+        --sc-tooltip-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+        --sc-tooltip-date-color: var(--text-muted);
+        --sc-tooltip-label-color: var(--text-secondary);
+        --sc-tooltip-value-color: var(--text);
+        --sc-tooltip-tag-color: var(--text-muted);
+        --sc-tooltip-range-color: var(--text-secondary);
+        --sc-tooltip-note-label-color: var(--text);
+        --sc-tooltip-note-description-color: var(--text-secondary);
+        --sc-tooltip-divider-color: #2f4472;
+
+        --sc-info-button-color: var(--text-muted);
+        --sc-info-button-hover-background: #1b2d52;
+        --sc-legend-label-color: var(--text-secondary);
+        --sc-legend-hover-background: #1b2d52;
+        --sc-legend-hover-color: var(--text);
+        --sc-legend-forecast-color: var(--text-muted);
+
+        --sc-annotation-line-color: #fb7185;
+        --sc-annotation-glyph-color: #fb7185;
+        --sc-annotation-glyph-ring-color: var(--panel);
+        --sc-annotation-point-color: #fb7185;
+        --sc-annotation-point-ring-color: var(--panel);
+        --sc-annotation-range-color: #fb7185;
+        --sc-incomplete-hatch-color: var(--panel);
+        --sc-incomplete-range-color: #8a9bba;
+
+        --sc-empty-icon-background: #1b2d52;
+        --sc-empty-glyph-color: var(--text-muted);
+        --sc-empty-message-color: var(--text-secondary);
+        --sc-error-title-color: var(--text);
+        --sc-error-issue-color: var(--text-secondary);
+        --sc-error-path-color: var(--text);
+
+        --sc-details-panel-background: #14264a;
+        --sc-details-panel-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+        --sc-details-heading-color: var(--text);
+        --sc-details-label-color: var(--text-secondary);
+        --sc-details-value-color: var(--text-secondary);
+        --sc-details-button-label-background: #1b2d52;
+        --sc-details-button-label-text-color: var(--text);
+        --sc-details-button-label-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        --sc-table-header-color: var(--text-secondary);
+        --sc-table-row-header-color: var(--text-secondary);
+        --sc-table-cell-color: var(--text);
+        --sc-table-date-color: var(--text-muted);
+        --sc-table-header-background: #14264a;
+        --sc-table-header-border-color: #2f4472;
+        --sc-table-row-border-color: #243760;
+      }
+      .tile .sc-root {
+        --sc-series-primary-0: var(--accent);
+      }
+      .tile .sc-root {
+        --sc-tile-border-color: transparent;
+        background: var(--panel-raised);
+      }
+      .volume .sc-root {
+        --sc-series-primary-0: #2dd4bf;
+      }
+      .brands .sc-root {
+        --sc-series-primary-0: #60a5fa;
+        --sc-series-primary-1: #fbbf24;
+        --sc-series-primary-2: #34d399;
+        --sc-series-primary-3: #f472b6;
+      }
+      .reasons .sc-root {
+        --sc-series-primary-0: #60a5fa;
+        --sc-series-primary-1: #a78bfa;
+        --sc-series-primary-2: #f472b6;
+        --sc-series-primary-3: #fb923c;
+      }
+
+      /* Recent large payouts: plain DOM */
+      .payouts {
+        display: flex;
+        flex-direction: column;
+      }
+      .payouts h2 {
+        margin: 0;
+        font-size: 16px;
+        line-height: 24px;
+        font-weight: 400;
+      }
+      .payouts .note {
+        margin: 4px 0 8px;
+        color: var(--text-muted);
+        font-size: 12px;
+        line-height: 16px;
+      }
+      .payouts ol {
+        flex: 1;
+        min-height: 0;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        list-style: none;
+      }
+      .payouts li {
+        display: grid;
+        grid-template-columns: 52px minmax(0, 1fr) auto 86px;
+        align-items: center;
+        gap: 12px;
+        padding: 7px 0;
+        border-top: 1px solid var(--border);
+        font-variant-numeric: tabular-nums;
+      }
+      .payouts li.head {
+        padding-top: 0;
+        border-top: 0;
+        color: var(--text-muted);
+        font-size: 11px;
+        line-height: 16px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .payouts .time {
+        color: var(--text-muted);
+      }
+      .payouts .who {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .payouts .who small {
+        display: block;
+        color: var(--text-muted);
+        font-size: 12px;
+        line-height: 16px;
+      }
+      .payouts .amount {
+        font-weight: 600;
+        text-align: right;
+      }
+      .badge {
+        justify-self: end;
+        padding: 1px 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        line-height: 18px;
+        font-weight: 600;
+      }
+      .badge.transit {
+        background: rgba(167, 139, 250, 0.16);
+        color: #c4b5fd;
+      }
+      .badge.paid {
+        background: rgba(74, 222, 128, 0.14);
+        color: var(--good);
+      }
+      .badge.pending {
+        background: rgba(251, 191, 36, 0.14);
+        color: var(--warn);
+      }
+
+      /* One screen on a TV: fill the viewport, no scrolling. */
+      @media (min-width: 1100px) and (min-height: 700px) {
+        body {
+          height: 100vh;
+          overflow: hidden;
+        }
+        .wall {
+          height: 100%;
+          grid-template-rows: auto auto minmax(0, 1fr) minmax(0, 1fr);
+        }
+      }
+      @media (max-width: 1099px), (max-height: 699px) {
+        .tile {
+          grid-column: span 6;
+        }
+        .span-7,
+        .span-5 {
+          grid-column: 1 / -1;
+        }
+        .panel {
+          height: 340px;
+        }
+        .panel.payouts {
+          height: auto;
+        }
+      }
+      @media (max-width: 560px) {
+        .wall {
+          padding: 12px;
+        }
+        .tile {
+          grid-column: 1 / -1;
+        }
+        .panel {
+          height: 320px;
+          padding: 12px;
+        }
+        h1 {
+          font-size: 18px;
+          line-height: 22px;
+        }
+        .payouts li {
+          grid-template-columns: 44px minmax(0, 1fr) auto;
+        }
+        .payouts li .badge {
+          display: none;
+        }
+        .payouts li.head span:last-child {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wall">
+      <header class="bar">
+        <div class="brand">
+          <div class="mark" aria-hidden="true">F</div>
+          <div>
+            <h1>Forkful payments</h1>
+            <p class="sub">Operations wallboard &middot; Monday, Nov 16</p>
+          </div>
+        </div>
+        <ul class="status" aria-label="Status">
+          <li class="chip">
+            <span class="dot amber" aria-hidden="true"></span>
+            Incident closed <strong>14:40</strong>
+          </li>
+          <li class="chip">
+            <span class="dot" aria-hidden="true"></span>
+            Updated <strong>15:32 CT</strong>
+          </li>
+        </ul>
+      </header>
+
+      <div class="tile" id="tile-payments" style="--accent: #2dd4bf"></div>
+      <div class="tile" id="tile-auth" style="--accent: #38bdf8"></div>
+      <div class="tile" id="tile-transit" style="--accent: #a78bfa"></div>
+      <div class="tile" id="tile-disputes" style="--accent: #fbbf24"></div>
+
+      <section class="panel span-7 volume"><div class="chart" id="volume"></div></section>
+      <section class="panel span-5 brands"><div class="chart" id="brands"></div></section>
+      <section class="panel span-7 reasons"><div class="chart" id="reasons"></div></section>
+      <section class="panel span-5 payouts" aria-labelledby="payouts-title">
+        <h2 id="payouts-title">Recent large payouts</h2>
+        <p class="note">Over $25,000, newest first</p>
+        <ol id="payout-list"></ol>
+      </section>
+    </main>
+
+    <script src="../../dist/stripe-charts.min.js"></script>
+    <script>
+      const TIME_ZONE = 'America/Chicago';
+      const USD_MINOR = {style: 'currency', currency: 'usd', unit: 'minor'};
+      const COUNT = {style: 'number', maximumFractionDigits: 0};
+      const RATE = {style: 'percent', unit: 'ratio', maximumFractionDigits: 1};
+
+      // Chicago is on standard time (UTC-6) on both days, so the offset is
+      // fixed; the library shows these instants in TIME_ZONE.
+      function hours(day) {
+        return Array.from(
+          {length: 16},
+          (_, hour) => `${day}T${String(hour).padStart(2, '0')}:00:00-06:00`,
+        );
+      }
+      function days(first, count) {
+        const start = Date.parse(`${first}T00:00:00Z`);
+        return Array.from({length: count}, (_, i) =>
+          new Date(start + i * 86400000).toISOString().slice(0, 10),
+        );
+      }
+      function points(xs, ys) {
+        return xs.map((x, i) => ({x, y: ys[i]}));
+      }
+      const sum = (values) => values.reduce((total, value) => total + value, 0);
+
+      const TODAY = hours('2026-11-16');
+      const LAST_WEEK = hours('2026-11-09');
+      // The hour from 15:00 is still running; last week's figure is the same
+      // 32 minutes, so the comparison is like for like.
+      const INCOMPLETE = {
+        from: TODAY[15],
+        message: 'Hour in progress: 15:00 to 15:32',
+      };
+      const INCIDENT = {
+        label: 'Card network latency 14:05–14:40',
+        description: 'Issuer timeouts; Visa and Mastercard approvals dipped',
+        from: TODAY[14],
+        to: TODAY[14],
+      };
+
+      // Successful payments per hour, and their amounts in cents.
+      const paymentsToday = [112, 68, 41, 28, 22, 35, 74, 168, 312, 436, 590, 861, 1043, 918, 512, 402];
+      const paymentsLastWeek = [104, 71, 45, 30, 25, 38, 70, 159, 298, 420, 571, 832, 1011, 934, 707, 372];
+      const volumeToday = [296534, 193615, 115778, 75080, 60472, 95755, 206641, 475582, 822520, 1141421, 1677968, 2351541, 2944846, 2396521, 1400171, 1130437];
+      const volumeLastWeek = [299280, 204153, 118163, 79013, 71098, 107011, 195827, 428708, 828340, 1167560, 1583233, 2208417, 2760624, 2540656, 1988397, 1074540];
+
+      // Share of attempts that were approved, overall and by card brand.
+      const rateToday = [0.9533, 0.9502, 0.9561, 0.9444, 0.9588, 0.9484, 0.9517, 0.9531, 0.9491, 0.9518, 0.9514, 0.9529, 0.9522, 0.9556, 0.8734, 0.9443];
+      const rateLastWeek = [0.9519, 0.9492, 0.9422, 0.964, 0.9382, 0.9531, 0.9578, 0.948, 0.9537, 0.9544, 0.9475, 0.9515, 0.9554, 0.9524, 0.9557, 0.9489];
+      const brandRates = {
+        Visa: [0.9567, 0.9515, 0.9665, 0.9492, 0.9631, 0.958, 0.9567, 0.9621, 0.9564, 0.9612, 0.9568, 0.9571, 0.9611, 0.9659, 0.8625, 0.9467],
+        Mastercard: [0.9588, 0.9684, 0.9573, 0.9519, 0.9693, 0.9414, 0.9593, 0.9525, 0.9507, 0.9504, 0.9527, 0.9588, 0.9512, 0.956, 0.8417, 0.9445],
+        'American Express': [0.9324, 0.9179, 0.9178, 0.9222, 0.9364, 0.9288, 0.9288, 0.932, 0.9304, 0.9286, 0.9345, 0.9334, 0.9279, 0.9319, 0.9273, 0.9355],
+        Discover: [0.9509, 0.9376, 0.9584, 0.9325, 0.9415, 0.9517, 0.9398, 0.9439, 0.9385, 0.946, 0.9472, 0.9449, 0.9485, 0.9418, 0.9343, 0.9451],
+      };
+      // Declined attempts per hour by reason.
+      const declines = {
+        'Insufficient funds': [2, 1, 1, 1, 0, 1, 2, 3, 6, 8, 11, 16, 18, 17, 11, 9],
+        'Do not honor': [2, 2, 1, 1, 0, 1, 2, 3, 7, 9, 11, 17, 18, 16, 12, 10],
+        'Suspected fraud': [1, 1, 0, 0, 1, 0, 0, 2, 3, 4, 7, 8, 14, 8, 5, 3],
+        'Issuer timeout': [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 46, 2],
+      };
+
+      // Daily balances for the last 14 days and the 14 before them.
+      const DAYS = days('2026-11-03', 14);
+      const PRIOR_DAYS = days('2026-10-20', 14);
+      const inTransit = [113576017, 142099025, 138156802, 137266094, 137017914, 112737425, 117393998, 130079024, 134275788, 139185934, 140202030, 108468730, 129234075, 131868058];
+      const inTransitPrior = [114441924, 109126641, 120842330, 111198891, 107660604, 121063641, 141718202, 137018094, 135606504, 113877127, 126467200, 116067306, 111906581, 109247332];
+      const openDisputes = [35, 33, 30, 32, 38, 29, 29, 36, 31, 34, 34, 32, 40, 30];
+      const openDisputesPrior = [34, 30, 34, 29, 39, 38, 35, 32, 39, 35, 39, 38, 34, 33];
+
+      const PAYOUTS = [
+        {time: '15:21', name: 'Casa Verde Kitchens', bank: 'Chase •• 4821', amount: 4821055, status: 'transit'},
+        {time: '15:04', name: 'Noodle Theory Group', bank: 'Wells Fargo •• 0377', amount: 3906210, status: 'transit'},
+        {time: '14:48', name: 'Bao & Bun Holdings', bank: 'Citibank •• 6190', amount: 3355000, status: 'transit'},
+        {time: '14:12', name: 'Harbor Street Pizza Co.', bank: 'Bank of America •• 2254', amount: 2988740, status: 'pending'},
+        {time: '13:37', name: 'Green Bowl Collective', bank: 'US Bank •• 9013', amount: 2764325, status: 'transit'},
+        {time: '12:55', name: 'Saffron & Salt', bank: 'Chase •• 7742', amount: 2640980, status: 'paid'},
+      ];
+      const STATUS_LABEL = {transit: 'In transit', pending: 'Pending', paid: 'Paid'};
+
+      function tile(id, spec) {
+        return StripeCharts.render(document.getElementById(id), {
+          chart: {type: 'kpi'},
+          timeZone: TIME_ZONE,
+          ...spec,
+        });
+      }
+
+      tile('tile-payments', {
+        title: 'Successful payments today',
+        format: COUNT,
+        kpi: {
+          basis: 'total',
+          value: sum(paymentsToday),
+          comparisonValue: sum(paymentsLastWeek),
+          notation: 'compact',
+        },
+        series: [
+          {label: 'Today', data: points(TODAY, paymentsToday)},
+          {label: 'Last Monday', comparison: true, data: points(LAST_WEEK, paymentsLastWeek)},
+        ],
+      });
+
+      tile('tile-auth', {
+        title: 'Authorization rate today',
+        format: RATE,
+        // Approved attempts over all attempts, not the mean of the hours.
+        kpi: {basis: 'custom', value: 0.9443, comparisonValue: 0.9525},
+        series: [
+          {label: 'Today', data: points(TODAY, rateToday)},
+          {label: 'Last Monday', comparison: true, data: points(LAST_WEEK, rateLastWeek)},
+        ],
+      });
+
+      tile('tile-transit', {
+        title: 'Payouts in transit',
+        format: USD_MINOR,
+        kpi: {
+          basis: 'latest',
+          value: inTransit[13],
+          comparisonValue: inTransitPrior[13],
+          notation: 'compact',
+        },
+        series: [
+          {label: 'Last 14 days', data: points(DAYS, inTransit)},
+          {label: 'Prior 14 days', comparison: true, data: points(PRIOR_DAYS, inTransitPrior)},
+        ],
+      });
+
+      tile('tile-disputes', {
+        title: 'Open disputes',
+        format: COUNT,
+        kpi: {
+          basis: 'latest',
+          value: openDisputes[13],
+          comparisonValue: openDisputesPrior[13],
+          goodDirection: 'down',
+        },
+        series: [
+          {label: 'Last 14 days', data: points(DAYS, openDisputes)},
+          {label: 'Prior 14 days', comparison: true, data: points(PRIOR_DAYS, openDisputesPrior)},
+        ],
+      });
+
+      StripeCharts.render(document.getElementById('volume'), {
+        title: 'Gross volume by hour',
+        description: 'Today so far against the same hours last Monday',
+        format: USD_MINOR,
+        timeZone: TIME_ZONE,
+        kpi: {
+          basis: 'total',
+          value: sum(volumeToday),
+          comparisonValue: sum(volumeLastWeek),
+        },
+        chart: {type: 'line', incomplete: INCOMPLETE},
+        series: [
+          {label: 'Today', data: points(TODAY, volumeToday)},
+          {label: 'Last Monday', comparison: true, data: points(LAST_WEEK, volumeLastWeek)},
+        ],
+        annotations: [INCIDENT],
+        provenance: {
+          source: 'Stripe Data API',
+          fetchedAt: '2026-11-16T15:32:00-06:00',
+          details: [
+            {label: 'Metric', value: 'gross_volume, succeeded charges'},
+            {label: 'Window', value: 'Nov 16, 00:00 to 15:32 CT'},
+          ],
+        },
+      });
+
+      StripeCharts.render(document.getElementById('brands'), {
+        title: 'Authorization rate by card brand',
+        description: 'Approved attempts, by hour',
+        format: RATE,
+        timeZone: TIME_ZONE,
+        chart: {type: 'line', legend: 'show', incomplete: INCOMPLETE},
+        series: Object.entries(brandRates).map(([label, rates]) => ({
+          label,
+          data: points(TODAY, rates),
+        })),
+        annotations: [INCIDENT],
+      });
+
+      StripeCharts.render(document.getElementById('reasons'), {
+        title: 'Declines by reason',
+        description: 'Declined attempts per hour, stacked',
+        format: COUNT,
+        timeZone: TIME_ZONE,
+        chart: {type: 'bar', stacking: 'stacked', legend: 'show', incomplete: INCOMPLETE},
+        series: Object.entries(declines).map(([label, counts]) => ({
+          label,
+          data: points(TODAY, counts),
+        })),
+        annotations: [INCIDENT],
+      });
+
+      const money = new Intl.NumberFormat('en-US', {style: 'currency', currency: 'USD'});
+      const list = document.getElementById('payout-list');
+      function cell(tag, className, text) {
+        const node = document.createElement(tag);
+        if (className) node.className = className;
+        node.textContent = text;
+        return node;
+      }
+      const head = document.createElement('li');
+      head.className = 'head';
+      head.append(cell('span', '', 'Time'), cell('span', '', 'Merchant'), cell('span', '', 'Amount'), cell('span', '', 'Status'));
+      list.append(head);
+      for (const payout of PAYOUTS) {
+        const row = document.createElement('li');
+        const who = cell('span', 'who', payout.name);
+        who.append(cell('small', '', payout.bank));
+        row.append(
+          cell('span', 'time', payout.time),
+          who,
+          cell('span', 'amount', money.format(payout.amount / 100)),
+          cell('span', `badge ${payout.status}`, STATUS_LABEL[payout.status]),
+        );
+        list.append(row);
+      }
+    </script>
+  </body>
+</html>

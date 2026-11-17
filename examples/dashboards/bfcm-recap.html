@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- An empty icon, so the browser does not request /favicon.ico. -->
+    <link rel="icon" href="data:," />
+    <title>Black Friday / Cyber Monday 2026 recap</title>
+    <!--
+      Example dashboard: a Black Friday / Cyber Monday recap for an online
+      retailer, written the way an agent would write a single-file artifact.
+      The data is made up and generated in the page by a seeded generator, so
+      every load shows the same numbers.
+
+      The library is loaded with one script tag. This copy points at the local
+      build so it can be opened from a checkout (build first; `dist/` is
+      generated). In an artifact, use the published file instead:
+
+        <script src="https://cdn.jsdelivr.net/npm/@stripe/charts@0.1.0/dist/stripe-charts.min.js"></script>
+    -->
+    <style>
+      :root {
+        --page: #f4f7fa;
+        --surface: #ffffff;
+        --border: #d5dbe1;
+        --text: #1a2c44;
+        --text-secondary: #3c4f69;
+        --text-muted: #50617a;
+        --positive: #217005;
+        --negative: #c0123c;
+        --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+          'Segoe UI Symbol';
+        --gap: 16px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--page);
+        color: var(--text);
+        font-family: var(--font);
+        font-size: 14px;
+        line-height: 20px;
+      }
+      main {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 40px 32px 56px;
+      }
+      .page-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 8px 24px;
+        margin-bottom: 28px;
+      }
+      .eyebrow {
+        margin: 0 0 4px;
+        color: var(--text-muted);
+        font-size: 12px;
+        line-height: 16px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      h1 {
+        margin: 0;
+        font-size: 28px;
+        line-height: 36px;
+        font-weight: 700;
+      }
+      .lede {
+        margin: 4px 0 0;
+        color: var(--text-secondary);
+      }
+      .as-of {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 12px;
+        line-height: 16px;
+        font-variant-numeric: tabular-nums;
+      }
+      .section-label {
+        margin: 32px 0 12px;
+        color: var(--text-muted);
+        font-size: 12px;
+        line-height: 16px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .tiles {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: var(--gap);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: var(--gap);
+      }
+      .span-4 {
+        grid-column: span 4;
+      }
+      .span-6 {
+        grid-column: span 6;
+      }
+      .span-8 {
+        grid-column: span 8;
+      }
+      .panel {
+        min-width: 0;
+        padding: 20px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+      }
+      .chart {
+        height: 360px;
+      }
+      .panel.fill {
+        display: flex;
+        flex-direction: column;
+      }
+      .panel.fill .chart {
+        flex: 1 1 auto;
+        height: auto;
+        min-height: 360px;
+      }
+      .takeaways h2 {
+        margin: 0 0 12px;
+        font-size: 16px;
+        line-height: 24px;
+        font-weight: 600;
+      }
+      .takeaways ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .takeaways li {
+        padding: 12px 0;
+        border-top: 1px solid var(--border);
+        color: var(--text-secondary);
+      }
+      .takeaways li:first-child {
+        border-top: 0;
+        padding-top: 0;
+      }
+      .takeaways strong {
+        color: var(--text);
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+      }
+      .takeaways .up {
+        color: var(--positive);
+      }
+      .takeaways .down {
+        color: var(--negative);
+      }
+      .day-detail {
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border);
+      }
+      .day-detail h3 {
+        margin: 0 0 8px;
+        font-size: 14px;
+        line-height: 20px;
+        font-weight: 600;
+      }
+      .day-detail dl {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 4px 12px;
+        margin: 0;
+        color: var(--text-secondary);
+        font-variant-numeric: tabular-nums;
+      }
+      .day-detail dd {
+        margin: 0;
+        color: var(--text);
+        text-align: right;
+      }
+      .day-detail .hint {
+        margin: 8px 0 0;
+        color: var(--text-muted);
+        font-size: 12px;
+        line-height: 16px;
+      }
+      .footnote {
+        margin: 32px 0 0;
+        color: var(--text-muted);
+        font-size: 12px;
+        line-height: 16px;
+      }
+      @media (max-width: 1100px) {
+        .tiles {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .span-8,
+        .span-4 {
+          grid-column: span 12;
+        }
+      }
+      @media (max-width: 760px) {
+        main {
+          padding: 24px 16px 40px;
+        }
+        h1 {
+          font-size: 22px;
+          line-height: 28px;
+        }
+        .span-6 {
+          grid-column: span 12;
+        }
+        .panel {
+          padding: 16px;
+        }
+        .chart {
+          height: 320px;
+        }
+        .panel.fill .chart {
+          min-height: 320px;
+        }
+      }
+      @media (max-width: 560px) {
+        .tiles {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">Juniper &amp; Pine · Online store</p>
+          <h1>Black Friday / Cyber Monday 2026</h1>
+          <p class="lede">
+            Thanksgiving through Cyber Monday, compared with the same weekdays
+            in 2025.
+          </p>
+        </div>
+        <p class="as-of" id="as-of"></p>
+      </header>
+
+      <section aria-label="Headline numbers" class="tiles">
+        <div id="tile-volume"></div>
+        <div id="tile-orders"></div>
+        <div id="tile-conversion"></div>
+        <div id="tile-aov"></div>
+      </section>
+
+      <h2 class="section-label">Sales</h2>
+      <div class="grid">
+        <section class="panel span-8 fill"><div class="chart" id="daily-volume"></div></section>
+        <section class="panel span-4 takeaways" aria-labelledby="takeaways-title">
+          <h2 id="takeaways-title">Takeaways</h2>
+          <ul id="takeaways"></ul>
+          <div class="day-detail" aria-live="polite">
+            <h3 id="day-title"></h3>
+            <dl id="day-rows"></dl>
+            <p class="hint">Click a day on the chart to see its breakdown.</p>
+          </div>
+        </section>
+      </div>
+
+      <h2 class="section-label">Black Friday and payments</h2>
+      <div class="grid">
+        <section class="panel span-6"><div class="chart" id="hourly-orders"></div></section>
+        <section class="panel span-6"><div class="chart" id="payment-methods"></div></section>
+      </div>
+
+      <p class="footnote">
+        Days are compared by weekday: Black Friday 2026 (Nov 27) lines up with
+        Black Friday 2025 (Nov 28). Use the info button on any card for its
+        source, time zone and a table of the values.
+      </p>
+    </main>
+
+    <script src="../../dist/stripe-charts.min.js"></script>
+    <script>
+      // ---- Data -------------------------------------------------------------
+      // A seeded generator stands in for rows fetched from an API, so the page
+      // is self-contained and reproducible. Money is in cents (integer minor
+      // units), as the API returns it; the specs say so with unit: 'minor'.
+
+      function seeded(seed) {
+        return function next() {
+          seed = (seed + 0x6d2b79f5) | 0;
+          let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      const random = seeded(20261127);
+      const jitter = (amount) => 1 + (random() * 2 - 1) * amount;
+      const toCents = (dollars) => Math.round(dollars * 100);
+      const sum = (values) => values.reduce((total, v) => total + v, 0);
+
+      function addDays(isoDate, days) {
+        const date = new Date(isoDate + 'T00:00:00Z');
+        date.setUTCDate(date.getUTCDate() + days);
+        return date.toISOString().slice(0, 10);
+      }
+      function addHours(isoDateTime, hours) {
+        const date = new Date(isoDateTime);
+        date.setUTCHours(date.getUTCHours() + hours);
+        return date.toISOString().replace('.000Z', 'Z');
+      }
+      const points = (xs, ys) => xs.map((x, i) => ({x, y: ys[i]}));
+
+      // Two weeks around the weekend, Friday to Thursday, lined up by weekday:
+      // index 7 is Black Friday in both years.
+      const DAYS = 14;
+      const days2026 = Array.from({length: DAYS}, (_, i) => addDays('2026-11-20', i));
+      const days2025 = Array.from({length: DAYS}, (_, i) => addDays('2025-11-21', i));
+      const WEEKEND = [6, 7, 8, 9, 10]; // Thanksgiving through Cyber Monday
+      const BLACK_FRIDAY = 7;
+      const lift = [1.0, 0.94, 0.88, 1.02, 1.08, 1.22, 1.55, 3.55, 2.35, 2.05, 3.1, 1.48, 1.18, 1.06];
+      const discounted = (i) => WEEKEND.includes(i);
+
+      function year(baseVolume, baseOrderValue, baseConversion, blackFridayBoost) {
+        const volume = [];
+        const orders = [];
+        const sessions = [];
+        lift.forEach((l, i) => {
+          const boost = i === BLACK_FRIDAY ? blackFridayBoost : 1;
+          const orderValue = baseOrderValue * (discounted(i) ? 0.93 : 1) * jitter(0.03);
+          const dayOrders = Math.round((baseVolume * l * boost * jitter(0.05)) / orderValue);
+          const conversion = baseConversion * (discounted(i) ? 1.75 : 1) * jitter(0.06);
+          orders.push(dayOrders);
+          volume.push(toCents(dayOrders * orderValue));
+          sessions.push(Math.round(dayOrders / conversion));
+        });
+        return {volume, orders, sessions};
+      }
+      const y2026 = year(41800, 89.4, 0.0226, 1.06);
+      const y2025 = year(36400, 84.1, 0.0208, 1);
+
+      // The page is read on Dec 3, mid-morning Eastern: that day is still
+      // settling, so only about 40% of its payments have landed.
+      const TODAY = DAYS - 1;
+      const FETCHED_AT = '2026-12-03T14:05:00Z';
+      const SETTLED = 0.4;
+      for (const key of ['volume', 'orders', 'sessions']) {
+        y2026[key][TODAY] = Math.round(y2026[key][TODAY] * SETTLED);
+      }
+
+      const ratio = (a, b) => a.map((v, i) => Math.round((v / b[i]) * 10000) / 10000);
+      const orderValue2026 = ratio(y2026.volume, y2026.orders).map(Math.round);
+      const orderValue2025 = ratio(y2025.volume, y2025.orders).map(Math.round);
+      const conversion2026 = ratio(y2026.orders, y2026.sessions);
+      const conversion2025 = ratio(y2025.orders, y2025.sessions);
+
+      const weekend = (values) => sum(WEEKEND.map((i) => values[i]));
+      const totals = (y) => ({
+        volume: weekend(y.volume),
+        orders: weekend(y.orders),
+        aov: Math.round(weekend(y.volume) / weekend(y.orders)),
+        conversion: Math.round((weekend(y.orders) / weekend(y.sessions)) * 10000) / 10000,
+      });
+      const t2026 = totals(y2026);
+      const t2025 = totals(y2025);
+
+      // Black Friday orders by hour, midnight to midnight Eastern (UTC-5).
+      const hourShape = [3.2, 2.0, 1.1, 0.7, 0.6, 0.8, 1.6, 2.8, 4.0, 5.2, 5.8, 5.6, 5.3, 5.0, 4.8, 4.7, 4.6, 4.8, 5.3, 6.0, 6.4, 5.9, 4.6, 3.0];
+      function byHour(total) {
+        const weights = hourShape.map((w) => w * jitter(0.08));
+        const scale = total / sum(weights);
+        return weights.map((w) => Math.round(w * scale));
+      }
+      const hours2026 = hourShape.map((_, h) => addHours('2026-11-27T05:00:00Z', h));
+      const hours2025 = hourShape.map((_, h) => addHours('2025-11-28T05:00:00Z', h));
+      const hourly2026 = byHour(y2026.orders[BLACK_FRIDAY]);
+      const hourly2025 = byHour(y2025.orders[BLACK_FRIDAY]);
+
+      // 2026 gross volume split by payment method; buy now, pay later and
+      // wallets gain share over the weekend.
+      const shares = (i) =>
+        discounted(i)
+          ? {cards: 0.565, wallets: 0.262, bnpl: 0.121}
+          : {cards: 0.632, wallets: 0.238, bnpl: 0.079};
+      const byMethod = (key) => y2026.volume.map((v, i) => Math.round(v * shares(i)[key] * jitter(0.02)));
+      const cards = byMethod('cards');
+      const wallets = byMethod('wallets');
+      const bnpl = byMethod('bnpl');
+      const bank = y2026.volume.map((v, i) => Math.max(0, v - cards[i] - wallets[i] - bnpl[i]));
+
+      // ---- Charts -----------------------------------------------------------
+
+      const LOCALE = 'en-US';
+      const TIME_ZONE = 'America/New_York';
+      const USD = {style: 'currency', currency: 'usd', unit: 'minor'};
+      const provenance = (metric, period) => ({
+        source: 'Stripe Data API',
+        fetchedAt: FETCHED_AT,
+        details: [
+          {label: 'Metric', value: metric},
+          {label: 'Period', value: period},
+          {label: 'Compared with', value: 'Same weekdays in 2025'},
+          {label: 'Time zone', value: TIME_ZONE},
+        ],
+      });
+      const WEEKEND_PERIOD = 'Nov 26 to Nov 30, 2026';
+      // The tiles cover the five days, so their sparklines do too.
+      const onWeekend = (values) => WEEKEND.map((i) => values[i]);
+      const sparkline = (ys2026, ys2025) => [
+        {label: '2026', data: points(onWeekend(days2026), onWeekend(ys2026))},
+        {label: '2025', comparison: true, data: points(onWeekend(days2025), onWeekend(ys2025))},
+      ];
+      const render = (id, spec, options) =>
+        StripeCharts.render(document.getElementById(id), {locale: LOCALE, timeZone: TIME_ZONE, ...spec}, options);
+
+
+      render('tile-volume', {
+        title: 'Gross volume',
+        description: 'Thanksgiving to Cyber Monday',
+        format: USD,
+        kpi: {basis: 'total', value: t2026.volume, comparisonValue: t2025.volume, notation: 'compact'},
+        chart: {type: 'kpi'},
+        series: sparkline(y2026.volume, y2025.volume),
+        provenance: provenance('gross_volume', WEEKEND_PERIOD),
+      });
+
+      render('tile-orders', {
+        title: 'Orders',
+        description: 'Successful payments',
+        format: {style: 'number', maximumFractionDigits: 0},
+        kpi: {basis: 'total', value: t2026.orders, comparisonValue: t2025.orders, notation: 'compact'},
+        chart: {type: 'kpi'},
+        series: sparkline(y2026.orders, y2025.orders),
+        provenance: provenance('successful_payments_count', WEEKEND_PERIOD),
+      });
+
+      render('tile-conversion', {
+        title: 'Conversion rate',
+        description: 'Orders per checkout session',
+        format: {style: 'percent', unit: 'ratio', maximumFractionDigits: 2},
+        // Orders over sessions for the five days, not an average of daily rates.
+        kpi: {basis: 'custom', value: t2026.conversion, comparisonValue: t2025.conversion},
+        chart: {type: 'kpi'},
+        series: sparkline(conversion2026, conversion2025),
+        provenance: provenance('checkout_conversion_rate', WEEKEND_PERIOD),
+      });
+
+      render('tile-aov', {
+        title: 'Average order value',
+        description: 'Gross volume per order',
+        format: USD,
+        // Volume over orders for the five days, not an average of daily values.
+        kpi: {basis: 'custom', value: t2026.aov, comparisonValue: t2025.aov},
+        chart: {type: 'kpi'},
+        series: sparkline(orderValue2026, orderValue2025),
+        provenance: provenance('average_order_value', WEEKEND_PERIOD),
+      });
+
+      const STILL_SETTLING = 'Today: payments are still settling, so this day will rise.';
+      const dayDetail = (index) => {
+        const title = document.getElementById('day-title');
+        const rows = document.getElementById('day-rows');
+        const date = new Intl.DateTimeFormat(LOCALE, {weekday: 'long', month: 'short', day: 'numeric', timeZone: 'UTC'}).format(
+          new Date(days2026[index] + 'T00:00:00Z'),
+        );
+        title.textContent = date + (index === TODAY ? ' (so far)' : '');
+        const lines = [
+          ['Gross volume', dollars(y2026.volume[index])],
+          ['Same weekday, 2025', dollars(y2025.volume[index])],
+          ['Orders', y2026.orders[index].toLocaleString(LOCALE)],
+          ['Cards', dollars(cards[index])],
+          ['Wallets', dollars(wallets[index])],
+          ['Buy now, pay later', dollars(bnpl[index])],
+          ['Bank debits', dollars(bank[index])],
+        ];
+        rows.replaceChildren(
+          ...lines.flatMap(([term, value]) => {
+            const dt = document.createElement('dt');
+            const dd = document.createElement('dd');
+            dt.textContent = term;
+            dd.textContent = value;
+            return [dt, dd];
+          }),
+        );
+      };
+
+      render('daily-volume', {
+        title: 'Gross volume by day',
+        description: 'Two weeks around the weekend, 2026 against the same weekdays in 2025',
+        format: USD,
+        kpi: {basis: 'total', value: sum(y2026.volume), comparisonValue: sum(y2025.volume)},
+        chart: {type: 'line', legend: 'show', incomplete: {from: days2026[TODAY], message: STILL_SETTLING}},
+        annotations: [
+          {label: 'Black Friday', at: days2026[BLACK_FRIDAY]},
+          {label: 'Cyber Monday', at: days2026[10]},
+          {
+            label: 'Sitewide 20% off',
+            description: 'Thanksgiving through Cyber Monday',
+            from: days2026[6],
+            to: days2026[10],
+          },
+        ],
+        series: [
+          {label: '2026', data: points(days2026, y2026.volume)},
+          {label: '2025', comparison: true, data: points(days2025, y2025.volume)},
+        ],
+        provenance: provenance('gross_volume', 'Nov 20 to Dec 3, 2026'),
+      }, {onPointClick: (event) => dayDetail(event.index)});
+
+      render('hourly-orders', {
+        title: 'Black Friday orders by hour',
+        description: 'Eastern time, against Black Friday 2025',
+        format: {style: 'number', maximumFractionDigits: 0},
+        // The total of the hourly bars: Black Friday's orders, to the order.
+        kpi: {basis: 'total', value: sum(hourly2026), comparisonValue: sum(hourly2025)},
+        chart: {type: 'bar', legend: 'show'},
+        series: [
+          {label: '2026', data: points(hours2026, hourly2026)},
+          {label: '2025', comparison: true, data: points(hours2025, hourly2025)},
+        ],
+        provenance: provenance('successful_payments_count', 'Nov 27, 2026, by hour'),
+      });
+
+      render('payment-methods', {
+        title: 'Gross volume by payment method',
+        description: 'Each day of the two weeks, 2026',
+        format: USD,
+        chart: {type: 'bar', stacking: 'stacked', incomplete: {from: days2026[TODAY], message: STILL_SETTLING}},
+        series: [
+          {label: 'Cards', data: points(days2026, cards)},
+          {label: 'Wallets', data: points(days2026, wallets)},
+          {label: 'Buy now, pay later', data: points(days2026, bnpl)},
+          {label: 'Bank debits', data: points(days2026, bank)},
+        ],
+        provenance: {
+          source: 'Stripe Data API',
+          fetchedAt: FETCHED_AT,
+          details: [
+            {label: 'Metric', value: 'gross_volume by payment_method_type'},
+            {label: 'Period', value: 'Nov 20 to Dec 3, 2026'},
+            {label: 'Time zone', value: TIME_ZONE},
+          ],
+        },
+      });
+
+
+      // ---- Takeaways ----------------------------------------------------------
+      // Written from the numbers above, the way an agent would summarize them.
+      // Built with text nodes: every string is treated as text.
+
+      const money = new Intl.NumberFormat(LOCALE, {style: 'currency', currency: 'USD', maximumFractionDigits: 0});
+      const dollars = (amountInCents) => money.format(amountInCents / 100);
+      const percent = (v, digits = 1) =>
+        new Intl.NumberFormat(LOCALE, {style: 'percent', maximumFractionDigits: digits, minimumFractionDigits: digits}).format(v);
+      const change = (now, then) => (now >= then ? '+' : '') + percent((now - then) / Math.abs(then));
+      const hourLabel = (iso) =>
+        new Intl.DateTimeFormat(LOCALE, {hour: 'numeric', timeZone: TIME_ZONE}).format(new Date(iso));
+
+      const peakHour = hourly2026.indexOf(Math.max(...hourly2026));
+      const bnplWeekendShare = weekend(bnpl) / t2026.volume;
+      const bnplTypicalShare = sum(bnpl.slice(0, 6)) / sum(y2026.volume.slice(0, 6));
+
+      const takeaways = [
+        ['The weekend brought in ', {strong: dollars(t2026.volume)}, ', ',
+          {change: change(t2026.volume, t2025.volume)}, ' on the same five days last year.'],
+        ['Black Friday was the biggest day at ', {strong: dollars(y2026.volume[BLACK_FRIDAY])},
+          ' (', {change: change(y2026.volume[BLACK_FRIDAY], y2025.volume[BLACK_FRIDAY])},
+          '). Orders peaked at ', {strong: hourLabel(hours2026[peakHour])}, ' Eastern, after a midnight rush when the sale opened.'],
+        ['More visitors bought: conversion rose to ', {strong: percent(t2026.conversion, 2)}, ' from ',
+          percent(t2025.conversion, 2), ', and each order was worth ', {strong: dollars(t2026.aov)},
+          ' on average (', {change: change(t2026.aov, t2025.aov)}, ').'],
+        ['Buy now, pay later took ', {strong: percent(bnplWeekendShare)}, ' of weekend volume, up from ',
+          percent(bnplTypicalShare), ' on the days before. Worth keeping it at the top of checkout for Cyber Week.'],
+      ];
+
+      const list = document.getElementById('takeaways');
+      for (const parts of takeaways) {
+        const item = document.createElement('li');
+        for (const part of parts) {
+          if (typeof part === 'string') {
+            item.append(part);
+          } else {
+            const emphasis = document.createElement('strong');
+            if (part.change !== undefined) emphasis.className = part.change.startsWith('+') ? 'up' : 'down';
+            emphasis.textContent = part.strong ?? part.change;
+            item.append(emphasis);
+          }
+        }
+        list.append(item);
+      }
+
+      dayDetail(BLACK_FRIDAY);
+
+      document.getElementById('as-of').textContent =
+        'Data as of ' +
+        new Intl.DateTimeFormat(LOCALE, {month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: TIME_ZONE, timeZoneName: 'short'}).format(
+          new Date(FETCHED_AT),
+        );
+    </script>
+  </body>
+</html>

@@ -1,0 +1,532 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Chart spec",
+  "description": "A declarative description of one chart card: a title, an optional headline KPI, and a line or bar chart of up to 4 series over time. Pass it as the second argument to StripeCharts.render(element, spec). Unknown fields are rejected. A comparison series (for example last year) lines up with the primary series by position, not by calendar date: the i-th point of every series is drawn in the same x slot, so put the days you want compared at the same index.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["title"],
+  "properties": {
+    "title": {
+      "description": "Card title shown at the top, for example \"Gross volume\". Plain text; markup is shown literally.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "description": {
+      "description": "Optional one-line subtitle under the title, for example \"Black Friday through Cyber Monday\". Plain text.",
+      "type": "string",
+      "maxLength": 500
+    },
+    "format": {
+      "description": "How values (KPI, axis ticks, tooltip) are formatted. Defaults to {\"style\": \"number\"}. Choose by the \"style\" field.",
+      "oneOf": [
+        {
+          "description": "Plain numbers, for example counts.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["style"],
+          "properties": {
+            "style": {
+              "description": "Use \"number\" for plain numbers.",
+              "const": "number"
+            },
+            "maximumFractionDigits": {
+              "description": "Optional maximum number of decimals to show, 0 to 20. Defaults to 2.",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 20
+            }
+          }
+        },
+        {
+          "description": "Money. The currency decides the decimals shown, so JPY shows none; amounts of 1,000 or more are shown in whole units.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["style", "currency", "unit"],
+          "properties": {
+            "style": {
+              "description": "Use \"currency\" for money.",
+              "const": "currency"
+            },
+            "currency": {
+              "description": "Three-letter ISO 4217 currency code, any case, for example \"usd\" or \"JPY\".",
+              "type": "string",
+              "pattern": "^[A-Za-z]{3}$"
+            },
+            "unit": {
+              "description": "Required. \"minor\" if values are in the currency's smallest unit, as Stripe API amounts are (1999 means $19.99, \u00a51,999, or 1.999 KWD); \"major\" if they are already in major units (19.99 means $19.99).",
+              "enum": ["minor", "major"]
+            }
+          }
+        },
+        {
+          "description": "Percentages. A KPI change is always relative: 2.07% against 2.01% shows as +3.0%, not +0.06 points.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["style", "unit"],
+          "properties": {
+            "style": {
+              "description": "Use \"percent\" for percentages.",
+              "const": "percent"
+            },
+            "unit": {
+              "description": "Required. \"ratio\" if 0.025 means 2.5%; \"percent\" if 2.5 means 2.5%.",
+              "enum": ["ratio", "percent"]
+            },
+            "maximumFractionDigits": {
+              "description": "Optional maximum number of decimals in the percentage, 0 to 20. Defaults to 1.",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 20
+            }
+          }
+        }
+      ]
+    },
+    "locale": {
+      "description": "BCP 47 language tag used for number and date formatting, for example \"en-US\" or \"ja-JP\". Defaults to \"en-US\".",
+      "type": "string",
+      "minLength": 1
+    },
+    "timeZone": {
+      "description": "IANA time zone, for example \"America/New_York\", used to display date-time values (x values and fetchedAt). Required when any x or fetchedAt is a date-time: use the zone the data was reported in, or \"UTC\". Date-only values like \"2026-11-27\" are never shifted, so it is optional for them. The viewer's own time zone is never used.",
+      "type": "string",
+      "minLength": 1
+    },
+    "kpi": {
+      "description": "Optional headline value shown above the chart, with an optional change against a comparison value.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "basis"],
+      "properties": {
+        "value": {
+          "description": "The headline value, in the same units as the series, as format says (minor or major currency units, ratio or percent). A finite number. Between -1e15 and 1e15; give larger values in a larger unit (thousands or millions).",
+          "type": "number",
+          "minimum": -1000000000000000.0,
+          "maximum": 1000000000000000.0
+        },
+        "basis": {
+          "description": "Required. How value relates to the primary series: \"total\" (its sum), \"latest\" (its last value), \"average\" (its mean), or \"custom\" for a figure computed elsewhere. Forecast points are not actual values, so the first three leave them out; incomplete points count. For those three, value is checked against the primary series, and comparisonValue against the first comparison series over the same slots (like periods: for \"latest\", the comparison's value where the primary's latest actual value is, even if a plan runs on past it), within 0.5% or one display unit, whichever is larger.",
+          "enum": ["total", "latest", "average", "custom"]
+        },
+        "comparisonValue": {
+          "description": "Optional value to compare against, for example the same period last year. The change is shown as a signed percentage, relative even for percent values; it is omitted when this is missing or 0. Between -1e15 and 1e15; give larger values in a larger unit (thousands or millions).",
+          "type": "number",
+          "minimum": -1000000000000000.0,
+          "maximum": 1000000000000000.0
+        },
+        "goodDirection": {
+          "description": "Which way a change is good: \"up\" (revenue) colours rises as good, \"down\" (churn, dispute or refund rate) colours falls as good. Defaults to \"up\".",
+          "enum": ["up", "down"]
+        },
+        "notation": {
+          "description": "How the value is written: \"standard\" in full ($294,470), or \"compact\" abbreviated ($294K, $3.8M) as the locale abbreviates. Values under 1,000 and percentages are always written in full, since abbreviating would round them. Defaults to \"standard\".",
+          "enum": ["standard", "compact"]
+        }
+      }
+    },
+    "chart": {
+      "description": "Chart options. Defaults to {\"type\": \"line\"}.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "description": "\"line\" for trends, \"bar\" for per-day totals, or \"kpi\" for a headline tile: the KPI value without axes, with a small sparkline of series when given.",
+          "enum": ["line", "bar", "kpi"]
+        },
+        "stacking": {
+          "description": "How bar series share a slot: \"grouped\" draws them side by side; \"stacked\" draws them on top of each other, positive values upward from 0 and negative values downward, so the bar shows the total. Only allowed when type is \"bar\". Comparison series cannot be stacked. Defaults to \"grouped\".",
+          "enum": ["grouped", "stacked"]
+        },
+        "legend": {
+          "description": "When the legend shows: \"auto\" for 3 or more series, or whenever a forecast or projected values need explaining; \"show\" always; \"hide\" never. Legend items toggle their series (click, Enter or Space) and isolate it (double-click or Shift+Enter). Defaults to \"auto\".",
+          "enum": ["auto", "show", "hide"]
+        },
+        "axes": {
+          "description": "Axis label options.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "x": {
+              "description": "X-axis options.",
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "labels": {
+                  "description": "Label granularity: \"auto\" picks hours, days, weeks, months, quarters or years from the data and width; \"day\", \"month\", \"year\" or \"time\" force one, still thinned to fit. Defaults to \"auto\".",
+                  "enum": ["auto", "day", "month", "year", "time"]
+                }
+              }
+            },
+            "y": {
+              "description": "Y-axis options.",
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "notation": {
+                  "description": "How labels are written: \"compact\" ($300K) or \"standard\" ($300,000). Defaults to \"compact\".",
+                  "enum": ["compact", "standard"]
+                },
+                "maximumFractionDigits": {
+                  "description": "Most decimals in a label, 0 to 20. Defaults to the fewest that keep ticks exact.",
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 20
+                }
+              }
+            }
+          }
+        },
+        "incomplete": {
+          "description": "A trailing period whose data is not final yet, such as today. From from to the end, lines are dashed and bars hatched, and the period is marked with message.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["from"],
+          "properties": {
+            "from": {
+              "description": "The first incomplete slot: an x value of the primary series, exactly as written there. Must come before any forecast points.",
+              "type": "string"
+            },
+            "message": {
+              "description": "Shown for the period. Plain text, up to 200 characters. Defaults to \"Data in this period is still being processed\".",
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            }
+          }
+        }
+      },
+      "if": {
+        "not": {
+          "properties": {
+            "type": {
+              "const": "bar"
+            }
+          }
+        }
+      },
+      "then": {
+        "not": {
+          "required": ["stacking"]
+        }
+      }
+    },
+    "series": {
+      "description": "1 to 4 series to plot. Required unless chart.type is \"kpi\" or loading is true; on a \"kpi\" chart they are optional and drawn as a sparkline beside the value. Put the primary series (for example this year) first and mark others such as last year with \"comparison\": true. Series are aligned by position; they may have different lengths. If every series has an empty data array, the card shows emptyMessage.",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4,
+      "items": {
+        "description": "One line or set of bars.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label", "data"],
+        "properties": {
+          "label": {
+            "description": "Series name shown in the tooltip and the chart's accessible summary, for example \"2026\". Plain text.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "comparison": {
+            "description": "true to draw this series in the muted comparison style, for example last year. Defaults to false.",
+            "type": "boolean"
+          },
+          "color": {
+            "description": "The series color, #rgb or #rrggbb hex, used for its marks, legend swatch, tooltip swatch, sparkline and table. Defaults to the palette; prefer it, and check contrast if you set one.",
+            "type": "string",
+            "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+          },
+          "data": {
+            "description": "Up to 1000 points in display order. Index i of this series is drawn in the same x slot as index i of every other series. The x-axis labels and the tooltip header come from the first non-comparison series; tooltip rows show each series' label and value, without dates.",
+            "type": "array",
+            "maxItems": 1000,
+            "items": {
+              "description": "One point.",
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["x", "y"],
+              "properties": {
+                "x": {
+                  "description": "The point's date: \"YYYY-MM-DD\" for a calendar day (never shifted by time zone), or an ISO 8601 date-time with \"Z\" or an offset, for example \"2026-11-27T18:00:00Z\", shown in timeZone. Every x in a chart uses the same form, all dates or all date-times, and years start at 1000. The primary series' dates label the x axis and the tooltip header; a comparison point's own date is read out in the accessible summary.",
+                  "type": "string",
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}(:\\d{2}(\\.\\d{1,3})?)?(Z|[+-]\\d{2}:\\d{2}))?$"
+                },
+                "y": {
+                  "description": "The value, in the units format says (minor or major currency units, ratio or percent), or null for a gap. Must be a JSON number, not a string. For a forecast point, the expected value. Between -1e15 and 1e15; give larger values in a larger unit (thousands or millions).",
+                  "type": ["number", "null"],
+                  "minimum": -1000000000000000.0,
+                  "maximum": 1000000000000000.0
+                },
+                "color": {
+                  "description": "Bar charts only: this bar segment's color, overriding the series color. #rgb or #rrggbb hex. Prefer the default palette; check contrast if you set one.",
+                  "type": "string",
+                  "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+                },
+                "forecast": {
+                  "description": "true for a forecast rather than an actual value. Forecast points must be one run at the end of the series. Lines draw them dashed from the last actual point; bars as outlined, lightly filled bars. Defaults to false.",
+                  "type": "boolean"
+                },
+                "low": {
+                  "description": "Forecast points only: the lower bound of the forecast range, at most y. Lines shade the band between low and high.",
+                  "type": "number",
+                  "minimum": -1000000000000000.0,
+                  "maximum": 1000000000000000.0
+                },
+                "high": {
+                  "description": "Forecast points only: the upper bound of the forecast range, at least y.",
+                  "type": "number",
+                  "minimum": -1000000000000000.0,
+                  "maximum": 1000000000000000.0
+                },
+                "projected": {
+                  "description": "Incomplete points only (from chart.incomplete.from on, in a non-comparison series): where the period is on pace to end, in the same units as y and with the same sign. y stays the value so far, which kpi.basis uses; the chart draws the projection as an extension.",
+                  "type": "number",
+                  "minimum": -1000000000000000.0,
+                  "maximum": 1000000000000000.0
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "provenance": {
+      "description": "Optional note on where the data came from. The info button next to the title opens a details view with these fields and a table of the chart's values.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source"],
+      "properties": {
+        "source": {
+          "description": "Where the data came from, for example \"Stripe Data API\". Plain text.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "fetchedAt": {
+          "description": "When the data was fetched, as an ISO 8601 date-time with \"Z\" or an offset, for example \"2026-11-27T18:00:00Z\". Shown in timeZone with the zone name.",
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(:\\d{2}(\\.\\d{1,3})?)?(Z|[+-]\\d{2}:\\d{2})$"
+        },
+        "details": {
+          "description": "Up to 12 short label/value pairs, for example the metric, date range and time zone.",
+          "type": "array",
+          "maxItems": 12,
+          "items": {
+            "description": "One label/value pair.",
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["label", "value"],
+            "properties": {
+              "label": {
+                "description": "Short label, for example \"Metric\". Plain text.",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "value": {
+                "description": "The value as text, for example \"gross_volume\". Plain text.",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              }
+            }
+          }
+        }
+      }
+    },
+    "loading": {
+      "description": "true while data is being fetched; series and kpi may then be omitted. Without data, the card shows a placeholder shaped by chart.type; with data (given in series, or already shown by a previous render), the chart stays in place, dimmed, until you render again without loading. Defaults to false.",
+      "type": "boolean"
+    },
+    "emptyMessage": {
+      "description": "Message for an empty plot, in your language, for example \"No disputes this week\". Plain text. Defaults to \"No data\".",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "annotations": {
+      "description": "Up to 10 notes on the chart, shown in the tooltip of the slots they cover, the accessible summary and the details view. Each uses exactly one of at (a marker) or from/to (a shaded range); x values must be exact x values of the primary series, since series line up by position.",
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+        "description": "One note.",
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label"],
+        "properties": {
+          "label": {
+            "description": "Short label, for example \"Black Friday\". Plain text, up to 80 characters.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "description": {
+            "description": "Longer note shown in the tooltip and details. Plain text, up to 200 characters.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "at": {
+            "description": "A single slot: a vertical marker there, or with series a hollow circle in that series color.",
+            "type": "string"
+          },
+          "from": {
+            "description": "Start of a shaded range, marked with a dashed line; omit to extend to the plot edge.",
+            "type": "string"
+          },
+          "to": {
+            "description": "End of a shaded range, inclusive, marked with a dashed line; omit to extend to the plot edge.",
+            "type": "string"
+          },
+          "series": {
+            "description": "With at: the label of the series whose point is marked.",
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "anyOf": [
+          {
+            "required": ["at"]
+          },
+          {
+            "required": ["from"]
+          },
+          {
+            "required": ["to"]
+          }
+        ],
+        "allOf": [
+          {
+            "if": {
+              "required": ["at"]
+            },
+            "then": {
+              "not": {
+                "anyOf": [
+                  {
+                    "required": ["from"]
+                  },
+                  {
+                    "required": ["to"]
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "if": {
+              "required": ["series"]
+            },
+            "then": {
+              "required": ["at"]
+            }
+          }
+        ]
+      }
+    },
+    "details": {
+      "description": "false to leave out the info button, so the details view (provenance, notes and the data table) can't be opened. The accessible summary is unchanged. Defaults to true.",
+      "type": "boolean"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "not": {
+          "anyOf": [
+            {
+              "required": ["loading"],
+              "properties": {
+                "loading": {
+                  "const": true
+                }
+              }
+            },
+            {
+              "required": ["chart"],
+              "properties": {
+                "chart": {
+                  "properties": {
+                    "type": {
+                      "const": "kpi"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "then": {
+        "required": ["series"]
+      }
+    },
+    {
+      "if": {
+        "required": ["chart"],
+        "properties": {
+          "chart": {
+            "required": ["stacking"],
+            "properties": {
+              "stacking": {
+                "const": "stacked"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "series": {
+            "items": {
+              "properties": {
+                "comparison": {
+                  "const": false
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "anyOf": [
+          {
+            "required": ["series"],
+            "properties": {
+              "series": {
+                "contains": {
+                  "properties": {
+                    "data": {
+                      "contains": {
+                        "properties": {
+                          "x": {
+                            "pattern": "T"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "required": ["provenance"],
+            "properties": {
+              "provenance": {
+                "required": ["fetchedAt"]
+              }
+            }
+          }
+        ]
+      },
+      "then": {
+        "required": ["timeZone"]
+      }
+    }
+  ]
+}

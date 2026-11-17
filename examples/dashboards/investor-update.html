@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- An empty icon, so the browser does not request /favicon.ico. -->
+    <link rel="icon" href="data:," />
+    <title>Tessel investor update, November 2026</title>
+    <!--
+      Example dashboard: a monthly investor update, written the way an agent
+      would turn billing data into a memo. The company and the data are made
+      up and generated in the page by a seeded generator. Every number in the
+      letter is computed from the same arrays the charts draw.
+
+      The library is loaded with one script tag. This copy points at the local
+      build (build first; `dist/` is generated). In an artifact, use the
+      published file instead:
+
+        <script src="https://cdn.jsdelivr.net/npm/@stripe/charts@0.1.0/dist/stripe-charts.min.js"></script>
+    -->
+    <style>
+      :root {
+        --ink: #14143c;
+        --ink-soft: #3a3a63;
+        --muted: #55557a;
+        --rule: #14143c;
+        --hairline: #dcdce8;
+        --cobalt: #3434d6;
+        --signal: #ffd23f;
+        --coral: #ff5a36;
+        --mint: #0f9d73;
+        --paper: #ffffff;
+        --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+          'Liberation Mono', monospace;
+        --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          Helvetica, Arial, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 15px;
+        line-height: 24px;
+      }
+      /* The memo's own palette for the charts: the library reads these. */
+      body .sc-root {
+        --sc-series-primary-0: var(--cobalt);
+        --sc-series-primary-1: var(--mint);
+        --sc-series-primary-2: var(--coral);
+        --sc-series-primary-3: var(--ink);
+      }
+      .fig {
+        font-family: var(--mono);
+        font-weight: 700;
+        font-size: 0.93em;
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+        background: linear-gradient(transparent 62%, rgba(255, 210, 63, 0.7) 62%);
+      }
+      .fig.up {
+        color: #0b7a58;
+      }
+      .fig.down {
+        color: #c4381a;
+      }
+
+      /* Header band */
+      .band {
+        display: grid;
+        grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+        background: var(--ink);
+        color: #fff;
+      }
+      .band-title {
+        padding: 40px max(32px, calc((100vw - 1240px) / 2)) 36px;
+        padding-right: 32px;
+      }
+      .band-title .kicker {
+        margin: 0 0 18px;
+        font-family: var(--mono);
+        font-size: 12px;
+        line-height: 16px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--signal);
+      }
+      .band-title h1 {
+        margin: 0;
+        font-size: 44px;
+        line-height: 48px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      .memo-meta {
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        gap: 2px 16px;
+        margin: 24px 0 0;
+        font-family: var(--mono);
+        font-size: 12px;
+        line-height: 18px;
+        color: #c9c9ee;
+      }
+      .memo-meta dt {
+        color: var(--signal);
+      }
+      .memo-meta dd {
+        margin: 0;
+      }
+      .band-figures {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        background: var(--signal);
+        color: var(--ink);
+      }
+      .vital {
+        padding: 22px 24px;
+        border-left: 2px solid var(--ink);
+        border-bottom: 2px solid var(--ink);
+      }
+      .vital:nth-child(n + 3) {
+        border-bottom: 0;
+      }
+      .vital:nth-child(2n + 1) {
+        border-left: 0;
+      }
+      .vital .label {
+        margin: 0;
+        font-family: var(--mono);
+        font-size: 11px;
+        line-height: 16px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .vital .value {
+        margin: 2px 0 0;
+        font-family: var(--mono);
+        font-size: 30px;
+        line-height: 38px;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+      }
+      .vital .note {
+        margin: 0;
+        font-size: 12px;
+        line-height: 16px;
+      }
+      .stripe {
+        display: grid;
+        grid-template-columns: 4fr 2fr 1fr 1fr;
+        height: 8px;
+      }
+      .stripe span:nth-child(1) {
+        background: var(--cobalt);
+      }
+      .stripe span:nth-child(2) {
+        background: var(--coral);
+      }
+      .stripe span:nth-child(3) {
+        background: var(--mint);
+      }
+      .stripe span:nth-child(4) {
+        background: var(--ink);
+      }
+
+      /* Letter and numbers */
+      main {
+        display: grid;
+        grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+        gap: 0 48px;
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 40px 32px 24px;
+      }
+      .letter {
+        padding-right: 32px;
+        border-right: 1px solid var(--hairline);
+        font-size: 15px;
+      }
+      .letter h2,
+      .numbers h2,
+      .asks h2 {
+        margin: 0 0 8px;
+        font-family: var(--mono);
+        font-size: 12px;
+        line-height: 16px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--cobalt);
+      }
+      .letter h3 {
+        margin: 28px 0 4px;
+        padding-top: 12px;
+        border-top: 3px solid var(--ink);
+        font-size: 18px;
+        line-height: 24px;
+        font-weight: 800;
+      }
+      .letter p {
+        margin: 0 0 12px;
+      }
+      .letter .sign {
+        margin-top: 24px;
+        font-weight: 700;
+      }
+      .numbers section {
+        margin-bottom: 36px;
+        break-inside: avoid;
+      }
+      .numbers .caption {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-family: var(--mono);
+        font-size: 12px;
+        line-height: 18px;
+      }
+      .chart-lg {
+        height: 380px;
+      }
+      .chart-md {
+        height: 320px;
+      }
+      .chart-sm {
+        height: 300px;
+      }
+      .multiples {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 20px;
+        padding-top: 16px;
+        border-top: 3px solid var(--ink);
+      }
+      .pair {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+        padding-top: 16px;
+        border-top: 3px solid var(--ink);
+      }
+      .rule-top {
+        padding-top: 16px;
+        border-top: 3px solid var(--ink);
+      }
+      .multiples > div,
+      .pair > div {
+        min-width: 0;
+      }
+
+      /* What I need from you */
+      .asks {
+        margin-top: 8px;
+        background: var(--cobalt);
+        color: #fff;
+      }
+      .asks-inner {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 40px 32px 44px;
+      }
+      .asks h2 {
+        color: var(--signal);
+      }
+      .asks h3 {
+        margin: 0 0 24px;
+        font-size: 32px;
+        line-height: 38px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      .ask-list {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 24px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        counter-reset: ask;
+      }
+      .ask-list li {
+        counter-increment: ask;
+        padding-top: 14px;
+        border-top: 3px solid var(--signal);
+      }
+      .ask-list li::before {
+        content: counter(ask, decimal-leading-zero);
+        display: block;
+        margin-bottom: 4px;
+        font-family: var(--mono);
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--signal);
+      }
+      .ask-list strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 18px;
+        line-height: 24px;
+      }
+      .ask-list .fig {
+        background: none;
+        color: var(--signal);
+      }
+      .ask-list p {
+        margin: 0;
+      }
+      footer {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 20px 32px 40px;
+        color: var(--muted);
+        font-family: var(--mono);
+        font-size: 12px;
+        line-height: 18px;
+      }
+      footer p {
+        margin: 0 0 6px;
+      }
+
+      @media (max-width: 1060px) {
+        .band {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .band-title {
+          padding: 32px;
+        }
+        main {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .letter {
+          padding: 0 0 12px;
+          border-right: 0;
+        }
+        .numbers {
+          margin-top: 24px;
+        }
+        .ask-list {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+      @media (max-width: 700px) {
+        .multiples {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .pair {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+      @media (max-width: 560px) {
+        .band-title {
+          padding: 24px 20px;
+        }
+        .band-title h1 {
+          font-size: 32px;
+          line-height: 36px;
+        }
+        .vital {
+          padding: 16px;
+        }
+        .vital .value {
+          font-size: 22px;
+          line-height: 30px;
+        }
+        main {
+          padding: 24px 20px 8px;
+        }
+        .asks-inner {
+          padding: 32px 20px;
+        }
+        .asks h3 {
+          font-size: 26px;
+          line-height: 32px;
+        }
+        footer {
+          padding: 16px 20px 32px;
+        }
+      }
+
+      @page {
+        size: auto;
+        margin: 12mm;
+      }
+      @media print {
+        * {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        body {
+          font-size: 12px;
+          line-height: 18px;
+        }
+        .band {
+          grid-template-columns: minmax(0, 1fr);
+          break-inside: avoid;
+        }
+        .band-title {
+          padding: 20px 24px;
+        }
+        .band-title h1 {
+          font-size: 30px;
+          line-height: 34px;
+        }
+        .vital {
+          padding: 10px 16px;
+        }
+        .vital .value {
+          font-size: 22px;
+          line-height: 28px;
+        }
+        main {
+          display: block;
+          padding: 20px 0 0;
+        }
+        .letter {
+          padding: 0;
+          border: 0;
+        }
+        .letter h3 {
+          break-after: avoid;
+        }
+        .numbers {
+          margin-top: 20px;
+        }
+        .numbers section,
+        .multiples,
+        .pair,
+        .ask-list li {
+          break-inside: avoid;
+        }
+        .chart-lg {
+          height: 300px;
+        }
+        .chart-md,
+        .chart-sm {
+          height: 250px;
+        }
+        .multiples {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+        .pair {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .asks {
+          break-before: auto;
+          break-inside: avoid;
+        }
+        .asks-inner {
+          padding: 20px 24px;
+        }
+        .asks h3 {
+          font-size: 22px;
+          line-height: 28px;
+          margin-bottom: 12px;
+        }
+        .ask-list {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 16px;
+        }
+        footer {
+          padding: 12px 0 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="band">
+        <div class="band-title">
+          <p class="kicker">Tessel · Monthly investor update</p>
+          <h1 id="headline">November 2026</h1>
+          <dl class="memo-meta">
+            <dt>To</dt><dd>Investors and advisors</dd>
+            <dt>From</dt><dd>Founder, Tessel</dd>
+            <dt>Period</dt><dd>December 2025 to November 2026</dd>
+            <dt>Data</dt><dd id="meta-data"></dd>
+          </dl>
+        </div>
+        <div class="band-figures" id="vitals"></div>
+      </div>
+      <div class="stripe" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    </header>
+
+    <main>
+      <article class="letter" id="letter" aria-label="Letter"></article>
+
+      <div class="numbers">
+        <h2>The numbers</h2>
+        <section class="rule-top" aria-label="Recurring revenue">
+          <div class="chart-lg" id="mrr"></div>
+          <p class="caption" id="mrr-caption"></p>
+        </section>
+        <section class="rule-top" aria-label="Net new MRR">
+          <div class="chart-md" id="movements"></div>
+          <p class="caption" id="movements-caption"></p>
+        </section>
+        <section aria-label="Revenue by currency">
+          <div class="multiples">
+            <div><div class="chart-sm" id="rev-usd"></div></div>
+            <div><div class="chart-sm" id="rev-eur"></div></div>
+            <div><div class="chart-sm" id="rev-gbp"></div></div>
+          </div>
+          <p class="caption">Each chart is in the currency customers are billed in, not converted. Grey bars are the same month a year earlier.</p>
+        </section>
+        <section aria-label="Customers and logo churn">
+          <div class="pair">
+            <div><div class="chart-sm" id="customers"></div></div>
+            <div><div class="chart-sm" id="logo-churn"></div></div>
+          </div>
+          <p class="caption">Dashed grey lines are the same month a year earlier.</p>
+        </section>
+      </div>
+    </main>
+
+    <section class="asks" aria-labelledby="asks-title">
+      <div class="asks-inner">
+        <h2>Closing</h2>
+        <h3 id="asks-title">What I need from you</h3>
+        <ol class="ask-list" id="asks"></ol>
+      </div>
+    </section>
+
+    <footer>
+      <p id="footnote"></p>
+      <p>Tessel is a made-up company and the figures are generated for this example. Use the info button on any chart for its source and a table of the values.</p>
+    </footer>
+
+    <script src="../../dist/stripe-charts.min.js"></script>
+    <script>
+      // ---- Data -------------------------------------------------------------
+      // A seeded generator stands in for rows fetched from the billing API, so
+      // the page is self-contained and reproducible. MRR is built from its
+      // movements, and customer counts from new and lost logos, so the charts
+      // and the letter agree. Money is in minor units, as the API returns it.
+
+      function seeded(seed) {
+        return function next() {
+          seed = (seed + 0x6d2b79f5) | 0;
+          let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      const random = seeded(731);
+      const jitter = (a) => 1 + (random() * 2 - 1) * a;
+      const whole = (v) => Math.round(v);
+      const sum = (v) => v.reduce((t, x) => t + x, 0);
+      const points = (xs, ys) => xs.map((x, i) => ({x, y: ys[i]}));
+      const monthStart = (y, m) => new Date(Date.UTC(y, m, 1)).toISOString().slice(0, 10);
+
+      const MONTHS = 24;
+      const allMonths = Array.from({length: MONTHS}, (_, i) => monthStart(2024, 11 + i));
+      const WIN = 12; // charts show the last 12 months; the first 12 are the year before
+      const PRICE_CHANGE = 20; // Aug 2026
+      const BIG_WIN = 22; // Oct 2026
+      const BIG_WIN_MRR = 3800000; // $38,000.00 a month
+
+      const newMrr = [], expansion = [], contraction = [], churned = [], mrr = [];
+      const customers = [], newLogos = [], lostLogos = [];
+      const START_MRR = 4200000, START_CUSTOMERS = 46;
+      for (let i = 0; i < MONTHS; i++) {
+        const pm = i === 0 ? START_MRR : mrr[i - 1];
+        const pc = i === 0 ? START_CUSTOMERS : customers[i - 1];
+        const arpa = pm / pc;
+        const organic = pm * (0.085 - 0.0023 * i) * jitter(0.1);
+        const win = i === BIG_WIN ? BIG_WIN_MRR : 0;
+        newMrr.push(whole(organic + win));
+        newLogos.push(whole(organic / (arpa * 0.55)) + (win ? 1 : 0));
+        expansion.push(whole(pm * (0.017 + (i === PRICE_CHANGE ? 0.012 : 0) + (i > PRICE_CHANGE ? 0.004 : 0)) * jitter(0.12)));
+        contraction.push(-whole(pm * 0.0055 * jitter(0.2)));
+        const logoRate = (0.021 - 0.0002 * i) * (i === PRICE_CHANGE + 1 ? 1.9 : i === PRICE_CHANGE + 2 ? 1.35 : 1) * jitter(0.12);
+        const lost = whole(pc * logoRate);
+        lostLogos.push(lost);
+        churned.push(-whole(lost * arpa * 0.7));
+        customers.push(pc + newLogos[i] - lost);
+        mrr.push(pm + newMrr[i] + expansion[i] + contraction[i] + churned[i]);
+      }
+      const logoChurn = lostLogos.map((l, i) => Math.round((l / (i === 0 ? START_CUSTOMERS : customers[i - 1])) * 10000) / 10000);
+
+      // The charts show the last 12 months; the 12 before are the year earlier.
+      const months = allMonths.slice(WIN);
+      const yearBefore = allMonths.slice(0, WIN);
+      const last = MONTHS - 1;
+      const lastIn = WIN - 1;
+      const thisYear = (values) => values.slice(WIN);
+      const priorYear = (values) => values.slice(0, WIN);
+
+      // Operating plan: 6% monthly growth from November 2025, continued into
+      // the forecast window.
+      const FORECAST_MONTHS = 6;
+      const futureMonths = Array.from({length: FORECAST_MONTHS}, (_, k) => monthStart(2026, 11 + k));
+      const planMrr = [...months, ...futureMonths].map((_, k) => whole(mrr[WIN - 1] * Math.pow(1.06, k + 1)));
+
+      // Forecast: the organic growth of the last five months before the big
+      // win (so one deal does not set the pace), easing by 3% each month, with
+      // a band that widens by 2% of MRR for every month out.
+      const growthOf = (i) => (mrr[i] - (i === BIG_WIN ? BIG_WIN_MRR : 0)) / mrr[i - 1] - 1;
+      const baseGrowth = sum([last - 6, last - 5, last - 4, last - 3, last - 1].map(growthOf)) / 5;
+      const forecast = [];
+      let carried = mrr[last];
+      for (let k = 0; k < FORECAST_MONTHS; k++) {
+        carried = whole(carried * (1 + baseGrowth * Math.pow(0.97, k + 1)));
+        forecast.push({y: carried, low: whole(carried * (1 - 0.02 * (k + 1))), high: whole(carried * (1 + 0.02 * (k + 1)))});
+      }
+
+      // Billed revenue by currency. Euro and sterling customers are billed in
+      // their own currency, so amounts are native, not converted.
+      const EUR_PER_USD = 0.92;
+      const GBP_PER_USD = 0.79;
+      const usdShare = (i) => 0.78 - 0.0035 * i;
+      const eurShare = (i) => 0.14 + 0.0025 * i;
+      const gbpShare = (i) => 1 - usdShare(i) - eurShare(i);
+      const usdRevenue = mrr.map((v, i) => whole(v * usdShare(i)));
+      const eurRevenue = mrr.map((v, i) => whole(v * eurShare(i) * EUR_PER_USD * jitter(0.01)));
+      const gbpRevenue = mrr.map((v, i) => whole(v * gbpShare(i) * GBP_PER_USD * jitter(0.01)));
+
+      // ---- Charts -----------------------------------------------------------
+
+      const LOCALE = 'en-US';
+      const USD = {style: 'currency', currency: 'usd', unit: 'minor'};
+      const FETCHED_AT = '2026-12-01T08:00:00Z';
+      const provenance = (metric, extra = []) => ({
+        source: 'Stripe Billing',
+        fetchedAt: FETCHED_AT,
+        details: [
+          {label: 'Metric', value: metric},
+          {label: 'Period', value: 'Dec 2025 to Nov 2026'},
+          ...extra,
+          {label: 'Time zone', value: 'UTC, month start'},
+        ],
+      });
+      const render = (id, spec, options) => StripeCharts.render(document.getElementById(id), {locale: LOCALE, timeZone: 'UTC', ...spec}, options);
+      const withYearBefore = (label, values) => [
+        {label, data: points(months, thisYear(values))},
+        {label: label + ', year before', comparison: true, data: points(months, priorYear(values))},
+      ];
+      const PRICE_CHANGE_NOTE = {
+        at: months[PRICE_CHANGE - WIN],
+        label: 'New pricing',
+        description: 'Per-seat prices rose and annual plans were introduced.',
+      };
+      const BIG_WIN_NOTE = {
+        at: months[BIG_WIN - WIN],
+        label: 'Large customer win',
+        description: 'A logistics company signed on an annual plan.',
+      };
+      const signedTick = (value, label) => (value > 0 ? '+' + label : label);
+
+      render('mrr', {
+        title: 'MRR against plan',
+        description: 'Month-start MRR, a six-month forecast and the plan of 6% monthly growth',
+        format: USD,
+        kpi: {basis: 'latest', value: mrr[last], comparisonValue: planMrr[lastIn]},
+        chart: {type: 'line', axes: {x: {labels: 'month'}}},
+        series: [
+          {
+            label: 'MRR',
+            data: [...points(months, thisYear(mrr)), ...futureMonths.map((x, k) => ({x, forecast: true, ...forecast[k]}))],
+          },
+          {label: 'Plan', comparison: true, data: points([...months, ...futureMonths], planMrr)},
+        ],
+        annotations: [{...PRICE_CHANGE_NOTE, series: 'MRR'}, {...BIG_WIN_NOTE, series: 'MRR'}],
+        provenance: provenance('mrr', [{label: 'Compared with', value: 'Operating plan'}]),
+      });
+
+      render('movements', {
+        title: 'Net new MRR',
+        description: 'What was added above zero and lost below it, each month',
+        format: USD,
+        chart: {type: 'bar', stacking: 'stacked', axes: {x: {labels: 'month'}}},
+        series: [
+          {label: 'New', color: '#0f9d73', data: points(months, thisYear(newMrr))},
+          {label: 'Expansion', color: '#7fd4b4', data: points(months, thisYear(expansion))},
+          {label: 'Contraction', color: '#f2a54a', data: points(months, thisYear(contraction))},
+          {label: 'Churn', color: '#d6336c', data: points(months, thisYear(churned))},
+        ],
+        annotations: [BIG_WIN_NOTE],
+        provenance: provenance('mrr_movements'),
+      }, {formatYTick: signedTick});
+
+      const revenueSpec = (id, title, currency, values) => {
+        const current = thisYear(values);
+        const before = priorYear(values);
+        render(id, {
+          title,
+          description: 'Billed in ' + currency.toUpperCase() + ', 12 months',
+          format: {style: 'currency', currency, unit: 'minor'},
+          kpi: {basis: 'total', value: sum(current), comparisonValue: sum(before), notation: 'compact'},
+          chart: {type: 'bar', axes: {x: {labels: 'month'}}},
+          series: [
+            {label: currency.toUpperCase(), data: points(months, current)},
+            {label: 'Year before', comparison: true, data: points(months, before)},
+          ],
+          provenance: provenance('billed_revenue', [{label: 'Currency', value: currency.toUpperCase() + ', not converted'}]),
+        });
+      };
+      revenueSpec('rev-usd', 'Revenue, USD', 'usd', usdRevenue);
+      revenueSpec('rev-eur', 'Revenue, EUR', 'eur', eurRevenue);
+      revenueSpec('rev-gbp', 'Revenue, GBP', 'gbp', gbpRevenue);
+
+      render('customers', {
+        title: 'Customers',
+        description: 'Active paying accounts at month start',
+        format: {style: 'number', maximumFractionDigits: 0},
+        kpi: {basis: 'latest', value: customers[last], comparisonValue: customers[last - WIN]},
+        chart: {type: 'line', axes: {x: {labels: 'month'}}},
+        series: withYearBefore('Customers', customers),
+        annotations: [{...BIG_WIN_NOTE, series: 'Customers'}],
+        provenance: provenance('active_customers'),
+      });
+
+      render('logo-churn', {
+        title: 'Logo churn',
+        description: 'Accounts lost as a share of last month’s accounts',
+        format: {style: 'percent', unit: 'ratio', maximumFractionDigits: 2},
+        kpi: {basis: 'latest', value: logoChurn[last], comparisonValue: logoChurn[last - WIN], goodDirection: 'down'},
+        chart: {type: 'line', axes: {x: {labels: 'month'}}},
+        series: withYearBefore('Logo churn', logoChurn),
+        annotations: [{...PRICE_CHANGE_NOTE, series: 'Logo churn'}],
+        provenance: provenance('logo_churn_rate'),
+      });
+
+      // ---- The letter ---------------------------------------------------------
+      // Written from the arrays above. Built with text nodes: every string is
+      // treated as text. A part is a string, or {fig, tone?} for a figure.
+
+      const money = (cents, currency = 'USD', digits = 0) =>
+        new Intl.NumberFormat(LOCALE, {style: 'currency', currency, maximumFractionDigits: digits, minimumFractionDigits: digits}).format(cents / 100);
+      const compact = (cents, currency = 'USD') =>
+        new Intl.NumberFormat(LOCALE, {style: 'currency', currency, notation: 'compact', maximumFractionDigits: 1}).format(cents / 100);
+      const percent = (v, digits = 1) =>
+        new Intl.NumberFormat(LOCALE, {style: 'percent', minimumFractionDigits: digits, maximumFractionDigits: digits}).format(v);
+      const signed = (v, digits = 1) => (v >= 0 ? '+' : '−') + percent(Math.abs(v), digits);
+      const count = (v) => new Intl.NumberFormat(LOCALE).format(v);
+      const monthName = (iso, long = true) =>
+        new Intl.DateTimeFormat(LOCALE, {month: long ? 'long' : 'short', year: 'numeric', timeZone: 'UTC'}).format(new Date(iso));
+      const fig = (text, tone) => ({fig: text, tone});
+
+      const write = (parent, parts) => {
+        for (const part of parts) {
+          if (typeof part === 'string') {
+            parent.append(part);
+          } else {
+            const strong = document.createElement('b');
+            strong.className = 'fig' + (part.tone ? ' ' + part.tone : '');
+            strong.textContent = part.fig;
+            parent.append(strong);
+          }
+        }
+      };
+      const element = (tag, parts, className) => {
+        const node = document.createElement(tag);
+        if (className) node.className = className;
+        write(node, Array.isArray(parts) ? parts : [parts]);
+        return node;
+      };
+
+      const year = (values) => sum(thisYear(values));
+      const mrrGrowth = mrr[last] / mrr[last - WIN] - 1;
+      const planGap = mrr[last] / planMrr[lastIn] - 1;
+      const net = (i) => newMrr[i] + expansion[i] + contraction[i] + churned[i];
+      const bigWinShare = BIG_WIN_MRR / newMrr[BIG_WIN];
+      const peakChurn = Math.max(...thisYear(logoChurn));
+      const peakMonth = months[thisYear(logoChurn).indexOf(peakChurn)];
+      const grossAdds = year(newMrr) + year(expansion);
+      const grossLosses = -(year(contraction) + year(churned));
+      const nrrAnnual = 1 + (sum(expansion.slice(-WIN)) + sum(contraction.slice(-WIN)) + sum(churned.slice(-WIN))) / mrr[last - WIN];
+      const nrrRounded = Math.round(nrrAnnual * 1000) / 1000;
+      const eurNow = eurShare(last);
+      const eurThen = eurShare(last - WIN);
+      const final = forecast[FORECAST_MONTHS - 1];
+      const planFinal = planMrr[planMrr.length - 1];
+      const customersAdded = customers[last] - customers[last - WIN];
+
+      const vitals = [
+        ['MRR', money(mrr[last]), signed(mrrGrowth, 0) + ' on a year ago'],
+        ['Against plan', signed(planGap), 'plan is ' + money(planMrr[lastIn])],
+        ['Net new MRR', money(net(last)), 'in ' + monthName(months[lastIn], false)],
+        ['Customers', count(customers[last]), '+' + count(customersAdded) + ' in 12 months'],
+      ];
+      const vitalsNode = document.getElementById('vitals');
+      for (const [label, value, note] of vitals) {
+        const cell = document.createElement('div');
+        cell.className = 'vital';
+        const labelNode = element('p', label, 'label');
+        const valueNode = element('p', value, 'value');
+        const noteNode = element('p', note, 'note');
+        cell.append(labelNode, valueNode, noteNode);
+        vitalsNode.append(cell);
+      }
+
+      const letter = document.getElementById('letter');
+      const heading = (text) => element('h3', text);
+      letter.append(
+        element('h2', 'The letter'),
+        element('p', 'Hi all,'),
+        element('p', [
+          'November closed with ', fig(money(mrr[last])), ' of MRR, ', fig(signed(mrrGrowth, 0), 'up'),
+          ' on a year ago and ', fig(percent(Math.abs(planGap)), planGap < 0 ? 'down' : 'up'),
+          planGap < 0
+            ? ' behind the plan we set last November, even with the largest deal in our history.'
+            : ' ahead of the plan we set last November. Without the October deal we would be ' + percent(Math.abs((mrr[last] - BIG_WIN_MRR) / planMrr[lastIn] - 1)) + (mrr[last] - BIG_WIN_MRR < planMrr[lastIn] ? ' behind it.' : ' ahead of it.'),
+        ]),
+
+        heading('Where growth came from'),
+        element('p', [
+          'Over twelve months we added ', fig(money(grossAdds)), ' of MRR from new customers and upgrades and lost ',
+          fig(money(grossLosses)), ' to downgrades and cancellations: net new MRR of ', fig(money(grossAdds - grossLosses)),
+          '. Trailing net revenue retention is ', fig(percent(nrrAnnual, 1)), ', so ',
+          nrrRounded > 1 ? 'the existing base grows' : nrrRounded < 1 ? 'the existing base shrinks slightly' : 'the existing base holds flat',
+          ' before we sell anything new.',
+        ]),
+        element('p', [
+          'In ', monthName(months[BIG_WIN - WIN], false), ' a logistics company signed on an annual plan worth ', fig(money(BIG_WIN_MRR)),
+          ' a month: ', fig(percent(bigWinShare, 0)), ' of that month’s new MRR. Without it, net new MRR would have been ',
+          fig(money(net(BIG_WIN) - BIG_WIN_MRR)), ' rather than ', fig(money(net(BIG_WIN))), '.',
+        ]),
+
+        heading('The pricing change'),
+        element('p', [
+          'In ', monthName(PRICE_CHANGE_NOTE.at, false), ' we raised per-seat prices and introduced annual plans. Expansion MRR rose and has stayed higher, but logo churn peaked at ',
+          fig(percent(peakChurn, 1), 'down'), ' in ', monthName(peakMonth, false), ' before settling at ', fig(percent(logoChurn[last], 1), 'up'),
+          ' in November. I would make the same call, with a gentler rollout for the smallest accounts.',
+        ]),
+
+        heading('Customers and currencies'),
+        element('p', [
+          'We have ', fig(count(customers[last])), ' paying customers, ', fig('+' + count(customersAdded)), ' in twelve months. Euro billing is now ',
+          fig(percent(eurNow, 0)), ' of MRR, up from ', fig(percent(eurThen, 0)), ' a year ago, and sterling ',
+          fig(percent(gbpShare(last), 0)), '. Each chart on the right is in the currency customers pay in, so no exchange rate moves the lines.',
+        ]),
+
+        heading('What I expect next'),
+        element('p', [
+          'If growth continues to ease as it has, MRR reaches about ', fig(compact(final.y)), ' by ', monthName(futureMonths[FORECAST_MONTHS - 1], false),
+          ' (range ', fig(compact(final.low)), ' to ', fig(compact(final.high)), '), against ', fig(compact(planFinal)), ' on plan. The forecast leaves the one-off win out of its growth rate.',
+        ]),
+        element('p', 'Thank you for the introductions and the straight answers this year.', 'sign'),
+        element('p', 'Founder, Tessel'),
+      );
+
+      // ---- Closing asks -------------------------------------------------------
+
+      const asks = [
+        [
+          'Introductions in the euro zone',
+          ['Euro billing grew from ', fig(percent(eurThen, 0)), ' to ', fig(percent(eurNow, 0)), ' of MRR with no local sales. Five introductions to finance leads at mid-sized German or Dutch companies would test whether that holds with outbound.'],
+        ],
+        [
+          'A head of sales, by spring',
+          ['New customers brought ', fig(money(year(newMrr))), ' of MRR this year and I closed almost every deal myself. One deal was ', fig(percent(bigWinShare, 0)), ' of a month; I want a second person who can close the next one.'],
+        ],
+        [
+          'Notes on pricing and churn',
+          ['Logo churn peaked at ', fig(percent(peakChurn, 1)), ' after the pricing change. If you have moved a base from seats to usage, thirty minutes on what you would do for small accounts would help.'],
+        ],
+      ];
+      const askList = document.getElementById('asks');
+      for (const [title, parts] of asks) {
+        const item = document.createElement('li');
+        const strong = document.createElement('strong');
+        strong.textContent = title;
+        item.append(strong, element('p', parts));
+        askList.append(item);
+      }
+
+      document.getElementById('headline').textContent =
+        'November 2026: ' + percent(Math.abs(planGap), 1) + (planGap < 0 ? ' behind plan' : ' ahead of plan') + ', ' + signed(mrrGrowth, 0) + ' on the year';
+      document.getElementById('meta-data').textContent =
+        'Stripe Billing, as of ' +
+        new Intl.DateTimeFormat(LOCALE, {month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'UTC', timeZoneName: 'short'}).format(new Date(FETCHED_AT));
+      document.getElementById('movements-caption').textContent =
+        'Contraction is small: ' + money(-year(contraction)) + ' over the year, ' + percent(year(contraction) / (year(contraction) + year(churned)), 0) +
+        ' of the ' + money(grossLosses) + ' lost, so its amber sliver is hard to see next to churn in red.';
+      document.getElementById('mrr-caption').textContent =
+        'The shaded dashed line is the forecast and its range; the grey dashed line is the plan.';
+      document.getElementById('footnote').textContent =
+        'MRR movements are the change in MRR from new customers, upgrades (expansion), downgrades (contraction) and cancellations (churn). Revenue is billed revenue in each currency.';
+    </script>
+  </body>
+</html>

@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- An empty icon, so the browser does not request /favicon.ico. -->
+    <link rel="icon" href="data:," />
+    <title>Subscription health, December 2024 to November 2026</title>
+    <!--
+      Example dashboard: the health of a subscription (SaaS) business over
+      24 months, written the way an agent would write a single-file artifact.
+      The data is made up and generated in the page by a seeded generator, so
+      every load shows the same numbers.
+
+      The library is loaded with one script tag. This copy points at the local
+      build so it can be opened from a checkout (build first; `dist/` is
+      generated). In an artifact, use the published file instead:
+
+        <script src="https://cdn.jsdelivr.net/npm/@stripe/charts@0.1.0/dist/stripe-charts.min.js"></script>
+    -->
+    <style>
+      :root {
+        --page: #f4f7fa;
+        --surface: #ffffff;
+        --border: #d5dbe1;
+        --text: #1a2c44;
+        --text-secondary: #3c4f69;
+        --text-muted: #50617a;
+        --positive: #217005;
+        --negative: #c0123c;
+        --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+          'Segoe UI Symbol';
+        --gap: 16px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--page);
+        color: var(--text);
+        font-family: var(--font);
+        font-size: 14px;
+        line-height: 20px;
+      }
+      main {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 40px 32px 56px;
+      }
+      .page-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 8px 24px;
+        margin-bottom: 28px;
+      }
+      .eyebrow {
+        margin: 0 0 4px;
+        color: var(--text-muted);
+        font-size: 12px;
+        line-height: 16px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      h1 {
+        margin: 0;
+        font-size: 28px;
+        line-height: 36px;
+        font-weight: 700;
+      }
+      .lede {
+        margin: 4px 0 0;
+        color: var(--text-secondary);
+      }
+      .as-of {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 12px;
+        line-height: 16px;
+        font-variant-numeric: tabular-nums;
+      }
+      .section-label {
+        margin: 32px 0 12px;
+        color: var(--text-muted);
+        font-size: 12px;
+        line-height: 16px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .tiles {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: var(--gap);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: var(--gap);
+      }
+      .span-4 {
+        grid-column: span 4;
+      }
+      .span-6 {
+        grid-column: span 6;
+      }
+      .span-12 {
+        grid-column: span 12;
+      }
+      .span-8 {
+        grid-column: span 8;
+      }
+      .panel {
+        min-width: 0;
+        padding: 20px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+      }
+      .chart {
+        height: 360px;
+      }
+      .takeaways h2 {
+        margin: 0 0 12px;
+        font-size: 16px;
+        line-height: 24px;
+        font-weight: 600;
+      }
+      .takeaways ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .takeaways li {
+        padding: 12px 0;
+        border-top: 1px solid var(--border);
+        color: var(--text-secondary);
+      }
+      .takeaways li:first-child {
+        border-top: 0;
+        padding-top: 0;
+      }
+      .takeaways strong {
+        color: var(--text);
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+      }
+      .takeaways .up {
+        color: var(--positive);
+      }
+      .takeaways .down {
+        color: var(--negative);
+      }
+      .footnote {
+        margin: 32px 0 0;
+        color: var(--text-muted);
+        font-size: 12px;
+        line-height: 16px;
+      }
+      @media (max-width: 1100px) {
+        .tiles {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .span-8,
+        .span-4 {
+          grid-column: span 12;
+        }
+      }
+      @media (max-width: 760px) {
+        main {
+          padding: 24px 16px 40px;
+        }
+        h1 {
+          font-size: 22px;
+          line-height: 28px;
+        }
+        .span-6 {
+          grid-column: span 12;
+        }
+        .panel {
+          padding: 16px;
+        }
+        .chart {
+          height: 320px;
+        }
+      }
+      @media (max-width: 560px) {
+        .tiles {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">Fieldnote · Subscription analytics</p>
+          <h1>Subscription health</h1>
+          <p class="lede">
+            Monthly recurring revenue and retention, December 2024 through
+            November 2026. Figures are at month end.
+          </p>
+        </div>
+        <p class="as-of" id="as-of"></p>
+      </header>
+
+      <section aria-label="Headline numbers" class="tiles">
+        <div id="tile-mrr"></div>
+        <div id="tile-subscriptions"></div>
+        <div id="tile-nrr"></div>
+        <div id="tile-eu-mrr"></div>
+      </section>
+
+      <h2 class="section-label">Growth</h2>
+      <div class="grid">
+        <section class="panel span-8"><div class="chart" id="mrr"></div></section>
+        <section class="panel span-4 takeaways" aria-labelledby="takeaways-title">
+          <h2 id="takeaways-title">Takeaways</h2>
+          <ul id="takeaways"></ul>
+        </section>
+      </div>
+
+      <h2 class="section-label">What moved MRR</h2>
+      <div class="grid">
+        <section class="panel span-12"><div class="chart" id="movements"></div></section>
+        <section class="panel span-6"><div class="chart" id="new-by-plan"></div></section>
+        <section class="panel span-6"><div class="chart" id="churn-rate"></div></section>
+      </div>
+
+      <p class="footnote">
+        MRR movements are the change in MRR from new subscriptions, upgrades
+        (expansion), downgrades (contraction) and cancellations (churn).
+        Net revenue retention compares today's MRR from customers who were
+        subscribed twelve months ago with their MRR then. Use the info button
+        on any card for its source and a table of the values.
+      </p>
+    </main>
+
+    <script src="../../dist/stripe-charts.min.js"></script>
+    <script>
+      // ---- Data -------------------------------------------------------------
+      // A seeded generator stands in for rows fetched from an API, so the page
+      // is self-contained and reproducible. MRR is built from its movements,
+      // so the charts agree with each other. Money is in cents (integer minor
+      // units), as the API returns it; the specs say so with unit: 'minor'.
+
+      function seeded(seed) {
+        return function next() {
+          seed = (seed + 0x6d2b79f5) | 0;
+          let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      const random = seeded(240);
+      const jitter = (amount) => 1 + (random() * 2 - 1) * amount;
+      const whole = (value) => Math.round(value);
+      const sum = (values) => values.reduce((total, v) => total + v, 0);
+      const points = (xs, ys) => xs.map((x, i) => ({x, y: ys[i]}));
+
+      const MONTHS = 24;
+      const months = Array.from({length: MONTHS}, (_, i) => {
+        const date = new Date(Date.UTC(2024, 11 + i, 1));
+        return date.toISOString().slice(0, 10);
+      });
+      // January is strong for new business and August is slow; a price change
+      // in September 2025 (index 9) caused a churn spike.
+      const season = (i) => ({0: 0.92, 1: 1.18, 8: 0.84, 20: 0.86}[i] ?? 1);
+      const STARTING_MRR = 18400000; // $184,000.00
+
+      const newMrr = [];
+      const expansion = [];
+      const contraction = [];
+      const churned = [];
+      const mrr = [];
+      for (let i = 0; i < MONTHS; i++) {
+        const previous = i === 0 ? STARTING_MRR : mrr[i - 1];
+        newMrr.push(whole(previous * 0.021 * season(i) * jitter(0.1)));
+        expansion.push(whole(previous * 0.03 * jitter(0.12)));
+        contraction.push(-whole(previous * 0.006 * jitter(0.2)));
+        churned.push(-whole(previous * 0.019 * (i === 9 ? 1.7 : i === 10 ? 1.25 : 1) * jitter(0.12)));
+        mrr.push(previous + newMrr[i] + expansion[i] + contraction[i] + churned[i]);
+      }
+      const plan = months.map((_, i) => whole(STARTING_MRR * Math.pow(1.026, i + 1)));
+
+      // Average revenue per subscription drifts up as larger plans grow.
+      const subscriptions = mrr.map((v, i) => whole(v / (7150 + 38 * i)));
+      // Cancelled subscriptions as a share of last month's subscriptions;
+      // churned accounts skew to smaller plans, so it runs above MRR churn.
+      const churnRate = churned.map((v, i) => {
+        const previous = i === 0 ? STARTING_MRR : mrr[i - 1];
+        return Math.round((-v / previous) * 1.18 * 10000) / 10000;
+      });
+      // Trailing twelve-month net revenue retention, from month 12 on.
+      const nrrMonths = months.slice(12);
+      const nrr = nrrMonths.map((_, k) => {
+        const i = k + 12;
+        const retained = sum(expansion.slice(i - 11, i + 1)) + sum(contraction.slice(i - 11, i + 1)) + sum(churned.slice(i - 11, i + 1));
+        return Math.round((1 + retained / mrr[i - 12]) * 10000) / 10000;
+      });
+      // The European entity bills in euros; its share of MRR grows slowly.
+      const EUR_PER_USD = 0.92;
+      const euMrr = mrr.map((v, i) => whole(v * (0.205 + 0.0025 * i) * EUR_PER_USD * jitter(0.01)));
+
+      // New MRR by plan over the last 12 months.
+      const lastYear = months.slice(12);
+      const planShare = (i) => ({starter: 0.24 - 0.004 * i, team: 0.46, business: 0.3 + 0.004 * i});
+      const newByPlan = (key) => lastYear.map((_, k) => whole(newMrr[k + 12] * planShare(k)[key]));
+
+      const last = MONTHS - 1;
+
+      // Three months ahead: recent net growth carried forward, with a band
+      // that widens by 1.6% of MRR for each month out.
+      const recentGrowth = Math.pow(mrr[last] / mrr[last - 6], 1 / 6) - 1;
+      const forecastMonths = [0, 1, 2].map((k) => new Date(Date.UTC(2026, 11 + k, 1)).toISOString().slice(0, 10));
+      const forecastMrr = forecastMonths.map((_, k) => {
+        const y = whole(mrr[last] * Math.pow(1 + recentGrowth, k + 1));
+        return {y, low: whole(y * (1 - 0.016 * (k + 1))), high: whole(y * (1 + 0.016 * (k + 1)))};
+      });
+      const thisYear = (values) => values.slice(12);
+      const yearBefore = (values) => values.slice(0, 12);
+
+      // ---- Charts -----------------------------------------------------------
+
+      const LOCALE = 'en-US';
+      const USD = {style: 'currency', currency: 'usd', unit: 'minor'};
+      const FETCHED_AT = '2026-12-01T08:00:00Z';
+      const provenance = (metric, period, extra = []) => ({
+        source: 'Stripe Billing',
+        fetchedAt: FETCHED_AT,
+        details: [
+          {label: 'Metric', value: metric},
+          {label: 'Period', value: period},
+          ...extra,
+          {label: 'Time zone', value: 'UTC, month end'},
+        ],
+      });
+      const TWO_YEARS = 'Dec 2024 to Nov 2026';
+      const ONE_YEAR = 'Dec 2025 to Nov 2026';
+      const VS_YEAR_BEFORE = {label: 'Compared with', value: 'Dec 2024 to Nov 2025'};
+      const yearOverYear = (values) => [
+        {label: 'Last 12 months', data: points(lastYear, thisYear(values))},
+        {label: 'Year before', comparison: true, data: points(months.slice(0, 12), yearBefore(values))},
+      ];
+      const render = (id, spec) => StripeCharts.render(document.getElementById(id), {locale: LOCALE, timeZone: 'UTC', ...spec});
+
+
+      render('tile-mrr', {
+        title: 'MRR',
+        description: 'November, against a year earlier',
+        format: USD,
+        kpi: {basis: 'latest', value: mrr[last], comparisonValue: mrr[last - 12], notation: 'compact'},
+        chart: {type: 'kpi'},
+        series: yearOverYear(mrr),
+        provenance: provenance('mrr', ONE_YEAR, [VS_YEAR_BEFORE]),
+      });
+
+      render('tile-subscriptions', {
+        title: 'Active subscriptions',
+        description: 'November, against a year earlier',
+        format: {style: 'number', maximumFractionDigits: 0},
+        kpi: {basis: 'latest', value: subscriptions[last], comparisonValue: subscriptions[last - 12]},
+        chart: {type: 'kpi'},
+        series: yearOverYear(subscriptions),
+        provenance: provenance('active_subscriptions', ONE_YEAR, [VS_YEAR_BEFORE]),
+      });
+
+      render('tile-nrr', {
+        title: 'Net revenue retention',
+        description: 'Trailing 12 months',
+        format: {style: 'percent', unit: 'ratio', maximumFractionDigits: 1},
+        kpi: {basis: 'latest', value: nrr[nrr.length - 1]},
+        chart: {type: 'kpi'},
+        series: [{label: 'Net revenue retention', data: points(nrrMonths, nrr)}],
+        provenance: provenance('net_revenue_retention_ttm', ONE_YEAR),
+      });
+
+      render('tile-eu-mrr', {
+        title: 'MRR, European entity',
+        description: 'Billed in euros, against a year earlier',
+        format: {style: 'currency', currency: 'eur', unit: 'minor'},
+        kpi: {basis: 'latest', value: euMrr[last], comparisonValue: euMrr[last - 12], notation: 'compact'},
+        chart: {type: 'kpi'},
+        series: yearOverYear(euMrr),
+        provenance: provenance('mrr', ONE_YEAR, [VS_YEAR_BEFORE, {label: 'Currency', value: 'EUR, not converted'}]),
+      });
+
+      render('mrr', {
+        title: 'MRR against plan',
+        description: 'Month-end MRR, a three-month forecast and the operating plan of 2.6% monthly growth',
+        format: USD,
+        // Latest actual month: forecast points don't count toward the basis.
+        kpi: {basis: 'latest', value: mrr[last], comparisonValue: plan[last]},
+        chart: {type: 'line'},
+        series: [
+          {
+            label: 'MRR',
+            data: [
+              ...points(months, mrr),
+              ...forecastMonths.map((x, k) => ({x, forecast: true, ...forecastMrr[k]})),
+            ],
+          },
+          {label: 'Plan', comparison: true, data: points(months, plan)},
+        ],
+        provenance: provenance('mrr', TWO_YEARS, [{label: 'Compared with', value: 'Operating plan'}]),
+      });
+
+      render('movements', {
+        title: 'MRR movements',
+        description: 'Gains above zero, losses below; their sum is net new MRR',
+        format: USD,
+        chart: {type: 'bar', stacking: 'stacked'},
+        series: [
+          {label: 'New', data: points(months, newMrr)},
+          {label: 'Expansion', data: points(months, expansion)},
+          {label: 'Churn', data: points(months, churned)},
+          {label: 'Contraction', data: points(months, contraction)},
+        ],
+        provenance: provenance('mrr_movements', TWO_YEARS),
+      });
+
+      render('new-by-plan', {
+        title: 'New MRR by plan',
+        description: 'Last 12 months',
+        format: USD,
+        chart: {type: 'bar'},
+        series: [
+          {label: 'Starter', data: points(lastYear, newByPlan('starter'))},
+          {label: 'Team', data: points(lastYear, newByPlan('team'))},
+          {label: 'Business', data: points(lastYear, newByPlan('business'))},
+        ],
+        provenance: provenance('new_mrr by plan', ONE_YEAR),
+      });
+
+      render('churn-rate', {
+        title: 'Subscription churn rate',
+        description: 'Cancellations as a share of last month’s subscriptions',
+        format: {style: 'percent', unit: 'ratio', maximumFractionDigits: 2},
+        // Lower churn is good, so a rise is shown in red.
+        kpi: {basis: 'latest', value: churnRate[last], comparisonValue: churnRate[last - 12], goodDirection: 'down'},
+        chart: {type: 'line', legend: 'show'},
+        series: yearOverYear(churnRate),
+        provenance: provenance('subscription_churn_rate', ONE_YEAR, [VS_YEAR_BEFORE]),
+      });
+
+
+      // ---- Takeaways ----------------------------------------------------------
+      // Written from the numbers above, the way an agent would summarize them.
+      // Built with text nodes: every string is treated as text.
+
+      const money = new Intl.NumberFormat(LOCALE, {style: 'currency', currency: 'USD', maximumFractionDigits: 0});
+      const dollars = (amountInCents) => money.format(amountInCents / 100);
+      const euros = new Intl.NumberFormat(LOCALE, {style: 'currency', currency: 'EUR', maximumFractionDigits: 0});
+      const percent = (v, digits = 1) =>
+        new Intl.NumberFormat(LOCALE, {style: 'percent', maximumFractionDigits: digits, minimumFractionDigits: digits}).format(v);
+      const change = (now, then) => (now >= then ? '+' : '') + percent((now - then) / Math.abs(then));
+      const monthName = (iso) => new Intl.DateTimeFormat(LOCALE, {month: 'long', year: 'numeric', timeZone: 'UTC'}).format(new Date(iso));
+      const average = (values) => sum(values) / values.length;
+
+      const net = months.map((_, i) => newMrr[i] + expansion[i] + contraction[i] + churned[i]);
+      const spike = churnRate.indexOf(Math.max(...churnRate));
+
+      const takeaways = [
+        ['MRR closed November at ', {strong: dollars(mrr[last])}, ', ', {change: change(mrr[last], mrr[last - 12])},
+          ' on a year earlier and ', {strong: percent(Math.abs(mrr[last] / plan[last] - 1))},
+          mrr[last] < plan[last] ? ' behind plan: churn after the September price change cost the lead.' : ' ahead of plan.'],
+        ['At the recent pace MRR reaches ', {strong: dollars(forecastMrr[2].y)}, ' by ', monthName(forecastMonths[2]),
+          ' (forecast range ', dollars(forecastMrr[2].low), ' to ', dollars(forecastMrr[2].high), ').'],
+        ['Net new MRR averaged ', {strong: dollars(average(net.slice(-6)))}, ' a month over the last six months, up from ',
+          dollars(average(net.slice(-12, -6))), ' in the six before.'],
+        ['Churn peaked at ', {strong: percent(churnRate[spike], 2)}, ' in ', monthName(months[spike]),
+          ' after the price change and is back to ', {strong: percent(churnRate[last], 2)}, '.'],
+        ['Net revenue retention is ', {strong: percent(nrr[nrr.length - 1])}, ': upgrades more than make up for downgrades and cancellations. The European entity grew to ',
+          {strong: euros.format(euMrr[last] / 100)}, ' (', {change: change(euMrr[last], euMrr[last - 12])}, ' in euros).'],
+      ];
+
+      const list = document.getElementById('takeaways');
+      for (const parts of takeaways) {
+        const item = document.createElement('li');
+        for (const part of parts) {
+          if (typeof part === 'string') {
+            item.append(part);
+          } else {
+            const emphasis = document.createElement('strong');
+            if (part.change !== undefined) emphasis.className = part.change.startsWith('+') ? 'up' : 'down';
+            emphasis.textContent = part.strong ?? part.change;
+            item.append(emphasis);
+          }
+        }
+        list.append(item);
+      }
+
+      document.getElementById('as-of').textContent =
+        'Data as of ' +
+        new Intl.DateTimeFormat(LOCALE, {month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'UTC', timeZoneName: 'short'}).format(
+          new Date(FETCHED_AT),
+        );
+    </script>
+  </body>
+</html>
