@@ -66,7 +66,7 @@ export function viewToggle(code: boolean, onToggle: () => void): HTMLElement {
  */
 export function codeView(
   snippet: string,
-  loadsScript: boolean,
+  downloadHtml: string | null,
   inline = false,
 ): HTMLElement {
   const view = document.createElement('section');
@@ -99,10 +99,12 @@ export function codeView(
   });
   const copyButton = controlButton('Copy');
   bar.append(copyButton);
-  if (loadsScript) {
+  if (downloadHtml !== null) {
     const download = controlButton('Download HTML');
     download.addEventListener('click', () => {
-      const url = URL.createObjectURL(new Blob([snippet], {type: 'text/html'}));
+      const url = URL.createObjectURL(
+        new Blob([downloadHtml], {type: 'text/html'}),
+      );
       const link = document.createElement('a');
       link.href = url;
       link.download = 'stripe-chart.html';

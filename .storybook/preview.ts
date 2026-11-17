@@ -5,14 +5,14 @@ import {addons} from 'storybook/preview-api';
 import {cleanUpCharts} from '../stories/support/mount';
 import {guideFor} from '../stories/support/guides';
 import {guidePage} from '../stories/support/guidePage';
-import {buildSnippet, takeRecords} from './code';
+import {buildJavaScript, buildSnippet, takeRecords} from './code';
 import {codeView, viewToggle} from './codeView';
 import {VIEW_GLOBAL, DEFAULT_VIEW, viewOf} from './view';
 
 /**
  * Chart / Code view for every story. The story always renders, so its charts
  * record their specs; in code mode they are destroyed again and the frame
- * shows the HTML page built from those specs instead. Each render first
+ * shows the rendering code built from those specs instead. Each render first
  * destroys the previous render's charts, so toggling never leaks. The
  * "screenshot" view shows the story without the toggle.
  */
@@ -39,8 +39,15 @@ const withView: Decorator = (storyFn, context) => {
   const records = takeRecords();
   const view = viewOf(context.globals);
   const custom = storyCode(context.parameters.code);
+  const downloadHtml =
+    custom === undefined && records.length > 0 ? buildSnippet(records) : null;
   const snippet =
-    custom?.source ?? (records.length > 0 ? buildSnippet(records) : null);
+    custom?.source ??
+    (context.title === 'Intro'
+      ? downloadHtml
+      : records.length > 0
+        ? buildJavaScript(records)
+        : null);
   if (view === 'screenshot' || typeof story === 'string') {
     return story;
   }
@@ -53,11 +60,11 @@ const withView: Decorator = (storyFn, context) => {
       guide,
       story,
       context.parameters.codePanel === false ? null : snippet,
-      custom === undefined,
+      downloadHtml,
       context.title === 'Intro' || isOverview,
     );
   if (snippet === null)
-    return guide ? guidePage(context.title, guide, story, null, false) : story;
+    return guide ? guidePage(context.title, guide, story, null, null) : story;
   const code = view === 'code';
   const toggle = viewToggle(code, () =>
     addons.getChannel().emit(UPDATE_GLOBALS, {
@@ -67,7 +74,7 @@ const withView: Decorator = (storyFn, context) => {
   const frame = document.createElement('div');
   if (code) {
     cleanUpCharts()();
-    frame.append(codeView(snippet, custom === undefined), toggle);
+    frame.append(codeView(snippet, downloadHtml), toggle);
   } else {
     frame.append(story, toggle);
   }

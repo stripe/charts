@@ -1,7 +1,7 @@
 // "Show code" support: stories record each chart they render, and the
-// preview turns the records into a self-contained HTML page that draws the
-// same charts. The snippet is built from the specs actually rendered, so it
-// cannot drift from the story.
+// preview turns the records into rendering JavaScript and a downloadable
+// HTML page. Both use the specs actually rendered, so they cannot drift
+// from the story.
 
 import {PACKAGE_NAME} from '../src/meta';
 
@@ -118,8 +118,12 @@ function idsFor(count: number): Ids {
 }
 
 /** The script lines for one chart: render, then its steps. */
-function chartScript(record: ChartRecord, n: number, ids: Ids): string[] {
-  const i = INDENT.repeat(4);
+function chartScript(
+  record: ChartRecord,
+  n: number,
+  ids: Ids,
+  i = '',
+): string[] {
   const name = ids.variable(n);
   const element = `document.getElementById('${ids.element(n)}')`;
   const options =
@@ -149,6 +153,14 @@ function chartScript(record: ChartRecord, n: number, ids: Ids): string[] {
     lines.push(`${i}${button}.addEventListener('click', () => ${call});`);
   });
   return lines;
+}
+
+/** Rendering JavaScript for existing chart containers, without page setup. */
+export function buildJavaScript(records: readonly ChartRecord[]): string {
+  const ids = idsFor(records.length);
+  return records
+    .map((record, n) => chartScript(record, n, ids).join('\n'))
+    .join('\n\n');
 }
 
 function titleOf(records: readonly ChartRecord[]): string {
@@ -192,7 +204,9 @@ export function buildSnippet(records: readonly ChartRecord[]): string {
       `    <div id="${ids.element(n)}" style="${styleFor(record)}"></div>`,
     );
   });
-  const script = records.flatMap((record, n) => chartScript(record, n, ids));
+  const script = records.flatMap((record, n) =>
+    chartScript(record, n, ids, INDENT.repeat(4)),
+  );
   // Embedded in a <script>, so "</" in a string must not end the element.
   const scriptText = script.join('\n').replace(/<\//g, '<\\/');
   return [

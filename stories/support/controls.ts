@@ -1,4 +1,4 @@
-import {buildSnippet} from '../../.storybook/code';
+import {buildJavaScript, buildSnippet} from '../../.storybook/code';
 import {codeView} from '../../.storybook/codeView';
 import {chart, track} from './mount';
 import type {ChartSpec} from '../../src/index';
@@ -43,8 +43,9 @@ export function chooseSpec(
       current = error.chart;
       if (current) track(current);
     }
+    const records = [{spec, width: '100%', height: 320}];
     code.replaceChildren(
-      codeView(buildSnippet([{spec, width: '100%', height: 320}]), true, true),
+      codeView(buildJavaScript(records), buildSnippet(records), true),
     );
   };
   select.addEventListener('change', show);
@@ -55,6 +56,6 @@ export function chooseSpec(
 
 /** A single chart used on a guide page. */
 export function guideChart(spec: ChartSpec): HTMLElement {
-  // Chart recording lets the shared guide show generated HTML beside the plot.
+  // Chart recording keeps the shared guide's JavaScript in sync with the plot.
   return chart(spec, {width: '100%', height: 320});
 }

@@ -16,6 +16,12 @@ test('changing units keeps the rendered chart and downloadable code in sync', ()
   const page = Units.render();
   document.body.appendChild(page);
   const select = page.querySelector('select');
+  expect(page.querySelector('[data-sb-code] code').textContent).toMatch(
+    /^const chart = StripeCharts.render\(/,
+  );
+  expect(page.querySelector('[data-sb-code] code').textContent).not.toContain(
+    '<html',
+  );
   expect(page.querySelector('[data-sb-code] code').textContent).toContain(
     '"unit": "minor"',
   );
@@ -57,7 +63,7 @@ test('the first guide shows the live example, API fields, and a complete HTML do
     guideFor('Intro'),
     story,
     html,
-    true,
+    html,
   );
   expect(page.querySelector('.sc-root')).not.toBeNull();
   expect(page.querySelector('table').textContent).toContain('series');
