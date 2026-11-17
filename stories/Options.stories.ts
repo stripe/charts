@@ -116,6 +116,18 @@ export const CustomTooltip: StoryObj<Args> = {
         {width: COLUMN_WIDTH, height: HEIGHT},
         {
           options: {renderTooltip: tooltipContents},
+          reactSource: `{
+  renderTooltip: (context) => (
+    <div>
+      <strong>Reporting period: {context.title}</strong>
+      {context.series.map((series) => (
+        <div key={series.label}>
+          {series.label}: {series.formatted} ({series.x ?? 'no data'})
+        </div>
+      ))}
+    </div>
+  ),
+}`,
           source: `{
   renderTooltip: (context) => {
     const box = document.createElement('div');
@@ -192,7 +204,7 @@ export const AxisFormatting: StoryObj<Args> = {
     ),
 };
 
-const WEEK = dates('2026-11-26', 5);
+const WEEK = dates('2026-11-01', 30);
 
 /**
  * `series[].color` sets a series color and, in bar charts,
@@ -204,7 +216,7 @@ export const Colors: StoryObj<Args> = {
   args: {
     spec: {
       title: 'Refunds',
-      description: 'November 26–30; the record day highlighted',
+      description: 'November 1–30; the record day highlighted',
       format: {style: 'currency', currency: 'usd', unit: 'major'},
       timeZone: 'America/New_York',
       chart: {type: 'bar'},
@@ -212,15 +224,19 @@ export const Colors: StoryObj<Args> = {
         {
           label: 'Refunds',
           color: '#0E7490',
-          data: points(WEEK, [28_640, 45_320, 30_510, 33_130, 38_740]).map(
-            (point) =>
-              point.x === '2026-11-27' ? {...point, color: '#C2410C'} : point,
+          data: points(
+            WEEK,
+            curve(WEEK.length, 28_640, 38_740, {jitter: 0.5, seed: 61}),
+          ).map((point) =>
+            point.x === '2026-11-27'
+              ? {...point, y: 45_320, color: '#C2410C'}
+              : point,
           ),
         },
       ],
       provenance: provenance({
         metric: 'refunds_amount',
-        period: 'Nov 26 to Nov 30, 2026, daily',
+        period: 'Nov 1 to Nov 30, 2026, daily',
         timeZone: 'America/New_York',
         fetchedAt: '2026-12-01T14:05:00Z',
       }),

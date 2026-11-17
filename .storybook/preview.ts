@@ -5,7 +5,7 @@ import {addons} from 'storybook/preview-api';
 import {cleanUpCharts} from '../stories/support/mount';
 import {guideFor} from '../stories/support/guides';
 import {guidePage} from '../stories/support/guidePage';
-import {buildJavaScript, buildSnippet, takeRecords} from './code';
+import {buildCodeExamples, takeRecords} from './code';
 import {codeView, viewToggle} from './codeView';
 import {VIEW_GLOBAL, DEFAULT_VIEW, viewOf} from './view';
 
@@ -16,36 +16,16 @@ import {VIEW_GLOBAL, DEFAULT_VIEW, viewOf} from './view';
  * destroys the previous render's charts, so toggling never leaks. The
  * "screenshot" view shows the story without the toggle.
  */
-/**
- * A story's own snippet, from `parameters.code`, for stories that don't
- * render through `StripeCharts.render` (for example the React binding's).
- * Shown verbatim instead of the generated HTML page.
- */
-export type StoryCode = {language: 'html' | 'tsx'; source: string};
-
-function storyCode(value: unknown): StoryCode | undefined {
-  if (typeof value !== 'object' || value === null) return undefined;
-  const {language, source} = value as Partial<StoryCode>;
-  return (language === 'html' || language === 'tsx') &&
-    typeof source === 'string'
-    ? {language, source}
-    : undefined;
-}
-
 const withView: Decorator = (storyFn, context) => {
   cleanUpCharts()();
   takeRecords();
   const story = storyFn();
   const records = takeRecords();
   const view = viewOf(context.globals);
-  const custom = storyCode(context.parameters.code);
   const snippet =
-    custom?.source ??
-    (records.length > 0
-      ? context.title === 'Intro'
-        ? buildSnippet(records)
-        : buildJavaScript(records)
-      : null);
+    records.length > 0
+      ? buildCodeExamples(records, context.title === 'Intro')
+      : null;
   if (view === 'screenshot' || typeof story === 'string') {
     return story;
   }
@@ -106,8 +86,6 @@ const preview: Preview = {
             'Details',
             'States',
           ],
-          'React',
-          ['Overview', 'StripeChart'],
           'Examples',
           ['Overview', 'Reporting', 'Dashboard', 'API', 'Options'],
         ],

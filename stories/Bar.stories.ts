@@ -179,8 +179,19 @@ export const ComparisonHover: StoryObj<ComparisonArgs> = {
   render: renderComparison,
 };
 
-const REPORT_DAYS = dates('2026-11-26', 5);
+const REPORT_DAYS = dates('2026-11-01', 30);
 const REPORT_HEIGHT = 400;
+
+function reportValues(lastFive: number[]): number[] {
+  const first = lastFive[0] ?? 0;
+  return [
+    ...curve(25, Math.round(first * 0.65), Math.round(first * 0.95), {
+      jitter: 0.45,
+      seed: Math.abs(first),
+    }),
+    ...lastFive,
+  ];
+}
 
 function reportProvenance(
   metric: string,
@@ -189,7 +200,7 @@ function reportProvenance(
   return provenance({
     metric,
     ...(comparedWith === undefined ? {} : {comparedWith}),
-    period: 'Nov 26 to Nov 30, 2026, daily',
+    period: 'Nov 1 to Nov 30, 2026, daily',
     timeZone: 'America/New_York',
     fetchedAt: '2026-12-01T14:05:00Z',
   });
@@ -197,26 +208,38 @@ function reportProvenance(
 
 const byPaymentMethod: ChartSpec = {
   title: 'Gross volume by payment method',
-  description: 'November 26–30',
+  description: 'November 1–30',
   format: {style: 'currency', currency: 'usd', unit: 'major'},
   timeZone: 'America/New_York',
   chart: {type: 'bar'},
   series: [
     {
       label: 'Cards',
-      data: points(REPORT_DAYS, [198_400, 286_900, 231_200, 204_800, 318_300]),
+      data: points(
+        REPORT_DAYS,
+        reportValues([198_400, 286_900, 231_200, 204_800, 318_300]),
+      ),
     },
     {
       label: 'Wallets',
-      data: points(REPORT_DAYS, [52_300, 79_800, 66_100, 59_400, 88_200]),
+      data: points(
+        REPORT_DAYS,
+        reportValues([52_300, 79_800, 66_100, 59_400, 88_200]),
+      ),
     },
     {
       label: 'Bank debits',
-      data: points(REPORT_DAYS, [21_700, 28_400, 24_900, 22_300, 31_000]),
+      data: points(
+        REPORT_DAYS,
+        reportValues([21_700, 28_400, 24_900, 22_300, 31_000]),
+      ),
     },
     {
       label: 'Buy now, pay later',
-      data: points(REPORT_DAYS, [14_000, 16_900, 16_750, 14_700, 18_230]),
+      data: points(
+        REPORT_DAYS,
+        reportValues([14_000, 16_900, 16_750, 14_700, 18_230]),
+      ),
     },
   ],
   provenance: reportProvenance('gross_volume, grouped by payment_method_type'),
@@ -239,30 +262,36 @@ export const GroupedWithComparison: StoryObj<SingleArgs> = {
   args: {
     spec: {
       title: 'Orders by channel',
-      description: 'November 26–30, compared with last year',
+      description: 'November 1–30, compared with last year',
       format: {style: 'number', maximumFractionDigits: 0},
       timeZone: 'America/New_York',
       chart: {type: 'bar'},
       series: [
         {
           label: 'Online',
-          data: points(REPORT_DAYS, [2_612, 4_015, 3_120, 2_841, 4_660]),
+          data: points(
+            REPORT_DAYS,
+            reportValues([2_612, 4_015, 3_120, 2_841, 4_660]),
+          ),
         },
         {
           label: 'In person',
-          data: points(REPORT_DAYS, [800, 1_193, 990, 853, 1_216]),
+          data: points(
+            REPORT_DAYS,
+            reportValues([800, 1_193, 990, 853, 1_216]),
+          ),
         },
         {
           label: 'All channels, 2025',
           comparison: true,
           data: points(
-            dates('2025-11-27', 5),
-            [3_050, 4_710, 3_820, 3_402, 5_301],
+            dates('2025-11-02', 30),
+            reportValues([3_050, 4_710, 3_820, 3_402, 5_301]),
           ),
         },
       ],
       provenance: reportProvenance('successful_payments_count, by channel', {
-        comparedWith: 'Nov 27 to Dec 1, 2025 (same weekdays)',
+        comparedWith: 'Nov 2 to Dec 1, 2025 (same weekdays)',
       }),
     },
   },
@@ -280,7 +309,7 @@ export const Stacked: StoryObj<SingleArgs> = {
   args: {
     spec: {
       title: 'Net volume',
-      description: 'Charges, refunds and disputes, November 26–30',
+      description: 'Charges, refunds and disputes, November 1–30',
       format: {style: 'currency', currency: 'usd', unit: 'major'},
       timeZone: 'America/New_York',
       chart: {type: 'bar', stacking: 'stacked'},
@@ -289,21 +318,21 @@ export const Stacked: StoryObj<SingleArgs> = {
           label: 'Charges',
           data: points(
             REPORT_DAYS,
-            [286_410, 412_000, 338_950, 301_220, 455_730],
+            reportValues([286_410, 412_000, 338_950, 301_220, 455_730]),
           ),
         },
         {
           label: 'Refunds',
           data: points(
             REPORT_DAYS,
-            [-28_640, -45_320, -30_510, -33_130, -38_740],
+            reportValues([-28_640, -45_320, -30_510, -33_130, -38_740]),
           ),
         },
         {
           label: 'Disputes',
           data: points(
             REPORT_DAYS,
-            [-8_590, -14_420, -7_460, -11_450, -12_300],
+            reportValues([-8_590, -14_420, -7_460, -11_450, -12_300]),
           ),
         },
       ],

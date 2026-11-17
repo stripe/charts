@@ -101,7 +101,7 @@ function revised(factor: number): unknown {
   if (current === undefined) return grossVolume;
   return {
     ...grossVolume,
-    description: 'November 26–30, revised forecast',
+    description: 'November 1–30, revised forecast',
     kpi: {
       ...grossVolume.kpi,
       basis: 'custom',

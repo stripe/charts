@@ -2,7 +2,7 @@ import type {Meta, StoryObj} from '@storybook/html';
 import type {ChartSpec} from '../src/index';
 import {curve, dates, points} from './support/data';
 import {chart, cleanUpCharts} from './support/mount';
-import {orderSpec} from './support/specs';
+import {orderSpec, orderTotal} from './support/specs';
 
 const meta: Meta = {
   parameters: {viewToggle: false, codePanel: false},
@@ -52,7 +52,11 @@ export const Overview: StoryObj = {
       [
         'KPI',
         'charts-kpi--overview',
-        {...orderSpec, chart: {type: 'kpi'}, kpi: {value: 360, basis: 'total'}},
+        {
+          ...orderSpec,
+          chart: {type: 'kpi'},
+          kpi: {value: orderTotal, basis: 'total'},
+        },
       ],
     ];
     for (const [label, id, spec] of examples) {

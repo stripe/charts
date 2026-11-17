@@ -1,7 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/html';
 import {cleanUpCharts} from './support/mount';
 import {chooseSpec} from './support/controls';
-import {orderSpec} from './support/specs';
+import {orderSpec, reportingDays} from './support/specs';
 
 const meta: Meta = {
   parameters: {viewToggle: false},
@@ -35,11 +35,14 @@ export const Overview: StoryObj = {
         series: [
           {
             label: 'Conversion',
-            data: [
-              {x: '2026-11-27', y: 0.025},
-              {x: '2026-11-28', y: 0.03},
-              {x: '2026-11-29', y: 0.028},
-            ],
+            data: reportingDays.map((x, index) => ({
+              x,
+              y:
+                Math.round(
+                  (0.025 + index * 0.0002 + Math.sin(index * 0.9) * 0.003) *
+                    10000,
+                ) / 10000,
+            })),
           },
         ],
       },

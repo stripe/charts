@@ -1,6 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/html';
 import {cleanUpCharts} from './support/mount';
 import {chooseSpec} from './support/controls';
+import {curve, dates, points} from './support/data';
 import {orderSpec} from './support/specs';
 
 const meta: Meta = {
@@ -16,11 +17,10 @@ const compared = {
     {
       label: 'Last year',
       comparison: true,
-      data: [
-        {x: '2025-11-28', y: 100},
-        {x: '2025-11-29', y: 90},
-        {x: '2025-11-30', y: 125},
-      ],
+      data: points(
+        dates('2025-11-02', 30),
+        curve(30, 100, 220, {jitter: 0.35, seed: 31}),
+      ),
     },
   ],
 };

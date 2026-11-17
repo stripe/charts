@@ -1,8 +1,9 @@
 import type {Meta, StoryObj} from '@storybook/html';
-import {orderSpec} from './support/specs';
+import {orderSpec, orderTotal} from './support/specs';
 
 import {shot} from '../.storybook/shots';
 import volumeTotal from '../examples/volume-kpi.json';
+import dailyVolume from '../examples/daily-gross-volume.json';
 import type {ChartSpec, Provenance, Series} from '../src/index';
 import {dates, points, seeded} from './support/data';
 import {
@@ -36,14 +37,18 @@ export default meta;
 export const Overview: StoryObj = {
   render: () =>
     chart(
-      {...orderSpec, chart: {type: 'kpi'}, kpi: {value: 360, basis: 'total'}},
+      {
+        ...orderSpec,
+        chart: {type: 'kpi'},
+        kpi: {value: orderTotal, basis: 'total'},
+      },
       {width: '100%', height: 320},
     ),
 };
 
 const usd = {style: 'currency', currency: 'usd', unit: 'major'} as const;
 
-const SPARKLINE_DAYS = dates('2026-10-26', 7);
+const SPARKLINE_DAYS = dates('2026-10-01', 30);
 const SPARKLINE_JITTER = 0.3;
 
 /**
@@ -210,16 +215,8 @@ export const NarrowSparkline: StoryObj<{spec: unknown}> = {
   ...shot('kpi-narrow-sparkline', 800, 500),
   args: {
     spec: {
-      ...volumeTotal,
-      series: [
-        {
-          label: 'Gross volume',
-          data: points(
-            dates('2026-11-27', 4),
-            [41_200_025, 33_895_080, 30_122_040, 45_573_010],
-          ),
-        },
-      ],
+      ...dailyVolume,
+      chart: {type: 'kpi'},
     },
   },
   render: ({spec}) =>

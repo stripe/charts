@@ -1,5 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/html';
 import {cleanUpCharts} from './support/mount';
+import {curve} from './support/data';
 import {chooseSpec} from './support/controls';
 
 const meta: Meta = {
@@ -22,11 +23,15 @@ export const Overview: StoryObj = {
             series: [
               {
                 label: 'Orders',
-                data: [
-                  {x: '2026-11-28T00:00:00Z', y: 120},
-                  {x: '2026-11-28T01:00:00Z', y: 95},
-                  {x: '2026-11-28T02:00:00Z', y: 145},
-                ],
+                data: curve(48, 120, 220, {jitter: 0.65, seed: 19}).map(
+                  (y, index) => ({
+                    x: new Date(
+                      Date.parse('2026-11-27T12:00:00Z') +
+                        index * 60 * 60 * 1000,
+                    ).toISOString(),
+                    y,
+                  }),
+                ),
               },
             ],
           },

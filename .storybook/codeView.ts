@@ -1,6 +1,7 @@
 // The story frame's code view and its Chart / Code toggle. In code mode the
 // snippet replaces the story in the same frame and scrolls inside it.
 // Styled as neutral page chrome, not like the chart.
+import type {CodeExample, CodeExamples} from './code';
 
 const FONT =
   '12px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
@@ -10,6 +11,7 @@ const BORDER = '1px solid #d0d7de';
 const COPIED_MS = 1500;
 /** Storybook's "padded" layout inset on each side of the frame. */
 const FRAME_INSET = '1rem';
+let nextPanelId = 0;
 
 function controlButton(label: string): HTMLButtonElement {
   const button = document.createElement('button');
@@ -64,7 +66,15 @@ export function viewToggle(code: boolean, onToggle: () => void): HTMLElement {
 /**
  * Copyable code, either inline or filling the frame.
  */
-export function codeView(snippet: string, inline = false): HTMLElement {
+export function codeView(
+  examples: CodeExamples,
+  inline = false,
+  initialLanguage: CodeExample['language'] = 'react',
+): HTMLElement {
+  let selected =
+    examples.find((example) => example.language === initialLanguage) ??
+    examples[0];
+  const panelId = `sc-code-${++nextPanelId}`;
   const view = document.createElement('section');
   view.dataset.sbCode = '';
   view.setAttribute('aria-label', 'Code for this story');
@@ -82,11 +92,23 @@ export function codeView(snippet: string, inline = false): HTMLElement {
     borderRadius: '6px',
   });
 
+  const bar = document.createElement('div');
+  Object.assign(bar.style, {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: inline ? '4px 8px' : '4px 120px 4px 8px',
+    borderBottom: BORDER,
+    flexShrink: '0',
+  });
+  const tabs = document.createElement('div');
+  tabs.setAttribute('role', 'tablist');
+  tabs.setAttribute('aria-label', 'Code language');
+  tabs.style.display = 'flex';
+  tabs.style.gap = '4px';
   const copyButton = controlButton('Copy');
   Object.assign(copyButton.style, {
-    position: 'absolute',
-    top: '6px',
-    right: inline ? '6px' : '120px',
+    marginLeft: 'auto',
     padding: '2px 6px',
     minHeight: '24px',
     borderRadius: '4px',
@@ -95,26 +117,86 @@ export function codeView(snippet: string, inline = false): HTMLElement {
   });
 
   const pre = document.createElement('pre');
+  pre.id = panelId;
+  pre.setAttribute('role', 'tabpanel');
+  pre.tabIndex = 0;
   Object.assign(pre.style, {
     flex: '1',
     margin: '0',
-    padding: '36px 12px 12px',
+    padding: '12px',
+    minHeight: '0',
     overflow: 'auto',
     font: FONT,
     color: '#24292f',
   });
   const code = document.createElement('code');
-  code.textContent = snippet;
   pre.append(code);
 
+  const buttons = examples.map((example) => {
+    const button = controlButton(example.label);
+    button.id = `${panelId}-${example.language}`;
+    button.dataset.language = example.language;
+    button.setAttribute('role', 'tab');
+    button.setAttribute('aria-controls', panelId);
+    Object.assign(button.style, {
+      padding: '2px 6px',
+      minHeight: '24px',
+      border: 'none',
+      borderRadius: '4px',
+    });
+    button.addEventListener('click', () => select(example));
+    tabs.appendChild(button);
+    return button;
+  });
+  function select(example: CodeExample): void {
+    selected = example;
+    code.textContent = selected.source;
+    code.className =
+      selected.language === 'react'
+        ? 'language-jsx'
+        : `language-${selected.label === 'HTML' ? 'html' : 'javascript'}`;
+    pre.setAttribute('aria-labelledby', `${panelId}-${selected.language}`);
+    pre.scrollTop = 0;
+    pre.scrollLeft = 0;
+    copyButton.textContent = 'Copy';
+    for (const button of buttons) {
+      const active = button.dataset.language === selected.language;
+      button.setAttribute('aria-selected', String(active));
+      button.tabIndex = active ? 0 : -1;
+      button.style.color = active ? '#24292f' : '#57606a';
+      button.style.background = active ? '#e8edf2' : 'transparent';
+    }
+  }
+  tabs.addEventListener('keydown', (event) => {
+    const index = examples.indexOf(selected);
+    const next =
+      event.key === 'Home'
+        ? 0
+        : event.key === 'End'
+          ? examples.length - 1
+          : event.key === 'ArrowRight'
+            ? (index + 1) % examples.length
+            : event.key === 'ArrowLeft'
+              ? (index + examples.length - 1) % examples.length
+              : null;
+    if (next === null) return;
+    event.preventDefault();
+    select(examples[next]);
+    buttons[next].focus();
+  });
+  select(selected);
+
   copyButton.addEventListener('click', async () => {
-    const copied = await copy(snippet, code);
+    const source = selected.source;
+    const copied = await copy(source, code);
+    if (source !== selected.source) return;
     copyButton.textContent = copied ? 'Copied' : 'Select and copy';
     setTimeout(() => {
       copyButton.textContent = 'Copy';
     }, COPIED_MS);
   });
 
-  view.append(copyButton, pre);
+  bar.append(tabs, copyButton);
+  view.append(bar, pre);
   return view;
 }

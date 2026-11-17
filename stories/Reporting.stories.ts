@@ -16,7 +16,7 @@ type Args = {spec: unknown};
 /**
  * Daily volume compared with the corresponding period last year. Each spec is a plain JSON file in `examples/`.
  *
- * The 2026 and 2025 series cover different calendar dates (Nov 26, 2026 and Nov 27, 2025) and line up by position, so each slot
+ * The 2026 and 2025 series cover different calendar dates (Nov 1, 2026 and Nov 2, 2025) and line up by position, so each slot
  * compares the same weekday. The tooltip is headed by the 2026 date; each
  * 2025 point's own date is in the screen-reader announcement for the slot
  * and in the details table.

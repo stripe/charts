@@ -1,4 +1,4 @@
-import {buildJavaScript} from '../../.storybook/code';
+import {buildCodeExamples} from '../../.storybook/code';
 import {codeView} from '../../.storybook/codeView';
 import {chart, track} from './mount';
 import type {ChartSpec} from '../../src/index';
@@ -44,7 +44,16 @@ export function chooseSpec(
       if (current) track(current);
     }
     const records = [{spec, width: '100%', height: 320}];
-    code.replaceChildren(codeView(buildJavaScript(records), true));
+    code.replaceChildren(
+      codeView(
+        buildCodeExamples(records),
+        true,
+        code.querySelector<HTMLElement>('[aria-selected="true"]')?.dataset
+          .language === 'javascript'
+          ? 'javascript'
+          : 'react',
+      ),
+    );
   };
   select.addEventListener('change', show);
   show();

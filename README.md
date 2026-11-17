@@ -6,10 +6,10 @@ use in a report, dashboard, or AI-generated page.
 
 ![A gross-volume chart comparing this year with last year](docs/assets/chart-preview.svg)
 
-**[Explore the gallery](https://stripe.github.io/charts/)** ·
-[Getting started](https://stripe.github.io/charts/?path=/story/intro--getting-started) ·
+**[Run Storybook locally](#run-from-source)** ·
+[Getting started](#try-it) ·
 [API and spec reference](docs/reference.md) ·
-[React](https://stripe.github.io/charts/?path=/story/react-stripechart--basic)
+[React](docs/reference.md#react)
 
 **v0.0.1 is an early release.** We’re starting with
 line charts, bar charts, and KPI cards, with more to come as Stripe Charts
@@ -24,14 +24,14 @@ evolves. Examples use fictional data.
 
 ## Try it
 
-Open the [gallery](https://stripe.github.io/charts/) to see charts alongside
-copyable code.
+Run [Storybook locally](#run-from-source) to see charts alongside copyable code.
 
-This is a complete first chart—one series, three dates:
+For a standalone example, run `npm ci` and `npm run build:all`, then save
+this HTML in the repository root:
 
 ```html
 <div id="chart" style="height: 320px; max-width: 640px"></div>
-<script src="https://stripe.github.io/charts/dist/stripe-charts.min.js"></script>
+<script src="./dist/stripe-charts.min.js"></script>
 <script>
   StripeCharts.render(document.getElementById('chart'), {
     title: 'Orders',
@@ -47,8 +47,7 @@ This is a complete first chart—one series, three dates:
 </script>
 ```
 
-The gallery bundle follows the current project build. For a fixed copy, save
-it with your report. The package version is available as `StripeCharts.version`.
+The package version is available as `StripeCharts.version`.
 
 ## JavaScript, TypeScript, and React
 
@@ -75,17 +74,17 @@ core JavaScript API do not require React.
 
 ## Build a report
 
-Start with the [reporting examples](https://stripe.github.io/charts/?path=/story/examples-reporting--gross-volume)
-or a [complete recap page](https://stripe.github.io/charts/examples/dashboards/sales-recap.html).
+Start with the [reporting examples](examples/)
+or a [complete recap page](examples/dashboards/sales-recap.html).
 
 | Need | Guide |
 | --- | --- |
-| Amounts straight from the Stripe API | [Money and units](https://stripe.github.io/charts/?path=/story/features-money-and-units--overview) |
-| Compare matching periods across years | [Comparisons](https://stripe.github.io/charts/?path=/story/features-comparisons--overview) |
-| Report in the business’s time zone | [Dates and time zones](https://stripe.github.io/charts/?path=/story/features-dates-and-time-zones--overview) |
-| Explain a promotion, outage, or partial day | [Annotations](https://stripe.github.io/charts/?path=/story/features-annotations--point-annotation) |
-| Show where a number came from | [Provenance](https://stripe.github.io/charts/?path=/story/features-provenance--overview) |
-| Understand a rejected spec | [Validation](https://stripe.github.io/charts/?path=/story/features-validation--overview) |
+| Amounts straight from the Stripe API | [Money and units](docs/reference.md#units-and-correctness) |
+| Compare matching periods across years | [Comparisons](docs/reference.md#comparisons-line-up-by-position) |
+| Report in the business’s time zone | [Dates and time zones](docs/reference.md#dates-and-time-zones) |
+| Explain a promotion, outage, or partial day | [Annotations](docs/reference.md#annotations-incomplete-periods-and-forecasts) |
+| Show where a number came from | [Provenance](docs/reference.md#details-view) |
+| Understand a rejected spec | [Validation](docs/reference.md#errors-and-how-to-fix-them) |
 
 Use up to 12 series and 1000 points per series. Aggregate dense data before
 charting. See [data-size guidance](docs/reference.md#performance-and-data-size)

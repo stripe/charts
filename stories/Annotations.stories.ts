@@ -26,26 +26,27 @@ const meta: Meta<Args> = {
 
 export default meta;
 
-const referenceMonths = [
-  '2026-01-01',
-  '2026-02-01',
-  '2026-03-01',
-  '2026-04-01',
-  '2026-05-01',
-];
+const referenceMonths = Array.from(
+  {length: 12},
+  (_, i) => `2026-${String(i + 1).padStart(2, '0')}-01`,
+);
 const referenceSpec: ChartSpec = {
   title: 'Regional volume',
   chart: {type: 'line', legend: 'show', axes: {x: {labels: 'month'}}},
   series: [
     {
       label: 'NA',
-      color: '#9966FF',
-      data: points(referenceMonths, [12, 18, 24, 20, 22]),
+      data: points(
+        referenceMonths,
+        [12, 18, 24, 20, 22, 26, 25, 28, 30, 29, 34, 36],
+      ),
     },
     {
       label: 'EMEA',
-      color: '#2255BB',
-      data: points(referenceMonths, [9, 12, 11, 15, 14]),
+      data: points(
+        referenceMonths,
+        [9, 12, 11, 15, 14, 17, 16, 19, 21, 20, 23, 25],
+      ),
     },
   ],
 };

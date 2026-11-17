@@ -49,11 +49,11 @@ Import `render` from `@stripe/charts`, or `StripeChart` from
 
 ## Documentation and examples
 
-The sidebar is ordered Intro, Charts, Features, React, Examples. Chart types
+The sidebar is ordered Intro, Charts, Features, Examples. Chart types
 live under Charts; behavior such as annotations and comparisons lives under
-Features. Keep explanatory material beside small, runnable demonstrations.
-Storybook’s guide wrapper shows the chart and generated code together, and
-provides controls where they help explain a choice.
+Features. Each code panel has React and JavaScript tabs (HTML for the intro’s
+setup example). Storybook shows the chart and generated code together, with
+controls where they help explain a choice.
 
 The full API reference is [reference.md](reference.md). Its theme table is
 generated from the design tokens:
@@ -69,10 +69,8 @@ synthetic example data and fixed geometry; it is not a browser screenshot:
 npm run preview:build
 ```
 
-## Public gallery
+## Static Storybook
 
-GitHub Actions builds and deploys Storybook to <https://stripe.github.io/charts/>
-on pushes to `main`, or when the Storybook workflow is run manually. The
-repository’s Pages source must be GitHub Actions. The workflow publishes only
-the built site, browser bundle, reference files, and examples; it does not
-publish an npm package.
+The Storybook workflow builds the static site and uploads it as a workflow
+artifact. To view it locally, download and extract it to `storybook-static/`,
+then run `npm run storybook:serve`.

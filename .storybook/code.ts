@@ -8,7 +8,7 @@ import {PACKAGE_NAME} from '../src/meta';
 /** Use the gallery's own build, including when served locally or under /charts/. */
 export const SCRIPT_URL =
   typeof window === 'undefined'
-    ? 'https://stripe.github.io/charts/dist/stripe-charts.min.js'
+    ? './dist/stripe-charts.min.js'
     : new URL('./dist/stripe-charts.min.js', window.location.href).href;
 
 /** Something that happens to a chart after it first renders. */
@@ -33,6 +33,8 @@ export type ChartRecord = {
    * it. Options hold functions, so they can't be printed as JSON.
    */
   optionsSource?: string;
+  /** React-specific callbacks, when the DOM and React APIs differ. */
+  reactOptionsSource?: string;
 };
 
 let pending: ChartRecord[] = [];
@@ -233,46 +235,107 @@ export function buildSnippet(records: readonly ChartRecord[]): string {
   ].join('\n');
 }
 
-/** What {@link reactCode} needs to print a complete React example. */
-export type ReactCodeParts = {
-  /**
-   * The specs the story renders, by the constant name the component uses,
-   * for example `{spec: grossVolume}`. Printed from these very values.
-   */
-  specs: Record<string, unknown>;
-  /** Names to import from `react`, for example `['useState']`. */
-  reactImports?: readonly string[];
-  /** The component's source, written against the spec constants. */
-  component: string;
-};
-
-/**
- * A copy-paste TSX example: imports from the package's React entry point,
- * each spec as a typed constant printed from the value the story rendered,
- * then the component. Only the component is a hand-written string.
- */
-export function reactCode({
-  specs,
-  reactImports = [],
-  component,
-}: ReactCodeParts): {language: 'tsx'; source: string} {
+/** React JSX for the same specs, callbacks, and lifecycle as the live story. */
+export function buildReact(records: readonly ChartRecord[]): string {
+  const hooks = new Set<string>();
+  const components = records.map((record, n) => {
+    const suffix = records.length === 1 ? '' : String(n + 1);
+    const specName = `spec${suffix}`;
+    const componentName =
+      records.length === 1 ? 'ChartExample' : `Chart${suffix}`;
+    const steps = record.steps ?? [];
+    const updates = steps.some((step) => step.kind !== 'destroy-button');
+    const destroys = steps.some((step) => step.kind === 'destroy-button');
+    const declarations = [`const ${specName} = ${json(record.spec, '')};`];
+    const body: string[] = [];
+    const children: string[] = [];
+    if (updates) {
+      hooks.add('useState');
+      body.push(`  const [currentSpec, setSpec] = useState(${specName});`);
+    }
+    if (destroys) {
+      hooks.add('useState');
+      body.push('  const [visible, setVisible] = useState(true);');
+    }
+    steps.forEach((step, s) => {
+      if (step.kind === 'destroy-button') {
+        children.push(
+          `      <button type="button" onClick={() => setVisible(false)}>{${JSON.stringify(step.label)}}</button>`,
+        );
+        return;
+      }
+      const next = `${specName}Update${s + 1}`;
+      declarations.push(`const ${next} = ${json(step.spec, '')};`);
+      if (step.kind === 'update-after') {
+        hooks.add('useEffect');
+        body.push(
+          '  useEffect(() => {',
+          `    const timer = setTimeout(() => setSpec(${next}), ${step.delayMs});`,
+          '    return () => clearTimeout(timer);',
+          '  }, []);',
+        );
+      } else {
+        children.push(
+          `      <button type="button" onClick={() => setSpec(${next})}>{${JSON.stringify(step.label)}}</button>`,
+        );
+      }
+    });
+    const options = record.reactOptionsSource ?? record.optionsSource;
+    if (options)
+      declarations.push(`const options${suffix} = ${options.trim()};`);
+    const style = json({width: record.width, height: record.height}, '');
+    const props = `spec={${updates ? 'currentSpec' : specName}} style={${style}}${options ? ` {...options${suffix}}` : ''}`;
+    const chart = `<StripeChart ${props} />`;
+    children.push(`      ${destroys ? `{visible && ${chart}}` : chart}`);
+    const render =
+      children.length === 1 && !destroys
+        ? [`  return ${chart};`]
+        : ['  return (', '    <>', ...children, '    </>', '  );'];
+    return [
+      ...declarations,
+      '',
+      `${records.length === 1 ? 'export ' : ''}function ${componentName}() {`,
+      ...body,
+      ...render,
+      '}',
+    ].join('\n');
+  });
   const imports = [
-    ...(reactImports.length > 0
-      ? [`import {${reactImports.join(', ')}} from 'react';`]
-      : []),
-    `import type {ChartSpec} from '${PACKAGE_NAME}';`,
+    ...(hooks.size ? [`import {${[...hooks].join(', ')}} from 'react';`] : []),
     `import {StripeChart} from '${PACKAGE_NAME}/react';`,
   ];
-  const constants = Object.entries(specs).map(
-    ([name, value]) => `const ${name}: ChartSpec = ${json(value, '')};`,
-  );
-  return {
-    language: 'tsx',
-    source: [
-      imports.join('\n'),
-      constants.join('\n\n'),
-      component.trim(),
-      '',
-    ].join('\n\n'),
-  };
+  if (records.length > 1)
+    components.push(
+      [
+        'export function ChartExample() {',
+        '  return (',
+        '    <>',
+        ...records.map((_, n) => `      <Chart${n + 1} />`),
+        '    </>',
+        '  );',
+        '}',
+      ].join('\n'),
+    );
+  return [...imports, '', ...components].join('\n\n');
+}
+
+export type CodeExample = {
+  language: 'react' | 'javascript';
+  label: string;
+  source: string;
+};
+export type CodeExamples = readonly [CodeExample, CodeExample];
+
+export function buildCodeExamples(
+  records: readonly ChartRecord[],
+  setup = false,
+): CodeExamples {
+  return [
+    {language: 'react', label: 'React', source: buildReact(records)},
+    {
+      language: 'javascript',
+      label: setup ? 'HTML' : 'JavaScript',
+      source: setup ? buildSnippet(records) : buildJavaScript(records),
+    },
+  ];
 }

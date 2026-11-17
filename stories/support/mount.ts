@@ -17,7 +17,11 @@ export type Size = {width: number | string; height?: number};
  * Render options for a story chart, with the JavaScript the code view shows
  * for them. Keep `source` next to `options` and saying the same thing.
  */
-export type StoryOptions = {options: RenderOptions; source: string};
+export type StoryOptions = {
+  options: RenderOptions;
+  source: string;
+  reactSource?: string;
+};
 
 const mounted = new Set<ChartHandle>();
 
@@ -39,7 +43,12 @@ export function chart(
   recordChart({
     spec,
     ...size,
-    ...(storyOptions ? {optionsSource: storyOptions.source} : {}),
+    ...(storyOptions
+      ? {
+          optionsSource: storyOptions.source,
+          reactOptionsSource: storyOptions.reactSource,
+        }
+      : {}),
   });
   try {
     mounted.add(render(element, spec, storyOptions?.options));

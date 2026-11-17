@@ -116,7 +116,7 @@ node(
 node(
   'text',
   {x: '32', y: '64', 'font-size': '13', class: 'preview-label'},
-  'November 26–30 · fictional data',
+  `${spec.description} · fictional data`,
 );
 node(
   'text',

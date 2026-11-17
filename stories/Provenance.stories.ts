@@ -13,9 +13,9 @@ export const Overview: StoryObj = {
       timeZone: 'America/New_York',
       provenance: {
         source: 'Example payments report',
-        fetchedAt: '2026-11-30T12:00:00Z',
+        fetchedAt: '2026-12-01T12:00:00Z',
         details: [
-          {label: 'Period', value: 'Nov 27–29, 2026'},
+          {label: 'Period', value: 'Nov 1–30, 2026'},
           {label: 'Includes', value: 'Successful payments'},
           {label: 'Excludes', value: 'Refunds'},
         ],

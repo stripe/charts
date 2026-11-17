@@ -15,11 +15,8 @@
       fresh rows every minute and call `chart.update(spec)`.
 
       The dark look comes only from the documented `--sc-*` custom properties,
-      set on `.sc-root`. The library is loaded with one script tag. This copy
-      points at the local build so it can be opened from a checkout (build
-      first; `dist/` is generated). In an artifact, use the published file:
-
-        <script src="https://stripe.github.io/charts/dist/stripe-charts.min.js"></script>
+      set on `.sc-root`. The script tag loads the local build from ../../dist/.
+      Run npm run build:all before opening this file.
     -->
     <style>
       :root {

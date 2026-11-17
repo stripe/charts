@@ -12,11 +12,8 @@
       The data is made up and generated in the page by a seeded generator, so
       every load shows the same numbers.
 
-      The library is loaded with one script tag. This copy points at the local
-      build so it can be opened from a checkout (build first; `dist/` is
-      generated). In an artifact, use the published file instead:
-
-        <script src="https://stripe.github.io/charts/dist/stripe-charts.min.js"></script>
+      The script tag loads the local build from ../../dist/.
+      Run npm run build:all before opening this file.
     -->
     <style>
       :root {

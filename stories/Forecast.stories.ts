@@ -82,12 +82,13 @@ export const Bars: StoryObj<Args> = {
   args: {spec: {...mrr, chart: {type: 'bar'}}},
 };
 
-const WEEK = dates('2026-11-23', 7);
+const WEEK = dates('2026-11-01', 30);
+const orderValues = curve(WEEK.length, 3_812, 6_950, {jitter: 0.35, seed: 37});
 const week = {
   label: 'Orders',
   data: WEEK.map((x, i): DataPoint => {
-    const y = [3_812, 3_954, 4_101, 6_420, 9_870, 7_310, 6_950][i] ?? 0;
-    return i < 4
+    const y = orderValues[i] ?? 0;
+    return i < 27
       ? {x, y}
       : {
           x,
@@ -107,17 +108,16 @@ export const IncompleteThenForecast: StoryObj<Args> = {
   args: {
     spec: {
       title: 'Orders',
-      description:
-        'The reporting week 2026: today still processing, the rest forecast',
+      description: 'November 2026: today still processing, the rest forecast',
       format: {style: 'number', maximumFractionDigits: 0},
       timeZone: 'America/New_York',
-      chart: {type: 'line', incomplete: {from: addDays('2026-11-23', 3)}},
+      chart: {type: 'line', incomplete: {from: addDays('2026-11-01', 26)}},
       series: [week],
       provenance: provenance({
         metric: 'successful_payments_count',
-        period: 'Nov 23 to Nov 29, 2026, daily',
+        period: 'Nov 1 to Nov 30, 2026, daily',
         timeZone: 'America/New_York',
-        fetchedAt: '2026-11-26T18:00:00Z',
+        fetchedAt: '2026-11-27T18:00:00Z',
       }),
     },
   },
