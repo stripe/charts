@@ -1,4 +1,5 @@
 import type {Meta, StoryObj} from '@storybook/html';
+import {orderSpec} from './support/specs';
 
 import type {AxisCase} from '../src/layout/testing/corpus';
 import {xAxisCases, yAxisCases} from '../src/layout/testing/corpus';
@@ -15,6 +16,10 @@ const meta: Meta = {
 };
 
 export default meta;
+
+export const Overview: StoryObj = {
+  render: () => chart(orderSpec, {width: '100%', height: 320}),
+};
 
 const CELL_GAP = 24;
 const HEADER_HEIGHT = 40;
@@ -79,7 +84,7 @@ export const WideSpans: StoryObj = {
     const all = xAxisCases();
     const spans = [
       '1 day hourly',
-      'BFCM 5 days hourly',
+      '5 days hourly',
       '2 weeks daily',
       '90 days daily',
       '5 years quarterly',
@@ -106,7 +111,7 @@ export const ZonesAndLocales: StoryObj = {
       ['30 days daily', 'dateTime', 'America/Los_Angeles', 'de-DE', 'line'],
       ['across new year daily', 'date', 'UTC', 'ja-JP', 'bar'],
       ['24 months monthly', 'date', 'UTC', 'de-DE', 'line'],
-      ['BFCM 5 days hourly', 'dateTime', 'Asia/Kolkata', 'ja-JP', 'bar'],
+      ['5 days hourly', 'dateTime', 'Asia/Kolkata', 'ja-JP', 'bar'],
       ['DST start hourly', 'America/New_York', 'en-US', 'line'],
       ['DST end hourly', 'America/New_York', 'en-US', 'line'],
       ['DST start hourly', 'Europe/London', 'de-DE', 'bar'],

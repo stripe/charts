@@ -173,7 +173,7 @@ describe('details notes and row status', () => {
       format: {style: 'number'},
       chart: {type: 'line', incomplete: {from: day(2)}},
       annotations: [
-        {label: 'Black Friday', description: 'Doors open at 6 AM', at: day(1)},
+        {label: 'Campaign launch', description: 'Doors open at 6 AM', at: day(1)},
       ],
       series: [
         {
@@ -192,7 +192,7 @@ describe('details notes and row status', () => {
     const notes = [...element.querySelectorAll('.sc-details-note')].map(
       (note) => note.textContent,
     );
-    expect(notes[0]).toBe('Black FridayNov 27Doors open at 6 AM');
+    expect(notes[0]).toBe('Campaign launchNov 27Doors open at 6 AM');
     expect(notes[1]).toContain('Nov 28');
     expect(notes).toHaveLength(2);
 

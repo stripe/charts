@@ -3,10 +3,13 @@
 // same charts. The snippet is built from the specs actually rendered, so it
 // cannot drift from the story.
 
-import {PACKAGE_NAME, VERSION} from '../src/meta';
+import {PACKAGE_NAME} from '../src/meta';
 
-/** Where the snippet loads the browser build from. A placeholder, like the README's. */
-export const SCRIPT_URL = `https://cdn.jsdelivr.net/npm/${PACKAGE_NAME}@${VERSION}/dist/stripe-charts.min.js`;
+/** Use the gallery's own build, including when served locally or under /charts/. */
+export const SCRIPT_URL =
+  typeof window === 'undefined'
+    ? 'https://stripe.github.io/charts/dist/stripe-charts.min.js'
+    : new URL('./dist/stripe-charts.min.js', window.location.href).href;
 
 /** Something that happens to a chart after it first renders. */
 export type ChartStep =

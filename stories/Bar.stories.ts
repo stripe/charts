@@ -1,4 +1,5 @@
 import type {Meta, StoryObj} from '@storybook/html';
+import {orderSpec} from './support/specs';
 
 import {shot} from '../.storybook/shots';
 import type {ChartSpec, Provenance, Series} from '../src/index';
@@ -28,6 +29,11 @@ const meta: Meta = {
 };
 
 export default meta;
+
+export const Overview: StoryObj = {
+  render: () =>
+    chart({...orderSpec, chart: {type: 'bar'}}, {width: '100%', height: 320}),
+};
 
 const WEEK = 7;
 
@@ -173,10 +179,10 @@ export const ComparisonHover: StoryObj<ComparisonArgs> = {
   render: renderComparison,
 };
 
-const BFCM_DAYS = dates('2026-11-26', 5);
-const BFCM_HEIGHT = 400;
+const REPORT_DAYS = dates('2026-11-26', 5);
+const REPORT_HEIGHT = 400;
 
-function bfcmProvenance(
+function reportProvenance(
   metric: string,
   {comparedWith}: {comparedWith?: string} = {},
 ): Provenance {
@@ -191,29 +197,29 @@ function bfcmProvenance(
 
 const byPaymentMethod: ChartSpec = {
   title: 'Gross volume by payment method',
-  description: 'Thanksgiving through Cyber Monday',
+  description: 'November 26–30',
   format: {style: 'currency', currency: 'usd', unit: 'major'},
   timeZone: 'America/New_York',
   chart: {type: 'bar'},
   series: [
     {
       label: 'Cards',
-      data: points(BFCM_DAYS, [198_400, 286_900, 231_200, 204_800, 318_300]),
+      data: points(REPORT_DAYS, [198_400, 286_900, 231_200, 204_800, 318_300]),
     },
     {
       label: 'Wallets',
-      data: points(BFCM_DAYS, [52_300, 79_800, 66_100, 59_400, 88_200]),
+      data: points(REPORT_DAYS, [52_300, 79_800, 66_100, 59_400, 88_200]),
     },
     {
       label: 'Bank debits',
-      data: points(BFCM_DAYS, [21_700, 28_400, 24_900, 22_300, 31_000]),
+      data: points(REPORT_DAYS, [21_700, 28_400, 24_900, 22_300, 31_000]),
     },
     {
       label: 'Buy now, pay later',
-      data: points(BFCM_DAYS, [14_000, 16_900, 16_750, 14_700, 18_230]),
+      data: points(REPORT_DAYS, [14_000, 16_900, 16_750, 14_700, 18_230]),
     },
   ],
-  provenance: bfcmProvenance('gross_volume, grouped by payment_method_type'),
+  provenance: reportProvenance('gross_volume, grouped by payment_method_type'),
 };
 
 /**
@@ -224,7 +230,7 @@ export const Grouped: StoryObj<SingleArgs> = {
   ...shot('bar-grouped-4', 800, 500),
   args: {spec: byPaymentMethod},
   render: ({spec}) =>
-    column(chart(spec, {width: COLUMN_WIDTH, height: BFCM_HEIGHT})),
+    column(chart(spec, {width: COLUMN_WIDTH, height: REPORT_HEIGHT})),
 };
 
 /** Three series, with the last year's total as a muted comparison. */
@@ -233,18 +239,18 @@ export const GroupedWithComparison: StoryObj<SingleArgs> = {
   args: {
     spec: {
       title: 'Orders by channel',
-      description: 'Thanksgiving through Cyber Monday, compared with last year',
+      description: 'November 26–30, compared with last year',
       format: {style: 'number', maximumFractionDigits: 0},
       timeZone: 'America/New_York',
       chart: {type: 'bar'},
       series: [
         {
           label: 'Online',
-          data: points(BFCM_DAYS, [2_612, 4_015, 3_120, 2_841, 4_660]),
+          data: points(REPORT_DAYS, [2_612, 4_015, 3_120, 2_841, 4_660]),
         },
         {
           label: 'In person',
-          data: points(BFCM_DAYS, [800, 1_193, 990, 853, 1_216]),
+          data: points(REPORT_DAYS, [800, 1_193, 990, 853, 1_216]),
         },
         {
           label: 'All channels, 2025',
@@ -255,13 +261,13 @@ export const GroupedWithComparison: StoryObj<SingleArgs> = {
           ),
         },
       ],
-      provenance: bfcmProvenance('successful_payments_count, by channel', {
+      provenance: reportProvenance('successful_payments_count, by channel', {
         comparedWith: 'Nov 27 to Dec 1, 2025 (same weekdays)',
       }),
     },
   },
   render: ({spec}) =>
-    column(chart(spec, {width: COLUMN_WIDTH, height: BFCM_HEIGHT})),
+    column(chart(spec, {width: COLUMN_WIDTH, height: REPORT_HEIGHT})),
 };
 
 /**
@@ -274,8 +280,7 @@ export const Stacked: StoryObj<SingleArgs> = {
   args: {
     spec: {
       title: 'Net volume',
-      description:
-        'Charges, refunds and disputes, Thanksgiving through Cyber Monday',
+      description: 'Charges, refunds and disputes, November 26–30',
       format: {style: 'currency', currency: 'usd', unit: 'major'},
       timeZone: 'America/New_York',
       chart: {type: 'bar', stacking: 'stacked'},
@@ -283,25 +288,28 @@ export const Stacked: StoryObj<SingleArgs> = {
         {
           label: 'Charges',
           data: points(
-            BFCM_DAYS,
+            REPORT_DAYS,
             [286_410, 412_000, 338_950, 301_220, 455_730],
           ),
         },
         {
           label: 'Refunds',
           data: points(
-            BFCM_DAYS,
+            REPORT_DAYS,
             [-28_640, -45_320, -30_510, -33_130, -38_740],
           ),
         },
         {
           label: 'Disputes',
-          data: points(BFCM_DAYS, [-8_590, -14_420, -7_460, -11_450, -12_300]),
+          data: points(
+            REPORT_DAYS,
+            [-8_590, -14_420, -7_460, -11_450, -12_300],
+          ),
         },
       ],
-      provenance: bfcmProvenance('net_volume, by balance_transaction_type'),
+      provenance: reportProvenance('net_volume, by balance_transaction_type'),
     },
   },
   render: ({spec}) =>
-    column(chart(spec, {width: COLUMN_WIDTH, height: BFCM_HEIGHT})),
+    column(chart(spec, {width: COLUMN_WIDTH, height: REPORT_HEIGHT})),
 };

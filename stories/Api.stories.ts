@@ -1,7 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/html';
 
 import {recordChart} from '../.storybook/code';
-import grossVolume from '../examples/bfcm-gross-volume.json';
+import grossVolume from '../examples/daily-gross-volume.json';
 import {render, SpecError} from '../src/index';
 import {
   COLUMN_WIDTH,
@@ -101,7 +101,7 @@ function revised(factor: number): unknown {
   if (current === undefined) return grossVolume;
   return {
     ...grossVolume,
-    description: 'Thanksgiving through Cyber Monday, revised forecast',
+    description: 'November 26–30, revised forecast',
     kpi: {
       ...grossVolume.kpi,
       basis: 'custom',

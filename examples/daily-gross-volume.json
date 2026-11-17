@@ -1,18 +1,19 @@
 {
-  "title": "Orders",
-  "timeZone": "America/New_York",
-  "description": "Successful payments per day, Thanksgiving through Cyber Monday",
+  "title": "Gross volume",
+  "description": "November 26–30, compared with last year",
   "format": {
-    "style": "number",
-    "maximumFractionDigits": 0
+    "style": "currency",
+    "currency": "usd",
+    "unit": "minor"
   },
+  "timeZone": "America/New_York",
   "kpi": {
     "basis": "total",
-    "value": 22300,
-    "comparisonValue": 20283
+    "value": 179431180,
+    "comparisonValue": 156955125
   },
   "chart": {
-    "type": "bar"
+    "type": "line"
   },
   "series": [
     {
@@ -20,23 +21,23 @@
       "data": [
         {
           "x": "2026-11-26",
-          "y": 3412
+          "y": 28641025
         },
         {
           "x": "2026-11-27",
-          "y": 5208
+          "y": 41200025
         },
         {
           "x": "2026-11-28",
-          "y": 4110
+          "y": 33895080
         },
         {
           "x": "2026-11-29",
-          "y": 3694
+          "y": 30122040
         },
         {
           "x": "2026-11-30",
-          "y": 5876
+          "y": 45573010
         }
       ]
     },
@@ -46,23 +47,23 @@
       "data": [
         {
           "x": "2025-11-27",
-          "y": 3050
+          "y": 25180000
         },
         {
           "x": "2025-11-28",
-          "y": 4710
+          "y": 35010000
         },
         {
           "x": "2025-11-29",
-          "y": 3820
+          "y": 29740050
         },
         {
           "x": "2025-11-30",
-          "y": 3402
+          "y": 26895000
         },
         {
           "x": "2025-12-01",
-          "y": 5301
+          "y": 40130075
         }
       ]
     }
@@ -73,7 +74,7 @@
     "details": [
       {
         "label": "Metric",
-        "value": "successful_payments_count"
+        "value": "gross_volume"
       },
       {
         "label": "Period",

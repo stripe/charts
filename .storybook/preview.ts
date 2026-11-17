@@ -3,6 +3,8 @@ import {UPDATE_GLOBALS} from 'storybook/internal/core-events';
 import {addons} from 'storybook/preview-api';
 
 import {cleanUpCharts} from '../stories/support/mount';
+import {guideFor} from '../stories/support/guides';
+import {guidePage} from '../stories/support/guidePage';
 import {buildSnippet, takeRecords} from './code';
 import {codeView, viewToggle} from './codeView';
 import {VIEW_GLOBAL, DEFAULT_VIEW, viewOf} from './view';
@@ -39,9 +41,21 @@ const withView: Decorator = (storyFn, context) => {
   const custom = storyCode(context.parameters.code);
   const snippet =
     custom?.source ?? (records.length > 0 ? buildSnippet(records) : null);
-  if (view === 'screenshot' || snippet === null || typeof story === 'string') {
+  if (view === 'screenshot' || typeof story === 'string') {
     return story;
   }
+  const guide = guideFor(context.title);
+  if (guide && (view !== 'code' || context.parameters.viewToggle === false))
+    return guidePage(
+      `${context.title.split('/').at(-1)} / ${context.name}`,
+      guide,
+      story,
+      snippet,
+      custom === undefined,
+      context.title === 'Intro' || context.name === 'Overview',
+    );
+  if (snippet === null)
+    return guide ? guidePage(context.title, guide, story, null, false) : story;
   const code = view === 'code';
   const toggle = viewToggle(code, () =>
     addons.getChannel().emit(UPDATE_GLOBALS, {
@@ -64,17 +78,32 @@ const preview: Preview = {
   // Set by the toolbar toggle (manager.ts); no menu of its own.
   initialGlobals: {[VIEW_GLOBAL]: DEFAULT_VIEW},
   parameters: {
-    layout: 'padded',
+    layout: 'fullscreen',
     options: {
       storySort: {
         order: [
           'Intro',
           'Charts',
-          ['Line', 'Bar', 'KPI'],
+          ['Overview', 'Line', 'Bar', 'KPI'],
           'Features',
-          ['Axes', 'Legend', 'Annotations', 'Forecast', 'Details', 'States'],
+          [
+            'Overview',
+            'Money and units',
+            'Dates and time zones',
+            'Comparisons',
+            'Provenance',
+            'Validation',
+            'Axes',
+            'Legend',
+            'Annotations',
+            'Forecast',
+            'Details',
+            'States',
+          ],
           'React',
+          ['Overview', 'StripeChart'],
           'Examples',
+          ['Overview', 'Reporting', 'Dashboard', 'API', 'Options'],
         ],
       },
     },

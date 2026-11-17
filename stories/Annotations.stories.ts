@@ -114,7 +114,7 @@ const series = {label: '2026', data: points(DAYS, volume)};
 
 const usdCents = {style: 'currency', currency: 'usd', unit: 'minor'} as const;
 
-/** Markers for Black Friday and Cyber Monday, a promo range and an outage. */
+/** Markers for sales, a promo range and an outage. */
 export const Events: StoryObj<Args> = {
   ...shot('annotations-events', 800, 500),
   args: {
@@ -128,8 +128,8 @@ export const Events: StoryObj<Args> = {
       series: [series],
       annotations: [
         {label: 'Early-access promo', from: '2026-11-20', to: '2026-11-24'},
-        {label: 'Black Friday', at: '2026-11-27'},
-        {label: 'Cyber Monday', at: '2026-11-30'},
+        {label: 'Campaign launch', at: '2026-11-27'},
+        {label: 'Campaign close', at: '2026-11-30'},
         {
           label: 'Checkout outage',
           description: 'Card payments failed for 40 minutes',

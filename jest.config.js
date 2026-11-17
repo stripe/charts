@@ -4,7 +4,7 @@ process.env.TZ = 'America/Los_Angeles';
 module.exports = {
   watchman: false,
   testEnvironment: 'jsdom',
-  testMatch: ['<rootDir>/src/**/*.test.ts'],
+  testMatch: ['<rootDir>/src/**/*.test.ts', '<rootDir>/tests/**/*.test.js'],
   moduleNameMapper: {'^src/(.*)$': '<rootDir>/src/$1'},
   transform: {
     '^.+\\.tsx?$': ['@swc/jest', {

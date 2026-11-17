@@ -2,7 +2,7 @@ import type {Meta, StoryObj} from '@storybook/html';
 
 import {shot} from '../.storybook/shots';
 import {recordChart} from '../.storybook/code';
-import grossVolume from '../examples/bfcm-gross-volume.json';
+import grossVolume from '../examples/daily-gross-volume.json';
 import {render} from '../src/index';
 import {
   COLUMN_WIDTH,
@@ -47,7 +47,7 @@ export const EmptyLine: StoryObj<Args> = {
     spec: {
       title: 'Gross volume',
       timeZone: 'UTC',
-      description: 'Thanksgiving through Cyber Monday',
+      description: 'November 26–30',
       format: {style: 'currency', currency: 'usd', unit: 'major'},
       chart: {type: 'line'},
       series: emptySeries,
@@ -79,7 +79,7 @@ export const EmptyBar: StoryObj<Args> = {
     spec: {
       title: 'Orders',
       timeZone: 'UTC',
-      description: 'Thanksgiving through Cyber Monday',
+      description: 'November 26–30',
       format: {style: 'number'},
       chart: {type: 'bar'},
       series: emptySeries,
@@ -104,7 +104,7 @@ export const ValidationError: StoryObj<Args> = {
   args: {
     spec: {
       title: 'Gross volume',
-      subtitle: 'Thanksgiving through Cyber Monday',
+      subtitle: 'November 26–30',
       format: {style: 'currency'},
       chart: {type: 'area'},
       series: [

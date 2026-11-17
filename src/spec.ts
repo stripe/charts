@@ -227,7 +227,7 @@ export type ChartOptions = {
  * of the primary series, since series line up by position.
  */
 export type Annotation = {
-  /** Short label, for example `"Black Friday"`. Plain text, up to 80 characters. */
+  /** Short label, for example `"Campaign launch"`. Plain text, up to 80 characters. */
   label: string;
   /** Longer note shown in the tooltip and details. Plain text, up to 200 characters. */
   description?: string;
@@ -336,8 +336,7 @@ export type ChartSpec = {
   /** Card title shown at the top, for example `"Gross volume"`. Plain text. */
   title: string;
   /**
-   * One-line subtitle under the title, for example `"Black Friday through
-   * Cyber Monday"`. Plain text.
+   * One-line subtitle under the title, for example `"Monthly sales report"`. Plain text.
    */
   description?: string;
   /** How values are formatted. Defaults to `{style: "number"}`. */

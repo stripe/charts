@@ -5,7 +5,7 @@
 import {createElement} from 'react';
 import type {ReactElement} from 'react';
 import {ToggleButton} from 'storybook/internal/components';
-import {addons, types, useGlobals} from 'storybook/manager-api';
+import {addons, types, useGlobals, useParameter} from 'storybook/manager-api';
 
 import {VIEW_GLOBAL, viewOf} from './view';
 
@@ -34,8 +34,10 @@ function icon(code: boolean): ReactElement {
   );
 }
 
-function ViewToggle(): ReactElement {
+function ViewToggle(): ReactElement | null {
   const [globals, updateGlobals] = useGlobals();
+  const enabled = useParameter('viewToggle', true);
+  if (!enabled) return null;
   const code = viewOf(globals) === 'code';
   return createElement(
     ToggleButton,

@@ -1,4 +1,5 @@
 import type {Meta, StoryObj} from '@storybook/html';
+import {orderSpec} from './support/specs';
 
 import {shot} from '../.storybook/shots';
 import type {ChartSpec} from '../src/index';
@@ -28,6 +29,10 @@ const meta: Meta = {
 };
 
 export default meta;
+
+export const Overview: StoryObj = {
+  render: () => chart(orderSpec, {width: '100%', height: 320}),
+};
 
 // Daily recurring revenue that is almost flat, with a short dip and a step
 const DAILY_START = '2026-08-01';

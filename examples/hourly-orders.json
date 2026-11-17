@@ -1,6 +1,6 @@
 {
   "title": "Gross volume by hour",
-  "description": "Black Friday, Eastern Time",
+  "description": "Campaign launch, Eastern Time",
   "format": {
     "style": "currency",
     "currency": "usd",
@@ -17,7 +17,7 @@
   },
   "series": [
     {
-      "label": "Black Friday 2026",
+      "label": "Campaign launch 2026",
       "data": [
         {
           "x": "2026-11-27T05:00:00Z",
@@ -118,7 +118,7 @@
       ]
     },
     {
-      "label": "Black Friday 2025",
+      "label": "Campaign launch 2025",
       "comparison": true,
       "data": [
         {

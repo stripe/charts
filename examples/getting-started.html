@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <title>Orders</title>
+  </head>
+  <body>
+    <div id="chart" style="height: 320px; max-width: 640px"></div>
+    <script src="../dist/stripe-charts.min.js"></script>
+    <script>
+      StripeCharts.render(document.getElementById('chart'), {
+        title: 'Orders',
+        series: [{label: 'Orders', data: [
+          {x: '2026-11-27', y: 120},
+          {x: '2026-11-28', y: 95},
+          {x: '2026-11-29', y: 145},
+        ]}],
+      });
+    </script>
+  </body>
+</html>

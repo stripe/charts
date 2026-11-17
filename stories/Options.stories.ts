@@ -1,7 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/html';
 
 import {shot} from '../.storybook/shots';
-import grossVolume from '../examples/bfcm-gross-volume.json';
+import grossVolume from '../examples/daily-gross-volume.json';
 import type {ChartSpec, PointEvent, TooltipContext} from '../src/index';
 import {curve, dates, points} from './support/data';
 import {
@@ -89,7 +89,7 @@ export const Events: StoryObj<Args> = {
 function tooltipContents(context: TooltipContext): Node {
   const box = document.createElement('div');
   const heading = document.createElement('strong');
-  heading.textContent = `Black Friday weekend: ${context.title}`;
+  heading.textContent = `Reporting period: ${context.title}`;
   box.append(heading);
   for (const series of context.series) {
     const line = document.createElement('div');
@@ -120,7 +120,7 @@ export const CustomTooltip: StoryObj<Args> = {
   renderTooltip: (context) => {
     const box = document.createElement('div');
     const heading = document.createElement('strong');
-    heading.textContent = 'Black Friday weekend: ' + context.title;
+    heading.textContent = 'Reporting period: ' + context.title;
     box.append(heading);
     for (const series of context.series) {
       const line = document.createElement('div');
@@ -204,8 +204,7 @@ export const Colors: StoryObj<Args> = {
   args: {
     spec: {
       title: 'Refunds',
-      description:
-        'Thanksgiving through Cyber Monday; the record day highlighted',
+      description: 'November 26–30; the record day highlighted',
       format: {style: 'currency', currency: 'usd', unit: 'major'},
       timeZone: 'America/New_York',
       chart: {type: 'bar'},

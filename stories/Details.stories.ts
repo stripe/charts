@@ -1,7 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/html';
 
 import {shot} from '../.storybook/shots';
-import grossVolume from '../examples/bfcm-gross-volume.json';
+import grossVolume from '../examples/daily-gross-volume.json';
 import type {ChartSpec} from '../src/index';
 import {addDays, curve, dates, last, points} from './support/data';
 import {

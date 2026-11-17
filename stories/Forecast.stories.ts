@@ -108,7 +108,7 @@ export const IncompleteThenForecast: StoryObj<Args> = {
     spec: {
       title: 'Orders',
       description:
-        'Thanksgiving week 2026: today still processing, the rest forecast',
+        'The reporting week 2026: today still processing, the rest forecast',
       format: {style: 'number', maximumFractionDigits: 0},
       timeZone: 'America/New_York',
       chart: {type: 'line', incomplete: {from: addDays('2026-11-23', 3)}},

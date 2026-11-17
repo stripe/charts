@@ -106,21 +106,21 @@ export const SPANS: readonly TimeSpan[] = [
     step: 1,
   },
   {
-    name: 'BFCM 5 days hourly',
+    name: '5 days hourly',
     start: '2026-11-26T00:00',
     count: 120,
     unit: 'hour',
     step: 1,
   },
   {
-    name: 'BFCM 4 days daily',
+    name: '4 days daily',
     start: '2026-11-27',
     count: 4,
     unit: 'day',
     step: 1,
   },
   {
-    name: 'BFCM 5 days daily',
+    name: '5 days daily',
     start: '2026-11-26',
     count: 5,
     unit: 'day',
@@ -239,7 +239,7 @@ export const VALUE_SETS: readonly ValueSet[] = [
     comparisonShare: 0.9998,
   },
   {
-    name: 'BFCM volume',
+    name: 'Gross volume',
     values: wave(POINTS, 240_000, 412_000.25),
     formats: MONEY,
   },

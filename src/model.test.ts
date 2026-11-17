@@ -93,7 +93,7 @@ describe('buildModel', () => {
       timeZone: 'America/New_York',
       series: [
         {
-          label: 'Black Friday',
+          label: 'Campaign launch',
           data: [
             {x: '2026-11-27T05:00:00Z', y: 1},
             {x: '2026-11-27T11:30:00Z', y: 2},
@@ -145,7 +145,7 @@ describe('buildModel', () => {
       timeZone: 'UTC',
       series: [
         {
-          label: 'BFCM',
+          label: 'Daily',
           data: Array.from({length: hours}, (_, i) => ({
             x: new Date(Date.UTC(2026, 10, 27, i)).toISOString(),
             y: i,

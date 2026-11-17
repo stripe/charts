@@ -1,7 +1,8 @@
 import type {Meta, StoryObj} from '@storybook/html';
+import {orderSpec} from './support/specs';
 
 import {shot} from '../.storybook/shots';
-import blackFridayTotal from '../examples/bfcm-kpi.json';
+import volumeTotal from '../examples/volume-kpi.json';
 import type {ChartSpec, Provenance, Series} from '../src/index';
 import {dates, points, seeded} from './support/data';
 import {
@@ -31,6 +32,14 @@ const meta: Meta<TilesArgs> = {
 };
 
 export default meta;
+
+export const Overview: StoryObj = {
+  render: () =>
+    chart(
+      {...orderSpec, chart: {type: 'kpi'}, kpi: {value: 360, basis: 'total'}},
+      {width: '100%', height: 320},
+    ),
+};
 
 const usd = {style: 'currency', currency: 'usd', unit: 'major'} as const;
 
@@ -188,7 +197,7 @@ const NARROW_GAP = 16;
  */
 export const Narrow: StoryObj<{spec: unknown}> = {
   ...shot('kpi-narrow', 800, 500),
-  args: {spec: blackFridayTotal},
+  args: {spec: volumeTotal},
   render: ({spec}) =>
     stack(NARROW_GAP, ...NARROW_WIDTHS.map((width) => chart(spec, {width}))),
 };
@@ -201,7 +210,7 @@ export const NarrowSparkline: StoryObj<{spec: unknown}> = {
   ...shot('kpi-narrow-sparkline', 800, 500),
   args: {
     spec: {
-      ...blackFridayTotal,
+      ...volumeTotal,
       series: [
         {
           label: 'Gross volume',
@@ -335,8 +344,8 @@ export const NarrowCompact: StoryObj<{spec: unknown}> = {
   ...shot('kpi-narrow-compact', 800, 500),
   args: {
     spec: {
-      ...blackFridayTotal,
-      kpi: {...blackFridayTotal.kpi, notation: 'compact'},
+      ...volumeTotal,
+      kpi: {...volumeTotal.kpi, notation: 'compact'},
     },
   },
   render: ({spec}) =>

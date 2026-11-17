@@ -1,7 +1,7 @@
 {
   "name": "@stripe/charts",
   "license": "MIT",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "sideEffects": [
     "./dist/browser.js",
     "./dist/stripe-charts.min.js"
@@ -21,6 +21,7 @@
     "globals": "^16.5.0",
     "jest": "^30.5.2",
     "jest-environment-jsdom": "^30.5.2",
+    "jsdom": "^26.1.0",
     "prettier": "^3.6.2",
     "react": "18.3.1",
     "react-dom": "18.3.1",
@@ -52,16 +53,18 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "storybook": "storybook dev --port 6107 --host 127.0.0.1 --no-open --ci",
-    "storybook:build": "storybook build --output-dir storybook-static --quiet",
+    "storybook": "npm run build:all && storybook dev --port 6107 --host 127.0.0.1 --no-open --ci",
+    "storybook:build": "npm run build:all && storybook build --output-dir storybook-static --quiet",
     "storybook:serve": "vite preview --outDir storybook-static --port 6108 --host 127.0.0.1 --strictPort",
     "theming:check": "node scripts/theming-table.js",
     "types": "tsc --noEmit",
     "types:stories": "tsc --project tsconfig.stories.json",
-    "prepack": "npm run build:all"
+    "prepack": "npm run build:all",
+    "preview:build": "node scripts/build-preview.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "docs/reference.md"
   ],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -79,7 +82,7 @@
     "./schema.json": "./dist/stripe-charts.schema.json",
     "./package.json": "./package.json"
   },
-  "description": "Declarative time-series charts and KPI cards with zero runtime dependencies.",
+  "description": "Declarative time-series charts and KPI cards.",
   "repository": {
     "type": "git",
     "url": "https://github.com/stripe/charts.git"

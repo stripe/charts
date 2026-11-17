@@ -13,7 +13,7 @@
       "maxLength": 200
     },
     "description": {
-      "description": "Optional one-line subtitle under the title, for example \"Black Friday through Cyber Monday\". Plain text.",
+      "description": "Optional one-line subtitle under the title, for example \"the reporting period\". Plain text.",
       "type": "string",
       "maxLength": 500
     },
@@ -357,7 +357,7 @@
         "required": ["label"],
         "properties": {
           "label": {
-            "description": "Short label, for example \"Black Friday\". Plain text, up to 80 characters.",
+            "description": "Short label, for example \"Campaign launch\". Plain text, up to 80 characters.",
             "type": "string",
             "minLength": 1,
             "maxLength": 80

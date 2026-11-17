@@ -8,7 +8,7 @@ source, examples, documentation, and configuration suitable for this repository.
   the separate `./react` entry point.
 - Preserve the layers: spec and validation, model, layout, then DOM/SVG render.
   Visual values belong in `src/tokens.ts`.
-- Keep the public types, JSON Schema, validation, and README aligned. Comparison
+- Keep the public types, JSON Schema, validation, and docs/reference.md aligned. Comparison
   series align by position; calendar dates must not shift with the viewer's zone.
 - Storybook lives here: `.storybook/` loads `stories/**/*.stories.ts`.
 - Use `npm ci` with Node.js 22.12 or newer. Verify changes with `npm run types`,

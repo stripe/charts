@@ -3,8 +3,8 @@ import {createElement, StrictMode, useState} from 'react';
 import type {ReactElement} from 'react';
 import {createRoot} from 'react-dom/client';
 
-import grossVolume from '../examples/bfcm-gross-volume.json';
-import orders from '../examples/bfcm-orders.json';
+import grossVolume from '../examples/daily-gross-volume.json';
+import orders from '../examples/daily-orders.json';
 import type {ChartSpec} from '../src/index';
 import {StripeChart} from '../src/react/index';
 import {reactCode} from '../.storybook/code';
