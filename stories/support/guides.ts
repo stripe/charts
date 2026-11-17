@@ -6,7 +6,6 @@ export type Guide = {
     defaultValue: string,
     meaning: string,
   ])[];
-  notes?: readonly string[];
 };
 
 const guides: Record<string, Guide> = {
@@ -25,9 +24,6 @@ const guides: Record<string, Guide> = {
         'Choose line, bar, or kpi. Give line and bar containers a height.',
       ],
     ],
-    notes: [
-      'Use the arrow keys on a focused plot to inspect points. Escape dismisses the tooltip.',
-    ],
   },
   Charts: {
     lead: 'Line, bar, and KPI charts share the same JSON spec.',
@@ -43,10 +39,6 @@ const guides: Record<string, Guide> = {
       ],
       ['kpi', 'Hidden', 'An optional headline; choose its basis explicitly.'],
     ],
-    notes: [
-      'Comparison series align by position, so match Campaign launch to Campaign launch before rendering.',
-      'For very dense data, aggregate to a reporting interval that remains readable.',
-    ],
   },
   'Charts/Bar': {
     lead: 'Use bars to compare daily totals, payment methods, or revenue movements. Grouped bars compare series; stacked bars show their contribution to a total.',
@@ -54,10 +46,6 @@ const guides: Record<string, Guide> = {
       ['chart.type', 'line', 'Set bar for a bar chart.'],
       ['chart.stacking', 'grouped', 'Set stacked to stack compatible series.'],
       ['series', 'No data', 'Up to twelve series; units must be consistent.'],
-    ],
-    notes: [
-      'A comparison series remains a comparison rather than becoming another contribution to the stack.',
-      'Negative values extend below zero. Use a line or aggregate periods when bars become too narrow.',
     ],
   },
   'Charts/KPI': {
@@ -74,10 +62,6 @@ const guides: Record<string, Guide> = {
         'Hidden',
         'The number used to calculate the change.',
       ],
-    ],
-    notes: [
-      'The headline is the number you supply. Hiding a series does not recompute it.',
-      'Forecast points are excluded from computed bases; incomplete actual values still count.',
     ],
   },
   Features: {
@@ -98,10 +82,6 @@ const guides: Record<string, Guide> = {
         'An optional decimal cap from 0 to 20.',
       ],
     ],
-    notes: [
-      'The galleries below include stress cases at several widths. The Overview is the small starting example.',
-      'Date-time points require a timeZone; date-only values keep their calendar day.',
-    ],
   },
   'Features/Legend': {
     lead: 'A legend identifies series and lets readers focus a comparison. Click to toggle a series, or double-click to isolate it.',
@@ -112,9 +92,6 @@ const guides: Record<string, Guide> = {
         'Required',
         'A unique label used by the legend and tooltips.',
       ],
-    ],
-    notes: [
-      'Keyboard activation is supported. The headline KPI stays unchanged while a series is hidden.',
     ],
   },
   'Features/Annotations': {
@@ -142,11 +119,6 @@ const guides: Record<string, Guide> = {
         'Optional longer explanation, up to 200 characters.',
       ],
     ],
-    notes: [
-      'Hover a covered date to read its notes. A point note names its series above the label.',
-      'Dates must exactly match the primary series. Use at for one slot, or from/to for a range; do not combine both forms.',
-      'Incomplete-period examples below use chart.incomplete, a separate automatic range for unfinished data.',
-    ],
   },
   'Features/Forecast': {
     lead: 'Distinguish future estimates from actual results. Forecast lines use a separate dash pattern and can include a low/high band.',
@@ -167,10 +139,6 @@ const guides: Record<string, Guide> = {
         'Marks an actual period that has started but is not final.',
       ],
     ],
-    notes: [
-      'Forecasts are excluded from total, latest, and average KPI bases.',
-      'Projected pace belongs to an incomplete actual period; a forecast belongs to a future period.',
-    ],
   },
   'Features/Details': {
     lead: 'Let readers inspect the numbers behind a chart. The details view combines a table, notes, and caller-supplied provenance.',
@@ -182,10 +150,6 @@ const guides: Record<string, Guide> = {
         'Source, fetch time, and label/value details to help explain the data.',
       ],
     ],
-    notes: [
-      'The table is built when opened. Keyboard users can open and dismiss the panel.',
-      'Provenance describes the supplied data; the library does not fetch or verify the source.',
-    ],
   },
   'Features/States': {
     lead: 'A report can distinguish loading, empty results, and invalid input. A chart with existing data can remain visible while an update is in progress.',
@@ -196,10 +160,6 @@ const guides: Record<string, Guide> = {
         'Default message',
         'Explain an empty result in the reader’s language.',
       ],
-    ],
-    notes: [
-      'Use update(nextSpec) when data arrives.',
-      'Invalid input draws an error card and reports field paths. It is different from a valid query returning no rows.',
     ],
   },
   'Features/Money and units': {
@@ -217,10 +177,6 @@ const guides: Record<string, Guide> = {
         'An ISO currency code such as usd, jpy, or kwd.',
       ],
     ],
-    notes: [
-      '1999 minor USD units is $19.99. JPY uses zero decimal places; some currencies use three.',
-      'A conversion rate of 0.025 is 2.5% with unit ratio; use unit percent when the value is already 2.5.',
-    ],
   },
   'Features/Dates and time zones': {
     lead: 'Keep a report’s dates tied to the business’s reporting calendar. Date-only strings keep their day; timestamps are formatted in the specified zone.',
@@ -237,10 +193,6 @@ const guides: Record<string, Guide> = {
       ],
       ['locale', 'en-US', 'Controls localized date and number labels.'],
     ],
-    notes: [
-      'The same timestamp can fall on different dates in different zones.',
-      'If you already have daily totals, date-only strings avoid accidental conversion through the viewer’s time zone.',
-    ],
   },
   'Features/Comparisons': {
     lead: 'Compare corresponding business periods. Business periods can start on different dates; series line up by position rather than by their date strings.',
@@ -256,10 +208,6 @@ const guides: Record<string, Guide> = {
         'Put the corresponding days in the same order in each series.',
       ],
     ],
-    notes: [
-      'Slot zero might be November 27 this year and November 28 last year. The caller decides whether those periods correspond.',
-      'Tooltips and accessible descriptions retain each series’ own dates.',
-    ],
   },
   'Features/Provenance': {
     lead: 'Give a reader enough context to trust and interpret the number: where it came from, when it was fetched, and what was included.',
@@ -271,10 +219,6 @@ const guides: Record<string, Guide> = {
         'Empty',
         'Label/value pairs such as metric, reporting window, or exclusions.',
       ],
-    ],
-    notes: [
-      'Open Details to see the source and metadata.',
-      'Use public-safe labels and values. This information comes from the caller; the chart makes no requests.',
     ],
   },
   'Features/Validation': {
@@ -296,10 +240,6 @@ const guides: Record<string, Guide> = {
         'A handle you can update with corrected input or destroy.',
       ],
     ],
-    notes: [
-      'Units, dates, series limits, and KPI bases are validated.',
-      'The example intentionally omits currency units. Switching to the corrected form renders the same data successfully.',
-    ],
   },
   React: {
     lead: 'Use the optional React binding when a chart belongs in an application. The component takes the same JSON spec and manages the chart’s lifecycle.',
@@ -319,10 +259,6 @@ const guides: Record<string, Guide> = {
         'Default tooltip',
         'Can return React content while retaining tooltip placement.',
       ],
-    ],
-    notes: [
-      'A changed spec updates the chart. Unmounting cleans it up.',
-      'Until npm publication, install a locally built tarball; see the development guide.',
     ],
   },
   Examples: {
