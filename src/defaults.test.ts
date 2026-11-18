@@ -5,6 +5,7 @@ describe('resolveSpec', () => {
   it('normalizes values to major units and ratios once', () => {
     const resolved = (format: ValueFormat, y: number) => {
       const spec: ChartSpec = {
+        version: 1,
         title: 'Gross volume',
         format,
         kpi: {value: y, basis: 'latest'},

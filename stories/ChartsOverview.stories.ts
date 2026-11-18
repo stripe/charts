@@ -15,6 +15,7 @@ export default meta;
 
 const days = dates('2026-10-01', 31);
 const lineSpec: ChartSpec = {
+  version: 1,
   title: 'Orders by channel',
   chart: {type: 'line', legend: 'show'},
   series: [

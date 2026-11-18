@@ -52,6 +52,7 @@ const series = (
 });
 
 const SPEC: ChartSpec = {
+  version: 1,
   title: 'Payments by method',
   timeZone: 'UTC',
   format: {style: 'number'},
@@ -216,7 +217,7 @@ describe('interactive legend', () => {
     click('Wallets');
     onLegendChange.mockClear();
 
-    chart.update({title: SPEC.title, loading: true});
+    chart.update({version: 1, title: SPEC.title, loading: true});
     expect(onLegendChange).not.toHaveBeenCalled();
     chart.update(SPEC);
     expect(shown()).toEqual(['Cards', 'Bank']);

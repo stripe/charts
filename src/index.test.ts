@@ -5,7 +5,7 @@ describe('render', () => {
     const element = document.createElement('div');
     let error: unknown;
     try {
-      render(element, {title: 'Gross volume', chart: {type: 'pie'}});
+      render(element, {version: 1, title: 'Gross volume', chart: {type: 'pie'}});
     } catch (caught) {
       error = caught;
     }
@@ -13,6 +13,7 @@ describe('render', () => {
     expect(element.querySelector('.sc-error')).not.toBeNull();
 
     (error as SpecError).chart?.update({
+      version: 1,
       title: 'Gross volume',
       series: [{label: '2026', data: [{x: '2026-11-27', y: 412000.25}]}],
     });

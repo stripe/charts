@@ -16,6 +16,7 @@ const actual = (seriesIndex: number, x: string | null, y: number | null) => ({
 describe('buildModel', () => {
   it('aligns series by position, not by calendar date', () => {
     const model = buildModel({
+      version: 1,
       title: 'Gross volume',
       series: [
         {
@@ -67,6 +68,7 @@ describe('buildModel', () => {
 
   it('starts bars at zero and zooms lines to the data', () => {
     const spec = (type: ChartType, ys: (number | null)[]): ChartSpec => ({
+      version: 1,
       title: 'Gross volume',
       chart: {type},
       series: [
@@ -89,6 +91,7 @@ describe('buildModel', () => {
 
   it('labels date-times within a short span by time of day in the spec zone', () => {
     const model = buildModel({
+      version: 1,
       title: 'Gross volume',
       timeZone: 'America/New_York',
       series: [
@@ -118,6 +121,7 @@ describe('buildModel', () => {
       data: [{x: '2026-11-27', y}],
     });
     const model = buildModel({
+      version: 1,
       title: 'Net volume',
       chart: {type: 'bar', stacking: 'stacked'},
       series: [
@@ -141,6 +145,7 @@ describe('buildModel', () => {
   it('keeps the time in tooltip headers for hourly data over several days', () => {
     const hours = 72;
     const model = buildModel({
+      version: 1,
       title: 'Gross volume',
       timeZone: 'UTC',
       series: [
@@ -162,6 +167,7 @@ describe('buildModel', () => {
   it('resolves annotations, the incomplete period and point kinds to slots', () => {
     const months = ['2026-01-01', '2026-02-01', '2026-03-01', '2026-04-01'];
     const model = buildModel({
+      version: 1,
       title: 'MRR',
       chart: {type: 'line', incomplete: {from: '2026-03-01'}},
       series: [
@@ -214,7 +220,8 @@ describe('buildModel', () => {
   });
 
   it('fits the y domain to visible series, forecast bands included', () => {
-    const spec = {
+    const spec: ChartSpec = {
+      version: 1,
       title: 'Volume',
       series: [
         {
@@ -236,6 +243,7 @@ describe('buildModel', () => {
 
   it('caps percent labels at whole percents, not whole ratios', () => {
     const model = buildModel({
+      version: 1,
       title: 'Conversion',
       format: {style: 'percent', unit: 'ratio'},
       chart: {type: 'line', axes: {y: {maximumFractionDigits: 0}}},
@@ -255,6 +263,7 @@ describe('buildModel', () => {
 
   it('fits and stacks a projected incomplete point to its projection', () => {
     const model = buildModel({
+      version: 1,
       title: 'Volume',
       chart: {
         type: 'bar',

@@ -17,6 +17,7 @@ export const Overview: StoryObj = {
       {
         title: 'Total',
         spec: {
+          version: 1,
           title: 'Orders',
           chart: {type: 'kpi'},
           kpi: {value: orderTotal, basis: 'total'},
@@ -25,6 +26,7 @@ export const Overview: StoryObj = {
       {
         title: 'Compact value',
         spec: {
+          version: 1,
           title: 'Orders',
           chart: {type: 'kpi'},
           kpi: {

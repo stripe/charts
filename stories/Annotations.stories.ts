@@ -29,6 +29,7 @@ const referenceMonths = Array.from(
   (_, i) => `2026-${String(i + 1).padStart(2, '0')}-01`,
 );
 const referenceSpec: ChartSpec = {
+  version: 1,
   title: 'Regional volume',
   chart: {type: 'line', legend: 'show', axes: {x: {labels: 'month'}}},
   series: [
@@ -118,6 +119,7 @@ export const Events: StoryObj<Args> = {
   ...shot('annotations-events', 800, 500),
   args: {
     spec: {
+      version: 1,
       title: 'Gross volume',
       description: 'November 16 to December 6, 2026',
       format: usdCents,
@@ -158,6 +160,7 @@ export const IncompletePeriod: StoryObj<Args> = {
   ...shot('annotations-incomplete', 800, 500),
   args: {
     spec: {
+      version: 1,
       title: 'Gross volume',
       description: 'December 2026 so far',
       format: usdCents,
@@ -186,6 +189,7 @@ const monthlyVolume = {
 
 function projectedSpec(type: 'line' | 'bar'): ChartSpec {
   return {
+    version: 1,
     title: 'Gross volume by month',
     description: '2026, with December on pace',
     format: usdCents,

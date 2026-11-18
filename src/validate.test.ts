@@ -4,6 +4,7 @@ import {validate} from './validate';
 import {validateOptions} from './validateOptions';
 
 const valid = {
+  version: 1,
   title: 'Gross volume',
   timeZone: 'America/New_York',
   format: {style: 'currency', currency: 'usd', unit: 'major'},
@@ -25,14 +26,35 @@ describe('validate', () => {
     expect(validate(valid)).toEqual({ok: true, spec: valid});
   });
 
+  it('requires the spec version, and rejects newer ones on their own', () => {
+    const {version: _version, ...unversioned} = valid;
+    expect(errorsFor(unversioned)).toEqual([
+      {path: 'version', message: 'required; expected 1, the spec format version'},
+    ]);
+    expect(errorsFor({...valid, version: '1'})).toEqual([
+      {path: 'version', message: 'expected 1, the spec format version, got "1"'},
+    ]);
+    // A newer spec's other fields may be valid there, so only the version is reported.
+    expect(errorsFor({...valid, version: 2, sparkline: true})).toEqual([
+      {
+        path: 'version',
+        message:
+          'spec version 2 is newer than this package supports (up to 1); upgrade @stripe/charts to render it',
+      },
+    ]);
+    expect(schema.required).toContain('version');
+    expect(schema.properties.version.const).toBe(1);
+  });
+
   it('accepts twelve series and rejects a thirteenth', () => {
     const series = Array.from({length: 12}, (_, index) => ({
       label: `Series ${index + 1}`,
       data: [{x: '2026-10-01', y: index + 1}],
     }));
-    expect(validate({title: 'Series palette', series}).ok).toBe(true);
+    expect(validate({version: 1, title: 'Series palette', series}).ok).toBe(true);
     expect(
       errorsFor({
+        version: 1,
         title: 'Series palette',
         series: [...series, {label: 'Series 13', data: []}],
       }),
@@ -121,7 +143,7 @@ describe('validate', () => {
   });
 
   it('does not require series while loading, and allows them on KPI tiles', () => {
-    expect(validate({title: 'Gross volume', loading: true}).ok).toBe(true);
+    expect(validate({version: 1, title: 'Gross volume', loading: true}).ok).toBe(true);
     // A KPI chart's series, comparison included, draw a sparkline.
     expect(validate({...valid, chart: {type: 'kpi'}}).ok).toBe(true);
   });
@@ -130,6 +152,7 @@ describe('validate', () => {
     const point = (x: string) => ({x, y: 1});
     expect(
       errorsFor({
+        version: 1,
         title: 'Gross volume',
         series: [
           {label: '2026', data: [point('0026-11-27'), point('2026-11-28')]},
@@ -206,6 +229,7 @@ describe('validate', () => {
   it('checks annotations, forecasts and the incomplete period against the data', () => {
     const point = (x: string, y: number, extra = {}) => ({x, y, ...extra});
     const spec = {
+      version: 1,
       title: 'MRR',
       chart: {type: 'line', incomplete: {from: '2026-04-01'}},
       series: [
@@ -261,6 +285,7 @@ describe('validate', () => {
     const data = [{x: '2026-01-01', y: 1}];
     expect(
       errorsFor({
+        version: 1,
         title: 'Volume',
         chart: {type: 'line', axes: {x: {labels: 'time'}}},
         series: [
@@ -286,6 +311,7 @@ describe('validate', () => {
     const months = Array.from({length: 6}, (_, i) => `2026-0${i + 1}-01`);
     // Actuals for 4 months, then a forecast; the plan runs all 6 months.
     const spec = (comparisonValue: number) => ({
+      version: 1,
       title: 'MRR',
       kpi: {value: 13, basis: 'latest', comparisonValue},
       series: [
@@ -313,6 +339,7 @@ describe('validate', () => {
     // A shorter comparison is summed over the slots both series have.
     expect(
       validate({
+        version: 1,
         title: 'Orders',
         kpi: {value: 33, basis: 'total', comparisonValue: 11},
         series: [
@@ -333,6 +360,7 @@ describe('validate', () => {
   it('allows projected only on incomplete actual points of the measured series', () => {
     const months = ['2026-09-01', '2026-10-01', '2026-11-01'];
     const errors = errorsFor({
+      version: 1,
       title: 'Volume',
       chart: {type: 'bar', incomplete: {from: '2026-11-01'}},
       // The KPI uses the value so far (30), not the projection.
@@ -373,6 +401,7 @@ describe('validate', () => {
 
   it('rejects a bar projection short of the value so far, but not a line one', () => {
     const spec = {
+      version: 1,
       title: 'Conversion rate',
       format: {style: 'percent', unit: 'percent'},
       chart: {type: 'bar', incomplete: {from: '2026-11-01'}},
@@ -401,6 +430,7 @@ describe('validate', () => {
   it('leaves forecast points out of the KPI basis', () => {
     expect(
       validate({
+        version: 1,
         title: 'MRR',
         kpi: {value: 12, basis: 'latest'},
         series: [

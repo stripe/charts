@@ -55,6 +55,7 @@ const mrrData: DataPoint[] = MONTHS.map((x, i) => {
 const actual = {label: 'MRR', data: mrrData.filter((point) => !point.forecast)};
 
 const mrr: ChartSpec = {
+  version: 1,
   title: 'Monthly recurring revenue',
   description: 'Last 12 months, then a 3-month forecast',
   format: {style: 'currency', currency: 'usd', unit: 'major'},
@@ -101,6 +102,7 @@ const week = {
 export const IncompleteThenForecast: StoryObj<Args> = {
   args: {
     spec: {
+      version: 1,
       title: 'Orders',
       description: 'November 2026: today still processing, the rest forecast',
       format: {style: 'number', maximumFractionDigits: 0},

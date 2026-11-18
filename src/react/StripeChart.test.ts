@@ -15,6 +15,7 @@ import type {StripeChartProps} from './index';
 
 function spec(title: string): ChartSpec {
   return {
+    version: 1,
     title,
     series: [
       {
@@ -95,7 +96,7 @@ test('unmounting destroys the chart and empties the container', () => {
 
 test('an invalid spec shows the error card and calls onError without throwing', () => {
   const onError = jest.fn();
-  const invalid = {title: ''} as ChartSpec;
+  const invalid = {version: 1, title: ''} as ChartSpec;
   expect(() => showChart({spec: invalid, onError})).not.toThrow();
   expect(onError).toHaveBeenCalledTimes(1);
   const error: unknown = onError.mock.calls[0]?.[0];
@@ -113,6 +114,7 @@ test('an invalid spec shows the error card and calls onError without throwing', 
 test('a value JSON cannot tell from null is still validated', () => {
   const onError = jest.fn();
   const withY = (y: number | null): ChartSpec => ({
+    version: 1,
     title: 'Gross volume',
     series: [{label: '2026', data: [{x: '2026-11-27', y}]}],
   });

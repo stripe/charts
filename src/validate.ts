@@ -31,6 +31,7 @@ import {
   Y_AXIS_NOTATIONS,
   LIMITS,
   PERCENT_UNITS,
+  SPEC_VERSION,
 } from './spec';
 import type {
   ChartSpec,
@@ -198,6 +199,29 @@ function checkFormat(c: Checker, format: unknown): void {
       () => new Intl.NumberFormat(undefined, {style: 'currency', currency}),
     );
   }
+}
+
+/** Returns false for a version newer than this package supports. */
+function checkVersion(c: Checker, version: unknown): boolean {
+  if (
+    typeof version === 'number' &&
+    Number.isInteger(version) &&
+    version > SPEC_VERSION
+  ) {
+    c.report(
+      'version',
+      `spec version ${version} is newer than this package supports (up to ${SPEC_VERSION}); upgrade @stripe/charts to render it`,
+    );
+    return false;
+  }
+  if (version !== SPEC_VERSION) {
+    c.reportExpected(
+      'version',
+      `${SPEC_VERSION}, the spec format version`,
+      version,
+    );
+  }
+  return true;
 }
 
 function checkLocale(c: Checker, locale: unknown): void {
@@ -707,6 +731,9 @@ function checkSeriesList(
 export function validate(spec: unknown): ValidationResult {
   const c = new Checker();
   if (!c.object('spec', spec)) return {ok: false, errors: c.issues};
+  // A newer spec may use fields this package has never heard of, so its
+  // other issues would only mislead.
+  if (!checkVersion(c, spec.version)) return {ok: false, errors: c.issues};
 
   c.unknownFields('', spec, FIELDS.spec, {aliases: ALIASES.spec});
   c.string('title', spec.title, {

@@ -441,6 +441,7 @@ export function xAxisCases(): AxisCase[] {
               cases.push({
                 name: `x | ${span.name} | ${form} | ${zone} | ${locale} | ${type} | w${width}`,
                 spec: {
+                  version: 1,
                   title: span.name,
                   locale,
                   timeZone: zone,
@@ -494,6 +495,7 @@ export function yAxisCases(): AxisCase[] {
             cases.push({
               name: `y | ${set.name} | ${formatName} | ${locale} | ${type} | h${height}`,
               spec: {
+                version: 1,
                 title: set.name,
                 format: FORMATS[formatName],
                 locale,
@@ -532,6 +534,7 @@ export function yAxisCases(): AxisCase[] {
           cases.push({
             name: `y | ${set.name} | ${formatName} | ${locale} | stacked | h${height}`,
             spec: {
+              version: 1,
               title: set.name,
               format: FORMATS[formatName],
               locale,
@@ -678,6 +681,7 @@ export const REFERENCE_CASES: readonly ReferenceCase[] = [
   {
     name: 'reference | near-flat daily line',
     spec: {
+      version: 1,
       title: 'Recurring revenue',
       format: USD,
       series: [referenceSeries('2026-08-01', 1, FLAT_DAILY)],
@@ -691,6 +695,7 @@ export const REFERENCE_CASES: readonly ReferenceCase[] = [
   {
     name: 'reference | weekly bars near $1.1M',
     spec: {
+      version: 1,
       title: 'Recurring revenue',
       format: USD,
       chart: {type: 'bar'},
@@ -705,6 +710,7 @@ export const REFERENCE_CASES: readonly ReferenceCase[] = [
   {
     name: 'reference | weekly line in a cell',
     spec: {
+      version: 1,
       title: 'MRR',
       format: USD,
       series: [
@@ -732,6 +738,7 @@ export const REFERENCE_CASES: readonly ReferenceCase[] = [
   {
     name: 'reference | weekly bars in a cell',
     spec: {
+      version: 1,
       title: 'New ARR',
       format: USD,
       chart: {type: 'bar'},

@@ -6,6 +6,7 @@ const {buildReact, buildCodeExamples} = require('../.storybook/code');
 const {codeView} = require('../.storybook/codeView');
 
 const spec = {
+  version: 1,
   title: 'Orders',
   series: [{label: 'Orders', data: [{x: '2026-11-01', y: 120}]}],
 };

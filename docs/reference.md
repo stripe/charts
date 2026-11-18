@@ -107,6 +107,13 @@ try {
 
 The package version, as a string.
 
+### `specVersion`
+
+The newest spec format version this package renders, currently `1`: the value
+to put in `spec.version`. It changes only when the spec format changes
+incompatibly, not with every package release. Compare it with a saved spec's
+`version` to tell whether this package can render it before you call `render`.
+
 The JSON Schema for the spec ships as `dist/stripe-charts.schema.json`
 (`@stripe/charts/schema.json`), and TypeScript types for every field come with
 the package.
@@ -129,6 +136,7 @@ import type {ChartSpec} from '@stripe/charts';
 import {StripeChart} from '@stripe/charts/react';
 
 const spec: ChartSpec = {
+  version: 1,
   title: 'Gross volume',
   // Amounts in cents, as the Stripe API returns them.
   format: {style: 'currency', currency: 'usd', unit: 'minor'},
@@ -210,6 +218,7 @@ charts.
 
 ```json
 {
+  "version": 1,
   "title": "Gross volume",
   "description": "November 26–30, compared with last year",
   "format": {"style": "currency", "currency": "usd", "unit": "minor"},
@@ -236,6 +245,7 @@ The comparison series is drawn as a muted dashed line under the primary one.
 
 ```json
 {
+  "version": 1,
   "title": "Orders",
   "description": "Successful payments per day",
   "format": {"style": "number", "maximumFractionDigits": 0},
@@ -272,6 +282,7 @@ for how many bars stay readable.
 
 ```json
 {
+  "version": 1,
   "title": "Net volume",
   "description": "Charges, refunds and disputes",
   "format": {"style": "currency", "currency": "usd", "unit": "major"},
@@ -296,6 +307,7 @@ year.
 
 ```json
 {
+  "version": 1,
   "title": "Gross volume, the reporting period",
   "format": {"style": "currency", "currency": "usd", "unit": "minor"},
   "kpi": {"basis": "total", "value": 150790155, "comparisonValue": 131775125},
@@ -310,6 +322,7 @@ point's value and change in the KPI, and leaving restores it.
 
 ```json
 {
+  "version": 1,
   "title": "MRR",
   "format": {"style": "currency", "currency": "usd", "unit": "major"},
   "kpi": {"basis": "latest", "value": 294470, "comparisonValue": 238630},
@@ -333,6 +346,7 @@ next to it as visually hidden text, and the accessible summary uses it too.
 
 ```json
 {
+  "version": 1,
   "title": "New ARR",
   "format": {"style": "currency", "currency": "usd", "unit": "major"},
   "kpi": {"basis": "custom", "value": 3798040, "comparisonValue": 3705405, "notation": "compact"},
@@ -348,6 +362,7 @@ Render a placeholder while the data is fetched, then update it:
 
 ```js
 const chart = StripeCharts.render(element, {
+  version: 1,
   title: 'Gross volume',
   format: {style: 'currency', currency: 'usd', unit: 'major'},
   chart: {type: 'line'},
@@ -372,6 +387,7 @@ are in the TypeScript types and the JSON Schema.
 
 | Field | Type | Default | Description |
 |---|---|---|---|
+| `version` | `1` | required | The spec format version. See [Spec versions](#spec-versions). |
 | `title` | string, 1 to 200 characters | required | Card title shown at the top. |
 | `description` | string, up to 500 characters | none | One-line subtitle under the title. |
 | `format` | object | `{"style": "number"}` | How values (KPI, axis ticks, tooltip) are formatted. Chosen by `format.style`. |
@@ -407,6 +423,17 @@ are in the TypeScript types and the JSON Schema.
 | `emptyMessage` | string, up to 200 characters | `"No data"` | Message for an empty plot, in your language, for example `"No disputes this week"`. Plain text. |
 | `annotations` | array of up to 10 | none | Markers and ranges: `label` (up to 80 characters), optional `description` (up to 200), and `at` (with optional `series`) or `from`/`to`. |
 | `loading` | boolean | `false` | `true` while the data is being fetched: the card shows a placeholder shaped by `chart.type`, and `series` and `kpi` may be omitted. Call `update` with the data to replace it. |
+
+### Spec versions
+
+Every spec starts with `"version": 1`. The version names the spec format, not
+the package release: it changes only for incompatible changes, such as a field
+being renamed or a default changing meaning, so a saved spec records which
+format it was written for. New optional fields don't change it.
+
+A spec whose version is newer than the package supports is rejected with only
+that one issue, since its other fields may be valid in the newer format:
+upgrade the package to render it.
 
 ## Performance and data size
 
@@ -944,6 +971,7 @@ inside an annotation adds it to the tooltip.
 
 ```json
 {
+  "version": 1,
   "title": "Gross volume",
   "format": {"style": "currency", "currency": "usd", "unit": "minor"},
   "chart": {"type": "line"},
@@ -1018,6 +1046,8 @@ Every problem names the field path and what was expected. Common ones:
 
 | Message | Fix |
 |---|---|
+| `version: required; expected 1, the spec format version` | Add `"version": 1`. |
+| `version: spec version 2 is newer than this package supports (up to 1); upgrade @stripe/charts to render it` | Upgrade the package. The spec was written for a newer format. |
 | `title: required; expected a non-empty string` | Add a `title`. |
 | `subtitle: unexpected field "subtitle"; did you mean "description"?` | Rename the field. Misspellings and common alternatives get a suggestion, for example `date` -> `x`, `value` -> `y`, `type` -> `chart.type`. |
 | `format.currency: required when format.style is "currency"; expected an ISO 4217 code like "usd"` | Add `currency`. |

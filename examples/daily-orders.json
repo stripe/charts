@@ -1,4 +1,5 @@
 {
+  "version": 1,
   "title": "Orders",
   "timeZone": "America/New_York",
   "description": "Successful payments per day, November 1–30",

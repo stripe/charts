@@ -4,7 +4,8 @@
 import {VERSION} from './meta';
 import {render as renderChart, renderErrorCard} from './render';
 import type {RenderHandle} from './render';
-import type {ChartHandle, ChartSpec, SpecIssue} from './spec';
+import {SPEC_VERSION} from './spec';
+import type {ChartHandle, ChartSpec, SpecIssue, SpecVersion} from './spec';
 import type {RenderOptions} from './options';
 import {formatIssues, validate} from './validate';
 import {validateOptions} from './validateOptions';
@@ -33,6 +34,7 @@ export type {
   PercentUnit,
   Series,
   SpecIssue,
+  SpecVersion,
   ValidationResult,
   ValueFormat,
   XAxisLabels,
@@ -52,6 +54,12 @@ export type {
 
 /** The package version. */
 export const version: string = VERSION;
+
+/**
+ * The newest spec format version this package renders: the value to put in
+ * `spec.version`. It changes only when the spec format changes incompatibly.
+ */
+export const specVersion: SpecVersion = SPEC_VERSION;
 
 /** Thrown by `render` and `update` when the spec is invalid. */
 export class SpecError extends Error {

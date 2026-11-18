@@ -405,6 +405,7 @@
 
 
       render('tile-volume', {
+        version: 1,
         title: 'Gross volume',
         description: 'November 26–30',
         format: USD,
@@ -414,6 +415,7 @@
       });
 
       render('tile-orders', {
+        version: 1,
         title: 'Orders',
         description: 'Successful payments',
         format: {style: 'number', maximumFractionDigits: 0},
@@ -423,6 +425,7 @@
       });
 
       render('tile-conversion', {
+        version: 1,
         title: 'Conversion rate',
         description: 'Orders per checkout session',
         format: {style: 'percent', unit: 'ratio', maximumFractionDigits: 2},
@@ -433,6 +436,7 @@
       });
 
       render('tile-aov', {
+        version: 1,
         title: 'Average order value',
         description: 'Gross volume per order',
         format: USD,
@@ -471,6 +475,7 @@
       };
 
       render('daily-volume', {
+        version: 1,
         title: 'Gross volume by day',
         description: 'Two weeks around the weekend, 2026 against the same weekdays in 2025',
         format: USD,
@@ -493,6 +498,7 @@
       }, {onPointClick: (event) => dayDetail(event.index)});
 
       render('hourly-orders', {
+        version: 1,
         title: 'Campaign launch orders by hour',
         description: 'Eastern time, against Campaign launch 2025',
         format: {style: 'number', maximumFractionDigits: 0},
@@ -506,6 +512,7 @@
       });
 
       render('payment-methods', {
+        version: 1,
         title: 'Gross volume by payment method',
         description: 'Each day of the two weeks, 2026',
         format: USD,

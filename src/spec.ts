@@ -294,6 +294,12 @@ export type Kpi = {
   notation?: KpiNotation;
 };
 
+/** A spec format version this package can render. */
+export type SpecVersion = 1;
+
+/** The newest spec format version this package can render. */
+export const SPEC_VERSION: SpecVersion = 1;
+
 /**
  * A declarative description of one chart card: a title, an optional headline
  * KPI, and a line or bar chart of up to 12 series over time. Unknown fields
@@ -305,6 +311,13 @@ export type Kpi = {
  * index.
  */
 export type ChartSpec = {
+  /**
+   * Required. The spec format version, always `1` for this format. It changes
+   * only when the format changes incompatibly, not with every package
+   * release, so a saved spec records which format it was written for. A spec
+   * with a newer version than this package supports is rejected.
+   */
+  version: SpecVersion;
   /** Card title shown at the top, for example `"Gross volume"`. Plain text. */
   title: string;
   /**
@@ -478,6 +491,7 @@ export const FIELDS: {
   readonly point: readonly (keyof DataPoint)[];
 } = {
   spec: [
+    'version',
     'title',
     'description',
     'format',

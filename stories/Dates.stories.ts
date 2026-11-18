@@ -18,6 +18,7 @@ export const Overview: StoryObj = {
         ['UTC', 'America/New_York', 'Asia/Tokyo'].map((timeZone) => [
           timeZone,
           {
+            version: 1,
             title: 'Orders around midnight',
             timeZone,
             series: [

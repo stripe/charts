@@ -518,6 +518,7 @@
       }
 
       tile('tile-payments', {
+        version: 1,
         title: 'Successful payments today',
         format: COUNT,
         kpi: {
@@ -533,6 +534,7 @@
       });
 
       tile('tile-auth', {
+        version: 1,
         title: 'Authorization rate today',
         format: RATE,
         // Approved attempts over all attempts, not the mean of the hours.
@@ -544,6 +546,7 @@
       });
 
       tile('tile-transit', {
+        version: 1,
         title: 'Payouts in transit',
         format: USD_MINOR,
         kpi: {
@@ -559,6 +562,7 @@
       });
 
       tile('tile-disputes', {
+        version: 1,
         title: 'Open disputes',
         format: COUNT,
         kpi: {
@@ -574,6 +578,7 @@
       });
 
       StripeCharts.render(document.getElementById('volume'), {
+        version: 1,
         title: 'Gross volume by hour',
         description: 'Today so far against the same hours last Monday',
         format: USD_MINOR,
@@ -592,6 +597,7 @@
       });
 
       StripeCharts.render(document.getElementById('brands'), {
+        version: 1,
         title: 'Authorization rate by card brand',
         description: 'Approved attempts, by hour',
         format: RATE,
@@ -605,6 +611,7 @@
       });
 
       StripeCharts.render(document.getElementById('reasons'), {
+        version: 1,
         title: 'Declines by reason',
         description: 'Declined attempts per hour, stacked',
         format: COUNT,

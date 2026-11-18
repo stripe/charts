@@ -27,6 +27,7 @@ function resizeAll(width: number, height: number): void {
 }
 
 const SPEC: ChartSpec = {
+  version: 1,
   title: 'Gross volume',
   format: {style: 'currency', currency: 'usd', unit: 'major'},
   kpi: {basis: 'custom', value: 1284300.5, comparisonValue: 1012400},
@@ -102,6 +103,7 @@ describe('render', () => {
       const handle = render(
         element,
         {
+          version: 1,
           title: 'Series palette',
           chart: {type},
           series: colors.map((_, index) => ({
@@ -295,7 +297,7 @@ describe('render', () => {
     const after = jest.fn();
     const chart = render(element, SPEC, {onPointClick: before});
     resizeAll(600, 300);
-    chart.update({title: 'Gross volume', loading: true}, {onPointClick: after});
+    chart.update({version: 1, title: 'Gross volume', loading: true}, {onPointClick: after});
     resizeAll(600, 300);
     const area = plotArea(element);
     pressKey(area, 'ArrowRight');
@@ -316,7 +318,7 @@ describe('render', () => {
       chart: {type: 'line', legend: 'show'},
     });
     resizeAll(600, 300);
-    chart.update({title: 'Gross volume', loading: true});
+    chart.update({version: 1, title: 'Gross volume', loading: true});
     const root = element.querySelector('.sc-root');
     expect(root?.getAttribute('aria-busy')).toBe('true');
 
@@ -539,6 +541,7 @@ describe('render', () => {
   it('gives hidden grouped series no band, so the rest fill the group', () => {
     const labels = ['A', 'B', 'C', 'D'];
     render(element, {
+      version: 1,
       title: 'Orders',
       chart: {type: 'bar', legend: 'show'},
       series: labels.map((label, index) => ({
@@ -659,6 +662,7 @@ describe('render', () => {
 
   it('shows the stack total in the hover KPI of a stacked chart', () => {
     render(element, {
+      version: 1,
       title: 'Net volume',
       kpi: {basis: 'custom', value: 100},
       chart: {type: 'bar', stacking: 'stacked', legend: 'show'},
@@ -681,6 +685,7 @@ describe('render', () => {
 
   it('colors the change by goodDirection, at rest and on hover', () => {
     render(element, {
+      version: 1,
       title: 'Refunds',
       format: {style: 'number'},
       kpi: {
@@ -707,6 +712,7 @@ describe('render', () => {
     // taller stack (slot 0). Series A has no segment there, so it draws
     // nothing at all, rather than its slot-1 value as a bar from zero.
     render(element, {
+      version: 1,
       title: 'Dense',
       chart: {type: 'bar', stacking: 'stacked'},
       series: [
@@ -736,6 +742,7 @@ describe('render', () => {
 
   it('shows a compact KPI to the eye and the exact value to screen readers', () => {
     render(element, {
+      version: 1,
       title: 'New ARR',
       format: {style: 'currency', currency: 'usd', unit: 'major'},
       chart: {type: 'kpi'},

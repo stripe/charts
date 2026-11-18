@@ -30,6 +30,7 @@ export default meta;
 export const Palette: StoryObj<Args> = {
   args: {
     spec: {
+      version: 1,
       title: 'Series palette',
       chart: {type: 'bar', legend: 'show'},
       series: Array.from({length: 12}, (_, index) => ({
@@ -56,6 +57,7 @@ function regionSeries(
 }
 
 const byRegion: ChartSpec = {
+  version: 1,
   title: 'Gross volume by region',
   description: 'November 2026, daily',
   format: {style: 'currency', currency: 'usd', unit: 'major'},

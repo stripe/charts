@@ -32,6 +32,7 @@ export const Overview: StoryObj = {
       {
         title: 'Grouped',
         spec: {
+          version: 1,
           title: 'Orders by channel',
           chart: {type: 'bar', legend: 'show'},
           series: channels,
@@ -40,6 +41,7 @@ export const Overview: StoryObj = {
       {
         title: 'Stacked',
         spec: {
+          version: 1,
           title: 'Orders by channel',
           chart: {type: 'bar', stacking: 'stacked', legend: 'show'},
           series: channels,

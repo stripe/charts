@@ -158,6 +158,7 @@ function StripeChartWithRef(
  * ```tsx
  * <StripeChart
  *   spec={{
+ *     version: 1,
  *     title: 'Gross volume',
  *     format: {style: 'currency', currency: 'usd', unit: 'minor'},
  *     series: [{label: '2026', data: [{x: '2026-11-27', y: 41200025}]}],

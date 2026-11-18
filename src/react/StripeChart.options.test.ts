@@ -30,6 +30,7 @@ class ResizeObserverStub {
 }
 
 const SPEC: ChartSpec = {
+  version: 1,
   title: 'Gross volume',
   series: [
     {

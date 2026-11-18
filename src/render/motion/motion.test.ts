@@ -78,6 +78,7 @@ function manualEnvironment({reducedMotion}: {reducedMotion: boolean}): {
 }
 
 const BARS: ChartSpec = {
+  version: 1,
   title: 'Orders',
   chart: {type: 'bar'},
   series: [
@@ -93,6 +94,7 @@ const BARS: ChartSpec = {
 };
 
 const LINES: ChartSpec = {
+  version: 1,
   title: 'Orders',
   series: [
     {label: '2026', data: (BARS.series ?? [])[0]?.data ?? []},
@@ -177,7 +179,7 @@ describe('motion', () => {
       resizeAll(600, 300);
       expect(geometry(element)).toEqual(settledGeometry(spec, UPDATED));
 
-      chart.update({title: 'Orders', loading: true});
+      chart.update({version: 1, title: 'Orders', loading: true});
       expect(element.querySelector('.sc-updating')).not.toBeNull();
       expect(geometry(element)).toEqual(settledGeometry(spec, UPDATED));
       chart.destroy();
@@ -193,7 +195,7 @@ describe('motion', () => {
 
       const loading = render(
         element,
-        {title: 'Orders', loading: true},
+        {version: 1, title: 'Orders', loading: true},
         {},
         page.environment,
       );
@@ -207,6 +209,7 @@ describe('motion', () => {
   it('draws dense bar charts once and animates whole series', () => {
     const days = 400;
     const dense: ChartSpec = {
+      version: 1,
       title: 'Orders',
       chart: {type: 'bar'},
       series: ['A', 'B', 'C', 'D'].map((label, seriesIndex) => ({
@@ -227,6 +230,7 @@ describe('motion', () => {
 
   it('keeps a filled gap inside the plot while the y scale tweens', () => {
     const line = (values: (number | null)[]): ChartSpec => ({
+      version: 1,
       title: 'Orders',
       series: [
         {
@@ -250,6 +254,7 @@ describe('motion', () => {
 
   it('grows a filled bar gap from the baseline, never past it', () => {
     const bars = (values: (number | null)[]): ChartSpec => ({
+      version: 1,
       title: 'Orders',
       chart: {type: 'bar'},
       series: [
@@ -271,6 +276,7 @@ describe('motion', () => {
 
   it('leaves hidden series out of stacks that grow on entrance', () => {
     const stacked: ChartSpec = {
+      version: 1,
       title: 'Orders',
       chart: {type: 'bar', stacking: 'stacked'},
       series: [
@@ -356,7 +362,7 @@ describe('motion', () => {
     const page = manualEnvironment({reducedMotion: false});
     const chart = render(
       element,
-      {title: 'Orders', loading: true, chart: {type: 'bar'}},
+      {version: 1, title: 'Orders', loading: true, chart: {type: 'bar'}},
       {},
       page.environment,
     );

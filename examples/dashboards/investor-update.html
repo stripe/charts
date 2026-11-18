@@ -637,6 +637,7 @@
       const signedTick = (value, label) => (value > 0 ? '+' + label : label);
 
       render('mrr', {
+        version: 1,
         title: 'MRR against plan',
         description: 'Month-start MRR, a six-month forecast and the plan of 6% monthly growth',
         format: USD,
@@ -653,6 +654,7 @@
       });
 
       render('movements', {
+        version: 1,
         title: 'Net new MRR',
         description: 'What was added above zero and lost below it, each month',
         format: USD,
@@ -670,6 +672,7 @@
         const current = thisYear(values);
         const before = priorYear(values);
         render(id, {
+          version: 1,
           title,
           description: 'Billed in ' + currency.toUpperCase() + ', 12 months',
           format: {style: 'currency', currency, unit: 'minor'},
@@ -686,6 +689,7 @@
       revenueSpec('rev-gbp', 'Revenue, GBP', 'gbp', gbpRevenue);
 
       render('customers', {
+        version: 1,
         title: 'Customers',
         description: 'Active paying accounts at month start',
         format: {style: 'number', maximumFractionDigits: 0},
@@ -696,6 +700,7 @@
       });
 
       render('logo-churn', {
+        version: 1,
         title: 'Logo churn',
         description: 'Accounts lost as a share of last month’s accounts',
         format: {style: 'percent', unit: 'ratio', maximumFractionDigits: 2},

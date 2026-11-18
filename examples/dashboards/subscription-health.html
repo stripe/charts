@@ -338,6 +338,7 @@
 
 
       render('tile-mrr', {
+        version: 1,
         title: 'MRR',
         description: 'November, against a year earlier',
         format: USD,
@@ -347,6 +348,7 @@
       });
 
       render('tile-subscriptions', {
+        version: 1,
         title: 'Active subscriptions',
         description: 'November, against a year earlier',
         format: {style: 'number', maximumFractionDigits: 0},
@@ -356,6 +358,7 @@
       });
 
       render('tile-nrr', {
+        version: 1,
         title: 'Net revenue retention',
         description: 'Trailing 12 months',
         format: {style: 'percent', unit: 'ratio', maximumFractionDigits: 1},
@@ -365,6 +368,7 @@
       });
 
       render('tile-eu-mrr', {
+        version: 1,
         title: 'MRR, European entity',
         description: 'Billed in euros, against a year earlier',
         format: {style: 'currency', currency: 'eur', unit: 'minor'},
@@ -374,6 +378,7 @@
       });
 
       render('mrr', {
+        version: 1,
         title: 'MRR against plan',
         description: 'Month-end MRR, a three-month forecast and the operating plan of 2.6% monthly growth',
         format: USD,
@@ -393,6 +398,7 @@
       });
 
       render('movements', {
+        version: 1,
         title: 'MRR movements',
         description: 'Gains above zero, losses below; their sum is net new MRR',
         format: USD,
@@ -406,6 +412,7 @@
       });
 
       render('new-by-plan', {
+        version: 1,
         title: 'New MRR by plan',
         description: 'Last 12 months',
         format: USD,
@@ -418,6 +425,7 @@
       });
 
       render('churn-rate', {
+        version: 1,
         title: 'Subscription churn rate',
         description: 'Cancellations as a share of last month’s subscriptions',
         format: {style: 'percent', unit: 'ratio', maximumFractionDigits: 2},

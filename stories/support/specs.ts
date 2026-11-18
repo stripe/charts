@@ -14,11 +14,13 @@ export const orders = {
 export const orderTotal = total(orders);
 
 export const orderSpec: ChartSpec = {
+  version: 1,
   title: 'Orders',
   series: [orders],
 };
 
 export const moneySpec: ChartSpec = {
+  version: 1,
   title: 'Gross volume',
   format: {style: 'currency', currency: 'usd', unit: 'minor'},
   series: [

@@ -4,8 +4,12 @@
   "description": "A declarative description of one chart card: a title, an optional headline KPI, and a line or bar chart of up to 12 series over time. Pass it as the second argument to StripeCharts.render(element, spec). Unknown fields are rejected. A comparison series (for example last year) lines up with the primary series by position, not by calendar date: the i-th point of every series is drawn in the same x slot, so put the days you want compared at the same index.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["title"],
+  "required": ["version", "title"],
   "properties": {
+    "version": {
+      "description": "Required. The spec format version, always 1 for this format. It changes only when the format changes incompatibly, not with every package release, so a saved spec records which format it was written for. A spec with a newer version than the package supports is rejected.",
+      "const": 1
+    },
     "title": {
       "description": "Card title shown at the top, for example \"Gross volume\". Plain text; markup is shown literally.",
       "type": "string",

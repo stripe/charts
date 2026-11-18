@@ -24,6 +24,7 @@ Render into a `<div id="chart"></div>`:
 import {render} from '@stripe/charts';
 
 render(document.getElementById('chart'), {
+  version: 1,
   title: 'Orders',
   series: [{label: 'Orders', data: [
     {x: '2026-11-01', y: 120},
@@ -38,6 +39,7 @@ render(document.getElementById('chart'), {
 import {render, type ChartSpec} from '@stripe/charts';
 
 const spec: ChartSpec = {
+  version: 1,
   title: 'Orders',
   series: [{label: 'Orders', data: [
     {x: '2026-11-01', y: 120},
@@ -56,6 +58,7 @@ import {StripeChart} from '@stripe/charts/react';
 
 export function OrdersChart() {
   return <StripeChart spec={{
+    version: 1,
     title: 'Orders',
     series: [{label: 'Orders', data: [
       {x: '2026-11-01', y: 120},

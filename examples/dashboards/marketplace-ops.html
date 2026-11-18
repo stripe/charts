@@ -428,6 +428,7 @@
 
 
       render('tile-gmv', {
+        version: 1,
         title: '流通総額',
         description: '90日間の合計',
         format: JPY,
@@ -437,6 +438,7 @@
       });
 
       render('tile-payouts', {
+        version: 1,
         title: '出品者への入金額',
         description: '90日間の合計',
         format: JPY,
@@ -446,6 +448,7 @@
       });
 
       render('tile-dispute-rate', {
+        version: 1,
         title: '不審請求申請率',
         description: '90日間の平均、決済件数あたり',
         format: {style: 'percent', unit: 'ratio', maximumFractionDigits: 2},
@@ -461,6 +464,7 @@
       });
 
       render('tile-sellers', {
+        version: 1,
         title: 'アクティブな出品者',
         description: '11月13日時点、90日前との比較',
         format: {style: 'number', maximumFractionDigits: 0},
@@ -473,6 +477,7 @@
       // "fetched", then updates in place. The button repeats it as a refresh,
       // which keeps the chart and dims it until the new data arrives.
       const payoutsSpec = {
+        version: 1,
         title: '出品者への入金額（日次）',
         description: '直前の90日間（曜日を揃えて比較）との比較',
         format: JPY,
@@ -481,6 +486,7 @@
         series: vsPrevious(payouts, previousPayouts),
       };
       const payoutsChart = render('payouts', {
+        version: 1,
         title: payoutsSpec.title,
         description: payoutsSpec.description,
         format: JPY,
@@ -495,6 +501,7 @@
       });
 
       render('dispute-rate', {
+        version: 1,
         title: '不審請求申請率（日次）',
         description: '決済件数あたりの申請件数',
         format: {style: 'percent', unit: 'ratio', maximumFractionDigits: 2},
@@ -505,6 +512,7 @@
       // An empty result is still a result: the card says so instead of
       // disappearing.
       render('high-value-disputes', {
+        version: 1,
         title: '高額の不審請求申請（今週）',
         description: '10万円以上の申請',
         format: JPY,
@@ -514,6 +522,7 @@
       });
 
       render('countries', {
+        version: 1,
         title: '海外購入者の流通額（国・地域別、週次）',
         description: '直近13週間、月曜日始まり',
         format: JPY,
@@ -562,6 +571,7 @@
       render(
         'payment-methods',
         {
+          version: 1,
           title: '決済手段別の流通額（日次）',
           description: '直近30日間。凡例をクリックして決済手段を絞り込めます',
           format: JPY,
