@@ -10,8 +10,8 @@ import {vars} from './styles';
 /**
  * Whether the chart shows a legend: always or never when `chart.legend`
  * says so; by default (`"auto"`) for as many series as
- * `legend.minSeriesCount`, or whenever there are forecast points, so the
- * dashed style is explained. KPI tiles have none.
+ * `legend.minSeriesCount`, or whenever forecast or projected values need
+ * a "Forecast" or "On pace" key to explain their style. KPI tiles have none.
  */
 export function legendShown(spec: ResolvedSpec): boolean {
   if (spec.chartType === 'kpi' || spec.series.length === 0) return false;

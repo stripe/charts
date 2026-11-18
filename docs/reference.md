@@ -151,11 +151,11 @@ export function GrossVolume() {
 
 | Prop | Type | Description |
 |---|---|---|
-| `spec` | `ChartSpec` | Required. The chart to draw. Compared by value (as JSON), so an inline object literal that describes the same chart does not redraw it; a changed spec updates the chart in place. |
+| `spec` | `ChartSpec` | Required. The chart to draw. Compared by serialized value, including object key order, so an inline object literal with the same serialization does not redraw it; a changed spec updates the chart in place. Unserializable specs are compared by identity. |
 | `style` | `CSSProperties` | Inline style for the container `div`. Line and bar charts fill the container, so give it a height. |
 | `className` | `string` | Class name for the container `div`. |
 | `id` | `string` | `id` for the container `div`. |
-| `onError` | `(error: SpecError) => void` | Called when `spec` is invalid, with the same `{path, message}` list as `validate` in `error.errors`. |
+| `onError` | `(error: SpecError) => void` | Called when validation fails on mount or when the serialized spec or set of callback options changes, with the same `{path, message}` list as `validate` in `error.errors`. An unchanged invalid spec can be reported again. |
 | `ref` | `Ref<HTMLDivElement>` | Forwarded to the container `div`. |
 | `onPointClick` | `(event: PointEvent) => void` | Called when a day is clicked, or Enter is pressed on the focused plot. The plot shows a pointer cursor while it is set. |
 | `onPointHover` | `(event: PointEvent \| null) => void` | Called as the hovered (or keyboard-focused) day changes; `null` on leave. |

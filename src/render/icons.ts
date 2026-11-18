@@ -23,7 +23,7 @@ export const WARNING_GLYPH: Glyph = {
     'M8 10.75a.875.875 0 1 1 0 1.75.875.875 0 0 1 0-1.75Z',
 };
 
-/** Draws a glyph. Decorative: hidden from assistive technology. */
+/** Decorative: hidden from assistive technology. */
 export function glyph(doc: Document, {viewBox, path}: Glyph): SVGSVGElement {
   const element = svg(doc, 'svg', {
     viewBox,

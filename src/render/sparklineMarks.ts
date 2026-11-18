@@ -31,7 +31,7 @@ export function sparkMarker(
   return group;
 }
 
-/** The latest point's dot with a soft halo, as in the reference tiles. */
+/** A dot and soft halo distinguish the latest point from the sparkline's trend. */
 export function sparkEndMarker(
   doc: Document,
   point: PathPoint,

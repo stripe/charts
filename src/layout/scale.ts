@@ -111,7 +111,7 @@ export function slotPixels(index: number, step: number): PixelSpan {
 }
 
 /**
- * Snaps a line position so a stroke of `strokeWidth` covers whole device
+ * Snaps a line position so a stroke of `strokeWidth` covers whole CSS
  * pixels: odd widths sit on a half pixel, even widths on a whole one.
  * Without this a 1px gridline is smeared over two pixel rows.
  */

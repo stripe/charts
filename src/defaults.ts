@@ -63,7 +63,7 @@ const PERCENT_PER_RATIO = 100;
 /**
  * A spec with every defaulted field filled in and every value normalized:
  * currency in major units (`format.unit` is `"major"`) and percentages as
- * ratios (`format.unit` is `"ratio"`), in `series` (y, low and high),
+ * ratios (`format.unit` is `"ratio"`), in all series values,
  * `kpi.value` and `kpi.comparisonValue`.
  */
 export type ResolvedSpec = Omit<
@@ -88,7 +88,6 @@ export type ResolvedSpec = Omit<
   /** `kpi.notation`, or the default when there is no KPI. */
   kpiNotation: KpiNotation;
   emptyMessage: string;
-  /** `chart.legend`. */
   legend: LegendMode;
   /** `chart.axes`, with defaults; `maximumFractionDigits` stays optional. */
   axes: {
@@ -100,7 +99,6 @@ export type ResolvedSpec = Omit<
   };
   /** `chart.incomplete` with its default message, or undefined. */
   incomplete: {from: string; message: string} | undefined;
-  /** `annotations`, or none. */
   annotations: Annotation[];
 };
 

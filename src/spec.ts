@@ -380,16 +380,13 @@ export type ChartHandle = {
   destroy(): void;
 };
 
-/** Every chart type, in documentation order. */
+// Shared enum choices keep validation messages in a consistent order.
 export const CHART_TYPES: readonly ChartType[] = ['line', 'bar', 'kpi'];
 
-/** Every currency unit, in documentation order. */
 export const CURRENCY_UNITS: readonly CurrencyUnit[] = ['minor', 'major'];
 
-/** Every percent unit, in documentation order. */
 export const PERCENT_UNITS: readonly PercentUnit[] = ['ratio', 'percent'];
 
-/** Every KPI basis, in documentation order. */
 export const KPI_BASES: readonly KpiBasis[] = [
   'total',
   'latest',
@@ -397,16 +394,12 @@ export const KPI_BASES: readonly KpiBasis[] = [
   'custom',
 ];
 
-/** Both KPI notations. */
 export const KPI_NOTATIONS: readonly KpiNotation[] = ['standard', 'compact'];
 
-/** Both good directions. */
 export const GOOD_DIRECTIONS: readonly GoodDirection[] = ['up', 'down'];
 
-/** Every legend mode, in documentation order. */
 export const LEGEND_MODES: readonly LegendMode[] = ['auto', 'show', 'hide'];
 
-/** Every x-axis label granularity, in documentation order. */
 export const X_AXIS_LABELS: readonly XAxisLabels[] = [
   'auto',
   'day',
@@ -415,16 +408,13 @@ export const X_AXIS_LABELS: readonly XAxisLabels[] = [
   'time',
 ];
 
-/** Both y-axis notations. */
 export const Y_AXIS_NOTATIONS: readonly YAxisNotation[] = [
   'compact',
   'standard',
 ];
 
-/** Every bar stacking mode, in documentation order. */
 export const BAR_STACKINGS: readonly BarStacking[] = ['grouped', 'stacked'];
 
-/** Every value format style, in documentation order. */
 export const FORMAT_STYLES: readonly ValueFormat['style'][] = [
   'number',
   'currency',
@@ -443,7 +433,7 @@ export const LIMITS: {
   readonly maxLabelLength: number;
   /** Longest description. */
   readonly maxDescriptionLength: number;
-  /** Largest `maximumFractionDigits` that Intl accepts. */
+  /** Largest `maximumFractionDigits` accepted by this package. */
   readonly maxFractionDigits: number;
   /**
    * Largest magnitude of a value or KPI. Below 2^53 (about 9e15) doubles

@@ -12,10 +12,11 @@ export type KpiHandle = {
   /** Shows slot `index`'s values, or the spec's KPI again for null. */
   showSlot(index: number | null): void;
   /**
-   * Keeps hovering from moving the layout: if the widest value and change
-   * any slot can show would not share a line, the change is placed under
-   * the value for every slot. Call again after the chart resizes, since the
-   * width and type size change.
+   * Estimates the room needed on hover by measuring a sample of the longest
+   * value-and-change pairs. If one does not fit, the change is placed under
+   * the value for every slot. With proportional fonts, a shorter string may
+   * be wider than the sample. Call again after a resize, since width and
+   * type size change.
    */
   reserve(): void;
 };
@@ -33,8 +34,8 @@ type KpiText = {
 const STACKED_CLASS = 'sc-kpi-stacked';
 
 // Values of equal length can still differ in width (a "1" next to an "8"
-// without tabular numerals, or a separator); measuring the few longest
-// covers the widest without measuring every slot.
+// without tabular numerals, or a separator). Sampling the longest avoids
+// measuring every slot, but can miss a wider string in a proportional font.
 const RESERVE_CANDIDATES = 3;
 
 /**
@@ -132,7 +133,7 @@ function slotTexts(model: ChartModel, spec: ResolvedSpec): KpiText[] {
   });
 }
 
-/** The few longest value-and-change pairs, which include the widest. */
+/** Width-measurement candidates selected by character count. */
 function longest(texts: readonly KpiText[]): KpiText[] {
   const length = (t: KpiText): number =>
     t.value.length + (t.change?.length ?? 0);
@@ -222,9 +223,8 @@ export function renderKpi(
     reserve: () => {
       if (slots.length === 0) return;
       row.classList.remove(STACKED_CLASS);
-      // If any slot's value and change would not fit on one line, the
-      // change always sits under the value, so hovering never re-wraps the
-      // row.
+      // If a sampled pair does not fit, reserve a separate change row for
+      // every slot to reduce wrapping on hover.
       row.classList.toggle(STACKED_CLASS, !fits(longest([rest, ...slots])));
     },
   };

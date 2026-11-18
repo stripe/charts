@@ -1,7 +1,6 @@
 import type {Tokens} from '../../tokens';
 import type {VarTree} from '../styles';
 
-/** Rules for annotation, incomplete and forecast marks. */
 export function markRules(v: VarTree<Tokens>): string[] {
   const {annotation: a, incomplete: i, forecast: f, projected: pr} = v;
   return [

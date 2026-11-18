@@ -4,13 +4,11 @@ import {html} from './dom';
 /** Parts of the header that the chart builds separately. */
 export type HeaderParts = {
   titleId: string;
-  /** The KPI row. */
   kpi: HTMLElement | null;
   /** True for the KPI-only tile, where the KPI comes before the description. */
   tile: boolean;
 };
 
-/** Builds the header block. */
 export function renderHeader(
   doc: Document,
   spec: ResolvedSpec,

@@ -15,10 +15,10 @@ function keyReplacer(_key: string, value: unknown): unknown {
 }
 
 /**
- * A value that is equal between renders exactly when the specs are equal as
- * data, so this is a deep comparison. A spec that cannot be serialized (for
- * example a cyclic object passed with a cast) falls back to comparison by
- * identity.
+ * A serialized comparison key, preserving object key order and distinguishing
+ * nonfinite numbers from null and strings. A spec that cannot be serialized
+ * (for example a cyclic object passed with a cast) falls back to comparison
+ * by identity.
  */
 export function specKey(spec: ChartSpec): unknown {
   try {

@@ -30,8 +30,8 @@ export function legendSparklineRules(v: VarTree<Tokens>): string[] {
     `.sc-legend-square.sc-legend-forecast{border:${v.forecast.barStrokeWidth} solid var(--sc-series-color);background:color-mix(in srgb, var(--sc-series-color) calc(${v.forecast.barFillOpacity} * 100%), transparent);}`,
     `.sc-legend-square{display:block;flex:none;width:${v.legend.swatchSize};height:${v.legend.swatchSize};background:var(--sc-series-color);}`,
 
-    // Beside the value, the value and change stay on one line, as in the
-    // reference, and the sparkline gives up width for them, down to its
+    // The value and change stay on one line so the sparkline can sit beside
+    // them. The sparkline gives up width for them, down to its
     // smallest (narrower than that, it goes under; see `watchPlacement`).
     // The text column's minimum is that one-line row; otherwise it takes
     // all the room the sparkline leaves, so the KPI sees its full width.

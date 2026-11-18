@@ -951,7 +951,7 @@ export const tokens: Tokens = {
     extensionStrokeWidth: p.stroke.hairline,
     extensionDash: p.mark.dashProjected,
   },
-  /** A 96x56 sparkline beside the value. */
+  /** The KPI tile's sparkline, placed beside or below the value as room allows. */
   sparkline: {
     width: p.sparkline.width,
     minWidth: p.sparkline.minWidth,

@@ -309,37 +309,20 @@ function isBetter(a: Ranked, b: Ranked | undefined): boolean {
  * Round ticks for `domain`, with the domain extended to the next multiple of
  * the step where needed. An end at 0 stays put, so bars keep their baseline.
  *
- * Candidates are the target's step and, with `minTickGap`, its neighbouring
- * 1/2/5 steps (one coarser, or two with `minCount` 2; two finer) that give
- * at most `maxCount` ticks at least `minTickGap` of the domain apart. Each
- * step is tried with every side of 0 the domain reaches given a tick (a
- * stack dipping to -$60K gets -$100K), and with a side that reaches less
- * than half a step left to hang past the last tick, as bars may rise above
- * the top one; each of those with and without a tick added beyond bars that
- * run far past it. All are then extended until at least `minCount` ticks
- * fit.
+ * With `minTickGap`, neighbouring 1/2/5 steps are compared subject to label
+ * spacing and `maxCount`. Prefer less empty space, then ticks on each side
+ * of 0 the data reaches, then ticks close to the far ends of bars, then
+ * less wasted range and a step near the target. These priorities keep the
+ * axis readable without making small variations look flat.
  *
- * The best candidate wins, in this order of priority:
+ * Two-tick axes favour reaching the taller side of the data, since no
+ * intermediate tick helps read the bars. Lines zoomed away from 0 may
+ * extend past their outermost ticks.
  *
- * 1. No end leaves half a step or more of empty plot past `domain`.
- * 2. Every side of 0 that `domain` reaches has a tick.
- * 3. For domains that reach 0 (bars, stacks), neither end runs more than
- *    three quarters of a step past its outermost tick where one more tick
- *    at the same step fits `maxCount` and `minTickGap`; where it does not,
- *    the bars may run further, as in the reference. With `minCount` 2, no
- *    tick in between helps, so the outermost tick on the taller side must
- *    reach the bars, with a coarser step if needed (0 / 0.005 for bars to
- *    0.0035, not 0 / 0.002). Lines zoomed away from 0 are exempt.
- * 4. The least wasted range (the fraction of the axis outside `domain`).
- * 5. The step nearest the target's.
- *
- * When `minStep` is at least the span, the domain is instead the fewest
- * `minStep` steps that hold it, with at least 2 ticks, whatever `minCount`.
- *
- * Otherwise `minCount`, chosen by the caller, always holds: when only an overshooting
- * candidate has that many ticks (all-negative stacks on a short plot), it is
- * used. When no neighbouring step fits the spacing limits, the target's step
- * is used.
+ * Domains are extended toward `minCount` where the step allows it. Flat,
+ * overflowing or numerically unusable ranges have fallback ticks; a step
+ * floor at least as wide as the span uses the smallest covering domain.
+ * If no candidate meets the spacing limits, the target's step is used.
  */
 export function niceScale(
   domain: readonly [number, number],

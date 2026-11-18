@@ -74,9 +74,8 @@ export type PlotLayout = {
   x: SlotScale;
   y: LinearScale;
   /**
-   * The value range `y` maps: the input domain, widened to a tick step
-   * where needed so there are at least 3 ticks and each side of 0 the data
-   * reaches has one.
+   * The value range `y` maps: the input domain, extended where needed for
+   * readable ticks. The tick count depends on plot height and label precision.
    */
   yDomain: [number, number];
   /** Left edge of the y labels, right of the plot. */

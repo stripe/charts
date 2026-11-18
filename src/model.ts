@@ -137,8 +137,8 @@ export type Slot = {
    */
   xLabel: string;
   /**
-   * Tooltip header from the same series: `Nov 27`, or `Nov 27, 6 AM` when
-   * the axis shows time of day. `""` when it has no point here.
+   * Tooltip header from the primary series, using {@link ChartModel.headerStyle}.
+   * `""` when it has no point here.
    */
   headerLabel: string;
   /** One entry per series, in series order. */
@@ -168,9 +168,7 @@ export type ChartModel = {
   annotations: ModelAnnotation[];
   /** The first incomplete slot, or null. */
   incompleteFrom: number | null;
-  /** True when any series has forecast points. */
   hasForecast: boolean;
-  /** True when any point has a projected value. */
   hasProjected: boolean;
   /** True for bar charts with `chart.stacking: "stacked"`. */
   stacked: boolean;
@@ -195,8 +193,8 @@ export type ChartModel = {
    */
   yTicks: number[];
   /**
-   * The smallest y tick step the data allows: the currency's minor unit
-   * (1 for JPY) when every value is a whole number of it, else 0.
+   * The smallest y tick step allowed by the data's currency unit and the
+   * requested label precision, or 0 when neither imposes a floor.
    */
   yMinStep: number;
   /** True when there are no points at all. */

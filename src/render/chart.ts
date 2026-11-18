@@ -145,7 +145,6 @@ export function mountChart(
   return () => controller.abort();
 }
 
-/** Creates the chart root inside `element`. */
 export function createRoot(element: HTMLElement): HTMLElement {
   const root = html(element.ownerDocument, 'div', 'sc-root');
   element.appendChild(root);

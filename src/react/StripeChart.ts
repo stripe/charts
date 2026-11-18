@@ -31,11 +31,12 @@ import type {TooltipOutlet} from './TooltipPortal';
  */
 export type StripeChartProps = CallbackProps & {
   /**
-   * The chart to draw. Compared by value, so an inline object literal that
-   * describes the same chart on every render does not redraw it. The spec is
-   * validated at runtime as well: JSON of unknown shape can be passed with a
-   * cast (`JSON.parse(text) as ChartSpec`), and an invalid one is reported
-   * through {@link StripeChartProps.onError}.
+   * The chart to draw. Compared by serialized value, including object key
+   * order, so an inline object literal with the same serialization on every
+   * render does not redraw it. Unserializable specs are compared by identity.
+   * The spec is validated at runtime as well: JSON of unknown shape can be
+   * passed with a cast (`JSON.parse(text) as ChartSpec`), and an invalid one
+   * is reported through {@link StripeChartProps.onError}.
    */
   spec: ChartSpec;
   /** Class name for the container `div`. */
@@ -51,7 +52,8 @@ export type StripeChartProps = CallbackProps & {
   /**
    * Called when `spec` is invalid, with every issue found. The chart shows
    * a card listing the issues in its place either way; nothing is thrown.
-   * Called again only when the spec changes.
+   * Validation runs on mount and when the serialized spec or set of callback
+   * options changes, so an unchanged invalid spec can be reported again.
    */
   onError?: (error: SpecError) => void;
 };
