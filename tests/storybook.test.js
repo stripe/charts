@@ -16,22 +16,22 @@ test('changing units keeps the rendered chart and copyable code in sync', () => 
   const page = Units.render();
   document.body.appendChild(page);
   const select = page.querySelector('select');
-  expect(page.querySelector('[data-sb-code] code').textContent).toContain(
-    '<StripeChart',
-  );
+  expect(
+    page.querySelector('[data-sb-code] [role="tabpanel"]').textContent,
+  ).toContain('<StripeChart');
   page.querySelector('[data-language="javascript"]').click();
-  expect(page.querySelector('[data-sb-code] code').textContent).not.toContain(
-    '<html',
-  );
-  expect(page.querySelector('[data-sb-code] code').textContent).toContain(
-    '"unit": "minor"',
-  );
+  expect(
+    page.querySelector('[data-sb-code] [role="tabpanel"]').textContent,
+  ).not.toContain('<html');
+  expect(
+    page.querySelector('[data-sb-code] [role="tabpanel"]').textContent,
+  ).toContain('"unit": "minor"');
   expect(page.querySelector('[id$="-summary"]').textContent).toContain('$0.95');
   select.value = 'USD · major units';
   select.dispatchEvent(new Event('change'));
-  expect(page.querySelector('[data-sb-code] code').textContent).toContain(
-    '"unit": "major"',
-  );
+  expect(
+    page.querySelector('[data-sb-code] [role="tabpanel"]').textContent,
+  ).toContain('"unit": "major"');
   expect(page.querySelector('[id$="-summary"]').textContent).toContain(
     '$95.00',
   );
@@ -40,9 +40,9 @@ test('changing units keeps the rendered chart and copyable code in sync', () => 
     'JavaScript',
   );
   page.querySelector('[data-language="react"]').click();
-  expect(page.querySelector('[data-sb-code] code').textContent).toContain(
-    '"unit": "major"',
-  );
+  expect(
+    page.querySelector('[data-sb-code] [role="tabpanel"]').textContent,
+  ).toContain('"unit": "major"');
 });
 
 test('the validation guide can recover from the deliberately invalid example', () => {
@@ -54,9 +54,9 @@ test('the validation guide can recover from the deliberately invalid example', (
   select.dispatchEvent(new Event('change'));
   expect(page.querySelector('.sc-error')).toBeNull();
   expect(page.querySelector('.sc-plot-area')).not.toBeNull();
-  expect(page.querySelector('[data-sb-code] code').textContent).toContain(
-    '"unit": "minor"',
-  );
+  expect(
+    page.querySelector('[data-sb-code] [role="tabpanel"]').textContent,
+  ).toContain('"unit": "minor"');
 });
 
 test('the first guide shows the live example and copyable code', () => {
@@ -78,7 +78,7 @@ test('the first guide shows the live example and copyable code', () => {
       (b) => b.textContent,
     ),
   ).toEqual(['React', 'HTML', 'Copy']);
-  expect(page.querySelector('[data-sb-code] code').textContent).toContain(
-    'Orders',
-  );
+  expect(
+    page.querySelector('[data-sb-code] [role="tabpanel"]').textContent,
+  ).toContain('Orders');
 });

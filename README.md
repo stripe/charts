@@ -1,8 +1,6 @@
 # Stripe Charts
 
-Charts for time series and KPIs. Give Stripe Charts a JSON
-spec to turn daily sales, order counts, and comparisons into a chart you can
-use in a report, dashboard, or AI-generated page.
+Stripe Charts is intended for use with the Stripe BFCM Dashboard skill.
 
 ![A gross-volume chart comparing this year with last year](docs/assets/chart-preview.svg)
 

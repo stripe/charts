@@ -181,3 +181,23 @@ test('multiple charts preserve their specs and React-specific tooltip content', 
   expect(tooltip.props.children).toBe('November');
   act(() => root.unmount());
 });
+
+test('React specs fold by default while JSX is highlighted and HTML stays intact', () => {
+  const examples = buildCodeExamples([record], true);
+  const view = codeView(examples, true);
+  const folded = view.querySelector('details');
+  expect(folded.open).toBe(false);
+  expect(folded.querySelector('summary').textContent).toBe(
+    'const spec = { … };',
+  );
+  expect(
+    folded.querySelector(':scope > code.language-jsx').textContent,
+  ).toContain('2026-11-01');
+  expect(view.querySelector('.token.keyword')).not.toBeNull();
+  expect(view.querySelector('.token.tag')).not.toBeNull();
+  folded.open = true;
+  expect(folded.textContent).toContain('Orders');
+  view.querySelector('[data-language="javascript"]').click();
+  expect(view.querySelector('details')).toBeNull();
+  expect(view.querySelector('code').textContent).toBe(examples[1].source);
+});

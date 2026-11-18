@@ -2,6 +2,8 @@
 // snippet replaces the story in the same frame and scrolls inside it.
 // Styled as neutral page chrome, not like the chart.
 import type {CodeExample, CodeExamples} from './code';
+import Prism from 'prismjs';
+import 'prismjs/components/prism-jsx';
 
 const FONT =
   '12px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
@@ -27,6 +29,60 @@ function controlButton(label: string): HTMLButtonElement {
     cursor: 'pointer',
   });
   return button;
+}
+
+/** Render tokens as text nodes, without injecting highlighted HTML. */
+function highlighted(source: string): HTMLElement {
+  const code = document.createElement('code');
+  code.className = 'language-jsx';
+  const colors: Record<string, string> = {
+    keyword: '#cf222e',
+    string: '#0a3069',
+    number: '#0550ae',
+    boolean: '#0550ae',
+    function: '#8250df',
+    tag: '#116329',
+    'attr-name': '#0550ae',
+    comment: '#6e7781',
+    punctuation: '#57606a',
+  };
+  function append(parent: HTMLElement, tokens: (string | Prism.Token)[]): void {
+    for (const token of tokens) {
+      if (typeof token === 'string') {
+        parent.append(document.createTextNode(token));
+      } else {
+        const span = document.createElement('span');
+        span.className = `token ${token.type}`;
+        if (colors[token.type]) span.style.color = colors[token.type];
+        append(
+          span,
+          Array.isArray(token.content) ? token.content : [token.content],
+        );
+        parent.append(span);
+      }
+    }
+  }
+  append(code, Prism.tokenize(source, Prism.languages.jsx));
+  return code;
+}
+
+function renderReact(container: HTMLElement, source: string): void {
+  let offset = 0;
+  // Specs are generated JSON declarations; embedded newlines are escaped.
+  for (const match of source.matchAll(
+    /^const (spec\d*(?:Update\d+)?) = [\s\S]*?;(?=\n|$)/gm,
+  )) {
+    container.append(highlighted(source.slice(offset, match.index)));
+    const details = document.createElement('details');
+    Object.assign(details.style, {margin: '0', padding: '0', border: '0'});
+    const summary = document.createElement('summary');
+    summary.style.cursor = 'pointer';
+    summary.append(highlighted(`const ${match[1]} = { … };`));
+    details.append(summary, highlighted(match[0]));
+    container.append(details);
+    offset = match.index + match[0].length;
+  }
+  container.append(highlighted(source.slice(offset)));
 }
 
 /** Copies `text`; without clipboard access, selects `code` instead. */
@@ -116,7 +172,7 @@ export function codeView(
     color: '#57606a',
   });
 
-  const pre = document.createElement('pre');
+  const pre = document.createElement('div');
   pre.id = panelId;
   pre.setAttribute('role', 'tabpanel');
   pre.tabIndex = 0;
@@ -128,8 +184,9 @@ export function codeView(
     overflow: 'auto',
     font: FONT,
     color: '#24292f',
+    whiteSpace: 'pre',
   });
-  const code = document.createElement('code');
+  const code = document.createElement('div');
   pre.append(code);
 
   const buttons = examples.map((example) => {
@@ -150,7 +207,14 @@ export function codeView(
   });
   function select(example: CodeExample): void {
     selected = example;
-    code.textContent = selected.source;
+    code.replaceChildren();
+    if (selected.language === 'react') {
+      renderReact(code, selected.source);
+    } else {
+      const plain = document.createElement('code');
+      plain.textContent = selected.source;
+      code.append(plain);
+    }
     code.className =
       selected.language === 'react'
         ? 'language-jsx'
