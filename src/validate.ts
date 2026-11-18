@@ -53,17 +53,10 @@ const ALIASES = {
     currency: 'format.currency',
     tz: 'timeZone',
     value: 'kpi.value',
-    showDetails: 'details',
-    detailsButton: 'details',
-    info: 'details',
-    infoButton: 'details',
-    showInfo: 'details',
   },
   kpi: {previous: 'comparisonValue', previousValue: 'comparisonValue'},
   series: {name: 'label', points: 'data', values: 'data'},
   point: {date: 'x', day: 'x', time: 'x', value: 'y'},
-  provenance: {fetched: 'fetchedAt', timestamp: 'fetchedAt'},
-  detail: {name: 'label', key: 'label'},
 };
 
 const CURRENCY_CODE_PATTERN = /^[A-Za-z]{3}$/;
@@ -133,7 +126,6 @@ const YEAR_PREFIX_PATTERN = /^(\d{4})-\d{2}-\d{2}/;
 
 const EXPECTED = {
   date: 'an ISO date like "2026-11-27" or a date-time like "2026-11-27T18:00:00Z"',
-  dateTime: 'an ISO 8601 date-time like "2026-11-27T18:00:00Z"',
   currency: 'a 3-letter ISO 4217 code like "usd"',
   locale: 'a BCP 47 language tag like "en-US"',
   timeZone: 'an IANA time zone like "America/New_York"',
@@ -364,7 +356,7 @@ function checkKpiBasis(c: Checker, spec: JsonObject): void {
 
 /** The path of the first date-time in the spec, if any. */
 function firstDateTime(spec: JsonObject): string | undefined {
-  const {series, provenance} = spec;
+  const {series} = spec;
   if (Array.isArray(series)) {
     for (const [i, s] of series.entries()) {
       const data = isJsonObject(s) && Array.isArray(s.data) ? s.data : [];
@@ -376,9 +368,6 @@ function firstDateTime(spec: JsonObject): string | undefined {
       );
       if (j >= 0) return `series[${i}].data[${j}].x`;
     }
-  }
-  if (isJsonObject(provenance) && provenance.fetchedAt !== undefined) {
-    return 'provenance.fetchedAt';
   }
   return undefined;
 }
@@ -493,15 +482,6 @@ function checkDate(c: Checker, path: string, value: unknown): void {
   if (typeof value === 'string' && parseIsoDate(value)) return;
   if (!reportEarlyYear(c, path, value)) {
     c.reportExpected(path, EXPECTED.date, value);
-  }
-}
-
-function checkDateTime(c: Checker, path: string, value: unknown): void {
-  if (typeof value === 'string' && parseIsoDate(value)?.kind === 'dateTime') {
-    return;
-  }
-  if (!reportEarlyYear(c, path, value)) {
-    c.reportExpected(path, EXPECTED.dateTime, value);
   }
 }
 
@@ -719,41 +699,6 @@ function checkSeriesList(
   }
 }
 
-function checkDetail(c: Checker, path: string, detail: unknown): void {
-  if (!c.object(path, detail)) return;
-  c.unknownFields(path, detail, FIELDS.detail, {aliases: ALIASES.detail});
-  for (const key of FIELDS.detail) {
-    c.string(fieldPath(path, key), detail[key], {
-      required: true,
-      maxLength: LIMITS.maxLabelLength,
-    });
-  }
-}
-
-function checkProvenance(c: Checker, provenance: unknown): void {
-  const path = 'provenance';
-  if (!c.object(path, provenance)) return;
-  c.unknownFields(path, provenance, FIELDS.provenance, {
-    aliases: ALIASES.provenance,
-  });
-  c.string(fieldPath(path, 'source'), provenance.source, {
-    required: true,
-    maxLength: LIMITS.maxLabelLength,
-  });
-  if (provenance.fetchedAt !== undefined) {
-    checkDateTime(c, fieldPath(path, 'fetchedAt'), provenance.fetchedAt);
-  }
-  const detailsPath = fieldPath(path, 'details');
-  if (
-    provenance.details !== undefined &&
-    c.array(detailsPath, provenance.details, {min: 0, max: LIMITS.maxDetails})
-  ) {
-    provenance.details.forEach((detail, i) =>
-      checkDetail(c, `${detailsPath}[${i}]`, detail),
-    );
-  }
-}
-
 /**
  * Checks that `spec` is a valid chart spec. Returns the spec on success, or
  * every issue found, each with a field path like `"series[1].data[3].x"`.
@@ -781,11 +726,9 @@ export function validate(spec: unknown): ValidationResult {
       ? {type: undefined, stacked: false}
       : checkChart(c, spec.chart);
   checkSeriesList(c, spec, chart);
-  if (spec.provenance !== undefined) checkProvenance(c, spec.provenance);
   if (spec.loading !== undefined && typeof spec.loading !== 'boolean') {
     c.reportExpected('loading', 'true or false', spec.loading);
   }
-  checkBoolean(c, 'details', spec.details);
   c.string('emptyMessage', spec.emptyMessage, {
     required: false,
     maxLength: LIMITS.maxLabelLength,

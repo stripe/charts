@@ -327,16 +327,6 @@
       const LOCALE = 'en-US';
       const USD = {style: 'currency', currency: 'usd', unit: 'minor'};
       const FETCHED_AT = '2026-12-01T08:00:00Z';
-      const provenance = (metric, period, extra = []) => ({
-        source: 'Stripe Billing',
-        fetchedAt: FETCHED_AT,
-        details: [
-          {label: 'Metric', value: metric},
-          {label: 'Period', value: period},
-          ...extra,
-          {label: 'Time zone', value: 'UTC, month end'},
-        ],
-      });
       const TWO_YEARS = 'Dec 2024 to Nov 2026';
       const ONE_YEAR = 'Dec 2025 to Nov 2026';
       const VS_YEAR_BEFORE = {label: 'Compared with', value: 'Dec 2024 to Nov 2025'};
@@ -354,7 +344,6 @@
         kpi: {basis: 'latest', value: mrr[last], comparisonValue: mrr[last - 12], notation: 'compact'},
         chart: {type: 'kpi'},
         series: yearOverYear(mrr),
-        provenance: provenance('mrr', ONE_YEAR, [VS_YEAR_BEFORE]),
       });
 
       render('tile-subscriptions', {
@@ -364,7 +353,6 @@
         kpi: {basis: 'latest', value: subscriptions[last], comparisonValue: subscriptions[last - 12]},
         chart: {type: 'kpi'},
         series: yearOverYear(subscriptions),
-        provenance: provenance('active_subscriptions', ONE_YEAR, [VS_YEAR_BEFORE]),
       });
 
       render('tile-nrr', {
@@ -374,7 +362,6 @@
         kpi: {basis: 'latest', value: nrr[nrr.length - 1]},
         chart: {type: 'kpi'},
         series: [{label: 'Net revenue retention', data: points(nrrMonths, nrr)}],
-        provenance: provenance('net_revenue_retention_ttm', ONE_YEAR),
       });
 
       render('tile-eu-mrr', {
@@ -384,7 +371,6 @@
         kpi: {basis: 'latest', value: euMrr[last], comparisonValue: euMrr[last - 12], notation: 'compact'},
         chart: {type: 'kpi'},
         series: yearOverYear(euMrr),
-        provenance: provenance('mrr', ONE_YEAR, [VS_YEAR_BEFORE, {label: 'Currency', value: 'EUR, not converted'}]),
       });
 
       render('mrr', {
@@ -404,7 +390,6 @@
           },
           {label: 'Plan', comparison: true, data: points(months, plan)},
         ],
-        provenance: provenance('mrr', TWO_YEARS, [{label: 'Compared with', value: 'Operating plan'}]),
       });
 
       render('movements', {
@@ -418,7 +403,6 @@
           {label: 'Churn', data: points(months, churned)},
           {label: 'Contraction', data: points(months, contraction)},
         ],
-        provenance: provenance('mrr_movements', TWO_YEARS),
       });
 
       render('new-by-plan', {
@@ -431,7 +415,6 @@
           {label: 'Team', data: points(lastYear, newByPlan('team'))},
           {label: 'Business', data: points(lastYear, newByPlan('business'))},
         ],
-        provenance: provenance('new_mrr by plan', ONE_YEAR),
       });
 
       render('churn-rate', {
@@ -442,7 +425,6 @@
         kpi: {basis: 'latest', value: churnRate[last], comparisonValue: churnRate[last - 12], goodDirection: 'down'},
         chart: {type: 'line', legend: 'show'},
         series: yearOverYear(churnRate),
-        provenance: provenance('subscription_churn_rate', ONE_YEAR, [VS_YEAR_BEFORE]),
       });
 
 

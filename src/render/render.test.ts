@@ -47,10 +47,6 @@ const SPEC: ChartSpec = {
       ],
     },
   ],
-  provenance: {
-    source: 'Example API',
-    details: [{label: 'Metric', value: 'gross_volume'}],
-  },
 };
 
 function plotArea(element: HTMLElement): HTMLElement {
@@ -142,30 +138,21 @@ describe('render', () => {
   it('shows markup in spec strings as literal text', () => {
     const title = '<img src=x onerror="alert(1)">';
     const label = '<b>2026</b>';
-    const detail = '<script>alert(2)</script>';
     render(element, {
       ...SPEC,
       title,
       series: (SPEC.series ?? []).map((series, index) =>
         index === 0 ? {...series, label} : series,
       ),
-      provenance: {
-        source: 'Example API',
-        details: [{label: 'Metric', value: detail}],
-      },
     });
     resizeAll(600, 300);
     plotArea(element).focus();
     pressKey(plotArea(element), 'ArrowRight');
-    // The details view, where the provenance details are shown, is built
-    // when it first opens.
-    element.querySelector<HTMLButtonElement>('button.sc-info')?.click();
 
     expect(element.querySelector('img, b, script')).toBeNull();
     const text = element.textContent ?? '';
     expect(text).toContain(title);
     expect(text).toContain(label);
-    expect(text).toContain(detail);
   });
 
   it('shows the slot in the tooltip and KPI, announcing comparison dates', () => {
@@ -814,7 +801,6 @@ describe('render', () => {
     const addListener = jest.spyOn(document, 'addEventListener');
     const chart = render(element, SPEC);
     chart.update({...SPEC, chart: {type: 'bar'}});
-    // A KPI tile's details panel listens on the document for outside presses.
     chart.update({...SPEC, chart: {type: 'kpi'}});
     chart.destroy();
 
@@ -822,7 +808,6 @@ describe('render', () => {
     expect(element.attributes).toHaveLength(0);
     expect(observers.length).toBeGreaterThanOrEqual(2);
     for (const {disconnect} of observers) expect(disconnect).toHaveBeenCalled();
-    expect(addListener).toHaveBeenCalled();
     for (const [, , options] of addListener.mock.calls) {
       expect(
         (options as AddEventListenerOptions | undefined)?.signal?.aborted,

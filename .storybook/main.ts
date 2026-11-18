@@ -3,13 +3,29 @@ import type {StorybookConfig} from '@storybook/html-vite';
 // Plain HTML stories keep the examples framework-independent.
 const config: StorybookConfig = {
   stories: ['../stories/**/*.stories.ts'],
+  // Leave examples/ to Vite: its JSON imports must become JavaScript modules.
+  // Serving it statically would return application/json for ?import requests.
   staticDirs: [
     {from: '../dist', to: '/dist'},
     {from: '../docs', to: '/docs'},
-    {from: '../examples', to: '/examples'},
   ],
   addons: [],
   framework: {name: '@storybook/html-vite', options: {}},
+  viteFinal(config) {
+    const ignored = config.server?.watch?.ignored;
+    config.server = {
+      ...config.server,
+      watch: {
+        ...config.server?.watch,
+        // Static builds must not trigger reloads in the running dev preview.
+        ignored: [
+          ...(Array.isArray(ignored) ? ignored : ignored ? [ignored] : []),
+          '**/storybook-static/**',
+        ],
+      },
+    };
+    return config;
+  },
   core: {
     disableTelemetry: true,
     disableWhatsNewNotifications: true,

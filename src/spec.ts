@@ -120,7 +120,7 @@ export type Series = {
   comparison?: boolean;
   /**
    * The series color, `#rgb` or `#rrggbb` hex, used for its marks, legend
-   * swatch, tooltip swatch, sparkline and table. Defaults to the palette;
+   * swatch, tooltip swatch and sparkline. Defaults to the palette;
    * prefer it, and check contrast if you set one.
    */
   color?: string;
@@ -221,15 +221,15 @@ export type ChartOptions = {
 };
 
 /**
- * A note on the chart, shown in the tooltip of the slots it covers, the
- * accessible summary and the details view. Use exactly one of `at` (a
+ * A note on the chart, shown in the tooltip of the slots it covers and the
+ * accessible summary. Use exactly one of `at` (a
  * marker) or `from`/`to` (a shaded range). x values must be exact x values
  * of the primary series, since series line up by position.
  */
 export type Annotation = {
   /** Short label, for example `"Campaign launch"`. Plain text, up to 80 characters. */
   label: string;
-  /** Longer note shown in the tooltip and details. Plain text, up to 200 characters. */
+  /** Longer note shown in the tooltip. Plain text, up to 200 characters. */
   description?: string;
   /**
    * A single slot: a vertical marker there, or with `series` a marker on
@@ -294,34 +294,6 @@ export type Kpi = {
   notation?: KpiNotation;
 };
 
-/** One label/value pair in the details view. */
-export type ProvenanceDetail = {
-  /** Short label, for example `"Metric"`. Plain text. */
-  label: string;
-  /** The value as text, for example `"gross_volume"`. Plain text. */
-  value: string;
-};
-
-/**
- * Where the data came from. The info button next to the title opens a
- * details view with these fields and a table of the chart's values.
- */
-export type Provenance = {
-  /** Where the data came from, for example `"Stripe Data API"`. Plain text. */
-  source: string;
-  /**
-   * When the data was fetched, as an ISO 8601 date-time with `Z` or an
-   * offset, for example `"2026-11-27T18:00:00Z"`. Shown in
-   * {@link ChartSpec.timeZone} with the zone name.
-   */
-  fetchedAt?: string;
-  /**
-   * Up to 12 short label/value pairs, for example the metric, date range and
-   * time zone.
-   */
-  details?: ProvenanceDetail[];
-};
-
 /**
  * A declarative description of one chart card: a title, an optional headline
  * KPI, and a line or bar chart of up to 12 series over time. Unknown fields
@@ -348,8 +320,7 @@ export type ChartSpec = {
   locale?: string;
   /**
    * IANA time zone, for example `"America/New_York"`, used to display
-   * date-time values (x values and `fetchedAt`). Required when any x or
-   * `fetchedAt` is a date-time: use the zone the data was reported in, or
+   * date-time x values. Required when any x is a date-time: use the zone the data was reported in, or
    * `"UTC"`. Date-only values like `"2026-11-27"` are never shifted, so it
    * is optional for them. The viewer's own time zone is never used.
    */
@@ -368,8 +339,6 @@ export type ChartSpec = {
    * {@link ChartSpec.emptyMessage}.
    */
   series?: Series[];
-  /** Where the data came from. */
-  provenance?: Provenance;
   /**
    * `true` while data is being fetched; `series` and `kpi` may then be
    * omitted. Without data, the card shows a placeholder shaped by
@@ -385,12 +354,6 @@ export type ChartSpec = {
   emptyMessage?: string;
   /** Up to 10 notes on the chart. See {@link Annotation}. */
   annotations?: Annotation[];
-  /**
-   * `false` to leave out the info button, so the details view (provenance,
-   * notes and the data table) can't be opened. The accessible summary is
-   * unchanged. Defaults to `true`.
-   */
-  details?: boolean;
 };
 
 /** One problem found in a spec. */
@@ -476,9 +439,7 @@ export const LIMITS: {
   readonly maxSeries: number;
   /** Most points per series. */
   readonly maxPoints: number;
-  /** Most provenance details. */
-  readonly maxDetails: number;
-  /** Longest title, series label, source, and detail label or value. */
+  /** Longest title or series label. */
   readonly maxLabelLength: number;
   /** Longest description. */
   readonly maxDescriptionLength: number;
@@ -491,7 +452,7 @@ export const LIMITS: {
   readonly maxAbsValue: number;
   /** Most annotations. */
   readonly maxAnnotations: number;
-  /** Longest annotation label; it sits in the tooltip and details view. */
+  /** Longest annotation label; it sits in the tooltip. */
   readonly maxAnnotationLabelLength: number;
   /** Longest annotation description or incomplete-period message. */
   readonly maxNoteLength: number;
@@ -499,7 +460,6 @@ export const LIMITS: {
   minSeries: 1,
   maxSeries: 12,
   maxPoints: 1000,
-  maxDetails: 12,
   maxLabelLength: 200,
   maxDescriptionLength: 500,
   maxFractionDigits: 20,
@@ -526,8 +486,6 @@ export const FIELDS: {
   readonly annotation: readonly (keyof Annotation)[];
   readonly series: readonly (keyof Series)[];
   readonly point: readonly (keyof DataPoint)[];
-  readonly provenance: readonly (keyof Provenance)[];
-  readonly detail: readonly (keyof ProvenanceDetail)[];
 } = {
   spec: [
     'title',
@@ -538,11 +496,9 @@ export const FIELDS: {
     'kpi',
     'chart',
     'series',
-    'provenance',
     'loading',
     'emptyMessage',
     'annotations',
-    'details',
   ],
   format: {
     number: ['style', 'maximumFractionDigits'],
@@ -558,6 +514,4 @@ export const FIELDS: {
   annotation: ['label', 'description', 'at', 'from', 'to', 'series'],
   series: ['label', 'comparison', 'color', 'data'],
   point: ['x', 'y', 'color', 'forecast', 'low', 'high', 'projected'],
-  provenance: ['source', 'fetchedAt', 'details'],
-  detail: ['label', 'value'],
 };

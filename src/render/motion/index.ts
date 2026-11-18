@@ -12,7 +12,7 @@ import {animateDenseBars, isDense} from './dense';
 import type {MotionEnvironment} from './environment';
 import {browserEnvironment} from './environment';
 import type {Phase} from './fades';
-import {createCrossFader, revealHeader, revealSparkline} from './fades';
+import {revealHeader, revealSparkline} from './fades';
 import type {SkeletonParts} from './lifecycle';
 import {
   animateSkeleton,
@@ -64,7 +64,6 @@ export type ChartMotion = {
    * still running on any of the elements is cancelled first, so fast
    * toggling never stacks fades.
    */
-  crossFade(outgoing: readonly Element[], incoming: readonly Element[]): void;
   revealSparkline(sparkline: Element): void;
   skeleton(parts: SkeletonParts): void;
   cancelAll(): void;
@@ -90,7 +89,6 @@ export function createChartMotion(
   const indicators = createAnimator(environment);
   // Before the chart mounts, so its position is read ahead of its first draw.
   environment.prepareInView?.(element);
-  const crossFader = createCrossFader(animator);
   const clipId = `${idPrefix()}-reveal`;
   let phase: Phase = 'first';
   let showingSkeleton = false;
@@ -101,7 +99,6 @@ export function createChartMotion(
   const cancelAll = (): void => {
     animator.cancelAll();
     indicators.cancelAll();
-    crossFader.clear();
   };
 
   // Set across a remount when the chart being replaced was updating.
@@ -236,7 +233,6 @@ export function createChartMotion(
       plotTransition = transition;
       return plotMotion(transition);
     },
-    crossFade: (outgoing, incoming) => crossFader.crossFade(outgoing, incoming),
     revealSparkline(sparkline) {
       if (phase !== 'update') revealSparkline(animator, sparkline);
     },

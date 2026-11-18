@@ -4,7 +4,6 @@ import {shot} from '../.storybook/shots';
 import type {ChartSpec, Series} from '../src/index';
 import {curve, dates, points} from './support/data';
 import {COLUMN_WIDTH, chart, cleanUpCharts, column} from './support/mount';
-import {provenance} from './support/provenance';
 
 const HEIGHT = 400;
 
@@ -16,7 +15,7 @@ type Args = {spec: ChartSpec};
  * shows a series at once, and a double-click (or Shift+Enter) shows only
  * that series (again to show all). The last visible series can't be
  * hidden. Hidden series leave the plot, the tooltip and the y axis in the
- * same frame, without animation; the KPI and the details table don't
+ * same frame, without animation; the KPI doesn't
  * change.
  */
 const meta: Meta<Args> = {
@@ -68,11 +67,6 @@ const byRegion: ChartSpec = {
     regionSeries('Asia Pacific', 61_000, 88_000, 53),
     regionSeries('Latin America', 24_000, 39_000, 54),
   ],
-  provenance: provenance({
-    metric: 'gross_volume, by region',
-    period: 'Nov 1 to Nov 30, 2026, daily',
-    fetchedAt: '2026-12-01T08:00:00Z',
-  }),
 };
 
 /** Four series with the legend below the plot. Click an entry to try it. */

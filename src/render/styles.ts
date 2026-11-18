@@ -1,7 +1,7 @@
 import {VERSION} from '../meta';
 import type {RoleColor, TextToken} from '../tokens';
 import {tokens} from '../tokens';
-import {detailsRules} from './details/styles';
+import {legendSparklineRules} from './legendSparklineStyles';
 import {motionRules} from './motion/styles';
 import {markRules} from './plot/markStyles';
 
@@ -93,7 +93,7 @@ const rules = [
 
   `.sc-header{display:flex;flex-direction:column;gap:${v.header.gap};flex:none;}`,
   `.sc-tile .sc-header{gap:${v.tile.gap};}`,
-  `.sc-title-row{display:flex;align-items:center;gap:${v.infoButton.gap};min-width:0;}`,
+  `.sc-title-row{display:flex;align-items:center;min-width:0;}`,
   `.sc-title{margin:0;${font(v.header.title)}overflow-wrap:anywhere;}`,
   `.sc-tile .sc-title{${font(v.tile.label)}}`,
   `.sc-description{margin:0;${font(
@@ -122,7 +122,7 @@ const rules = [
   // its own height the plot area grows or shrinks to fill it.
   `.sc-plot-area{position:relative;flex:1 1 ${v.plot.defaultHeight};min-height:0;margin-top:${v.header.plotGap};outline:none;}`,
   `.sc-plot-area.sc-clickable{cursor:pointer;}`,
-  `.sc-plot-area:focus-visible{outline:${v.infoButton.focusRingWidth} solid ${v.color.focusRing};outline-offset:${v.infoButton.focusRingWidth};}`,
+  `.sc-plot-area:focus-visible{outline:${v.focusRingWidth} solid ${v.color.focusRing};outline-offset:${v.focusRingWidth};}`,
   `.sc-svg{position:absolute;top:0;left:0;display:block;overflow:visible;}`,
   `.sc-gridline{stroke:${v.grid.color};stroke-opacity:${v.grid.opacity};stroke-width:${v.grid.width};}`,
   `.sc-baseline,.sc-tick{stroke:${v.axis.baselineColor};stroke-width:${v.axis.baselineWidth};}`,
@@ -165,12 +165,6 @@ const rules = [
     v.tooltip.noteDescription,
   )}}`,
 
-  `.sc-details-trigger{display:inline-flex;flex:none;}`,
-  `.sc-info{display:inline-flex;align-items:center;justify-content:center;flex:none;width:${v.infoButton.size};height:${v.infoButton.size};margin:0;padding:0;border:0;border-radius:${v.infoButton.radius};background:transparent;color:${v.infoButton.color};cursor:pointer;}`,
-  `.sc-info:hover{background:${v.infoButton.hoverBackground};}`,
-  `.sc-info:focus-visible{outline:${v.infoButton.focusRingWidth} solid ${v.color.focusRing};outline-offset:0;}`,
-  `.sc-info svg{width:${v.infoButton.glyphSize};height:${v.infoButton.glyphSize};fill:currentColor;}`,
-
   `.sc-empty{position:absolute;top:0;right:0;bottom:0;left:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:${v.empty.gap};text-align:center;}`,
   `.sc-empty-icon{display:flex;align-items:center;justify-content:center;flex:none;width:${v.empty.iconSize};height:${v.empty.iconSize};border-radius:50%;background:${v.empty.iconBackground};color:${v.empty.glyphColor};}`,
   `.sc-empty-icon svg{width:${v.empty.glyphSize};height:${v.empty.glyphSize};fill:currentColor;}`,
@@ -188,7 +182,7 @@ const rules = [
   ...markRules(vars),
   ...motionRules(vars),
 
-  ...detailsRules(vars),
+  ...legendSparklineRules(vars),
 ];
 
 const STYLESHEET: string = rules.join('\n');

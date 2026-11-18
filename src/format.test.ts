@@ -1,7 +1,6 @@
 import {
   formatChange,
   formatDate,
-  formatDateTime,
   formatKpiValue,
   formatTicks,
   formatValue,
@@ -145,9 +144,6 @@ describe('formatDate', () => {
     expect(
       formatDate('2026-11-27T15:30:00Z', {...options, style: 'tooltip'}),
     ).toBe('Sat, Nov 28, 2026, 12:30 AM');
-    expect(formatDateTime('2026-11-27T15:30:00Z', 'en-US', 'Asia/Tokyo')).toBe(
-      'Nov 28, 2026, 12:30 AM GMT+9',
-    );
     // 15:00 UTC on Dec 31 is midnight on New Year's Day in Tokyo.
     const newYear = '2026-12-31T15:00:00Z';
     const label = (style: DateStyle) =>

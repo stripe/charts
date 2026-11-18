@@ -262,7 +262,7 @@ export const VALUE_SETS: readonly ValueSet[] = [
   },
   {name: 'huge', values: wave(POINTS, 0.8e12, 1.3e12), formats: MONEY},
   {name: 'single point', values: [412_000.25], formats: MONEY},
-  // A metric that roughly doubles over the range, as in a details view.
+  // A metric that roughly doubles over the range, in a report.
   {
     name: 'rising volume',
     values: Array.from({length: POINTS}, (_, i) => 250_000 + i * 7_100),

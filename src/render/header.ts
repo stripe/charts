@@ -4,8 +4,6 @@ import {html} from './dom';
 /** Parts of the header that the chart builds separately. */
 export type HeaderParts = {
   titleId: string;
-  /** The details trigger, placed after the title. */
-  trigger: HTMLElement | null;
   /** The KPI row. */
   kpi: HTMLElement | null;
   /** True for the KPI-only tile, where the KPI comes before the description. */
@@ -16,14 +14,13 @@ export type HeaderParts = {
 export function renderHeader(
   doc: Document,
   spec: ResolvedSpec,
-  {titleId, trigger, kpi, tile}: HeaderParts,
+  {titleId, kpi, tile}: HeaderParts,
 ): HTMLElement {
   const header = html(doc, 'div', 'sc-header');
   const titleRow = html(doc, 'div', 'sc-title-row');
   const title = html(doc, 'span', 'sc-title', spec.title);
   title.id = titleId;
   titleRow.appendChild(title);
-  if (trigger) titleRow.appendChild(trigger);
   header.appendChild(titleRow);
 
   const description =

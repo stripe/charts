@@ -640,15 +640,6 @@
 
       // ---- Charts -----------------------------------------------------------
       const NOV = '2026-11-01';
-      const provenance = (metric) => ({
-        source: 'Stripe Data API',
-        fetchedAt: FETCHED_AT,
-        details: [
-          {label: 'Metric', value: metric},
-          {label: 'Period', value: 'January to November 16, 2026'},
-          {label: 'Time zone', value: TIME_ZONE},
-        ],
-      });
       const monthAxis = {x: {labels: 'month'}};
       const comparisonSeries = (values) => {
         const data = dated(2025, values);
@@ -692,7 +683,6 @@
               to: NOV,
             },
           ],
-          provenance: provenance('payments_volume'),
         },
         subscriptions: {
           title: 'Subscriptions and one-time orders',
@@ -722,7 +712,6 @@
               ),
             },
           ],
-          provenance: provenance('payments_volume_by_billing_type'),
         },
         refunds: {
           title: 'Refund rate',
@@ -740,7 +729,6 @@
             {label: '2026', data: dated(2026, refund2026)},
             comparisonSeries(refund2025),
           ],
-          provenance: provenance('refund_rate'),
         },
         disputes: {
           title: 'Dispute rate',
@@ -758,7 +746,6 @@
             {label: '2026', data: dated(2026, dispute2026)},
             comparisonSeries(dispute2025),
           ],
-          provenance: provenance('dispute_rate'),
         },
         aov: {
           title: 'Average order value',
@@ -771,7 +758,6 @@
             {label: '2026', data: dated(2026, aov2026)},
             comparisonSeries(aov2025),
           ],
-          provenance: provenance('average_order_value'),
         },
         methods: {
           title: 'Payment methods',
@@ -785,7 +771,6 @@
             {label: 'Google Pay', data: dated(2026, google)},
             {label: 'Bank debit', data: dated(2026, bank)},
           ],
-          provenance: provenance('payments_by_method'),
         },
         forecast: {
           title: 'Revenue, next three months',
@@ -817,7 +802,6 @@
               ],
             },
           ],
-          provenance: provenance('payments_volume_forecast'),
         },
       };
 

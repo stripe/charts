@@ -3,7 +3,6 @@ import {UPDATE_GLOBALS} from 'storybook/internal/core-events';
 import {addons} from 'storybook/preview-api';
 
 import {cleanUpCharts} from '../stories/support/mount';
-import {guideFor} from '../stories/support/guides';
 import {guidePage} from '../stories/support/guidePage';
 import {buildCodeExamples, takeRecords} from './code';
 import {codeView, viewToggle} from './codeView';
@@ -22,26 +21,19 @@ const withView: Decorator = (storyFn, context) => {
   const story = storyFn();
   const records = takeRecords();
   const view = viewOf(context.globals);
-  const snippet =
-    records.length > 0
-      ? buildCodeExamples(records, context.title === 'Intro')
-      : null;
+  const snippet = records.length > 0 ? buildCodeExamples(records) : null;
   if (view === 'screenshot' || typeof story === 'string') {
     return story;
   }
-  const guide = guideFor(context.title);
   const section = context.title.split('/').at(-1) ?? context.title;
   const isOverview = context.name === 'Overview' || context.name === section;
-  if (guide && (view !== 'code' || context.parameters.viewToggle === false))
+  if (view !== 'code' || context.parameters.viewToggle === false)
     return guidePage(
       isOverview ? section : `${section} / ${context.name}`,
-      guide,
       story,
       context.parameters.codePanel === false ? null : snippet,
-      context.title === 'Intro' || isOverview,
     );
-  if (snippet === null)
-    return guide ? guidePage(context.title, guide, story, null) : story;
+  if (snippet === null) return guidePage(context.title, story, null);
   const code = view === 'code';
   const toggle = viewToggle(code, () =>
     addons.getChannel().emit(UPDATE_GLOBALS, {
@@ -68,7 +60,6 @@ const preview: Preview = {
     options: {
       storySort: {
         order: [
-          'Intro',
           'Charts',
           ['Overview', 'Line', 'Bar', 'KPI'],
           'Features',
@@ -77,17 +68,12 @@ const preview: Preview = {
             'Money and units',
             'Dates and time zones',
             'Comparisons',
-            'Provenance',
             'Validation',
             'Axes',
             'Legend',
             'Annotations',
             'Forecast',
-            'Details',
-            'States',
           ],
-          'Examples',
-          ['Overview', 'Reporting', 'Dashboard', 'API', 'Options'],
         ],
       },
     },

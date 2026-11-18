@@ -6,20 +6,6 @@ export const MESSAGES = {
   noValue: 'No value',
   /** The KPI while the hovered slot has no value. */
   missingValue: '\u2013',
-  /** The info button's accessible name: it opens the details view. */
-  details: 'Details',
-  /** The info button's label, shown on hover and focus. */
-  detailsHint: 'Click for details',
-  /** Caption of the details view's data table. */
-  dataTable: 'Data',
-  /** Heading of the table's column that flags forecast and incomplete rows. */
-  status: 'Status',
-  /** Heading of the details view's list of annotations. */
-  notes: 'Notes',
-  /** Heading of the table's date column. */
-  date: 'Date',
-  source: 'Source',
-  fetchedAt: 'Fetched',
   errorTitle: 'This chart could not be drawn',
   plotInstructions:
     'Chart values. Use the left and right arrow keys to read each point.',

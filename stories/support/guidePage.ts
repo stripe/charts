@@ -1,6 +1,5 @@
 import type {CodeExamples} from '../../.storybook/code';
 import {codeView} from '../../.storybook/codeView';
-import type {Guide} from './guides';
 
 function text<K extends keyof HTMLElementTagNameMap>(
   tag: K,
@@ -14,10 +13,8 @@ function text<K extends keyof HTMLElementTagNameMap>(
 /** A readable guide around the exact story and the code generated from it. */
 export function guidePage(
   title: string,
-  guide: Guide,
   story: Node,
   snippet: CodeExamples | null,
-  showIntroduction = false,
 ): HTMLElement {
   const page = document.createElement('article');
   page.className = 'sc-guide';
@@ -27,14 +24,14 @@ export function guidePage(
     .sc-guide>h1{font-size:20px;font-weight:600;line-height:1.3;margin:0 0 24px}.sc-guide>h2{font-size:16px;margin:24px 0 12px}
     .sc-guide>p{max-width:720px}.sc-guide a{color:#635bff}
     .sc-guide-demo{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;align-items:start;margin-top:20px}
-    @media(min-width:1000px){.sc-guide-demo:has(>[data-sb-code]){grid-template-columns:minmax(560px,1.4fr) minmax(300px,1fr)}}
+    @media(min-width:800px){.sc-guide-demo:has(>[data-sb-code],>.sc-example-code){grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}}
+    .sc-example-code{min-width:0}
     .sc-guide-canvas{min-width:0;overflow:auto;padding:4px}.sc-guide-canvas>div{max-width:100%}
     .sc-guide details{margin-top:24px;border-top:1px solid #ecf1f6;padding-top:12px}.sc-guide summary{cursor:pointer;color:#50617a}
     .sc-example-controls{display:flex;gap:16px;flex-wrap:wrap;margin:0 0 16px;font:14px/1.6 system-ui,sans-serif}
     .sc-example-controls label{display:flex;align-items:center;gap:8px}.sc-example-controls select{font:inherit;padding:4px 8px}
   `;
   page.append(style, text('h1', title));
-  if (showIntroduction) page.appendChild(text('p', guide.lead));
   const demo = document.createElement('div');
   demo.className = 'sc-guide-demo';
   const canvas = document.createElement('section');

@@ -7,7 +7,10 @@ const orderValues = curve(reportingDays.length, 120, 260, {
   seed: 17,
 });
 orderValues[1] = 95;
-const orders = {label: 'Orders', data: points(reportingDays, orderValues)};
+export const orders = {
+  label: 'Orders',
+  data: points(reportingDays, orderValues),
+};
 export const orderTotal = total(orders);
 
 export const orderSpec: ChartSpec = {

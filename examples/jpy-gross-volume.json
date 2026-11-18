@@ -268,19 +268,5 @@
         }
       ]
     }
-  ],
-  "provenance": {
-    "source": "Stripe Data API",
-    "fetchedAt": "2026-12-01T09:00:00+09:00",
-    "details": [
-      {
-        "label": "指標",
-        "value": "gross_volume"
-      },
-      {
-        "label": "タイムゾーン",
-        "value": "Asia/Tokyo"
-      }
-    ]
-  }
+  ]
 }

@@ -1,5 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/html';
 import type {ChartSpec} from '../src/index';
+import {buildCodeExamples} from '../.storybook/code';
+import {codeView} from '../.storybook/codeView';
 import {curve, dates, points} from './support/data';
 import {chart, cleanUpCharts} from './support/mount';
 import {orderSpec, orderTotal} from './support/specs';
@@ -42,7 +44,7 @@ export const Overview: StoryObj = {
     const gallery = document.createElement('div');
     Object.assign(gallery.style, {
       display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))',
+      gridTemplateColumns: 'minmax(0, 1fr)',
       gap: '32px',
       alignItems: 'start',
     });
@@ -63,13 +65,25 @@ export const Overview: StoryObj = {
       const section = document.createElement('section');
       section.style.minWidth = '0';
       const heading = document.createElement('h2');
-      heading.style.cssText = 'font-size:16px;font-weight:500;margin:0 0 16px';
+      heading.style.cssText =
+        'font-size:24px;font-weight:600;line-height:1.3;margin:0 0 16px';
       const link = document.createElement('a');
       link.textContent = label;
       link.href = `./?path=/story/${id}`;
       link.target = '_top';
       heading.appendChild(link);
-      section.append(heading, chart(spec, {width: '100%', height: 320}));
+      section.setAttribute('aria-label', `${label} example`);
+      const row = document.createElement('div');
+      row.className = 'sc-guide-demo';
+      const canvas = document.createElement('div');
+      canvas.className = 'sc-guide-canvas';
+      const size = {width: '100%', height: 320};
+      canvas.append(chart(spec, size));
+      row.append(
+        canvas,
+        codeView(buildCodeExamples([{spec, ...size}], true), true),
+      );
+      section.append(heading, row);
       gallery.appendChild(section);
     }
     return gallery;

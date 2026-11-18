@@ -2,7 +2,6 @@ import type {ChartSpec} from '../../spec';
 import {render} from '..';
 import {buildModel} from '../../model';
 import type {MotionEnvironment} from '.';
-import {createChartMotion} from '.';
 import {growBars, interpolateModel} from './plotTransition';
 
 type ResizeCallback = (
@@ -224,24 +223,6 @@ describe('motion', () => {
     expect(page.pendingFrames()).toBe(0);
     expect(geometry(element)).toEqual(settledGeometry(dense));
     expect(page.animations.length).toBeGreaterThanOrEqual(4);
-  });
-
-  it('stops tracking cross-fades that a newer cross-fade cancels', () => {
-    const page = manualEnvironment({reducedMotion: false});
-    const motion = createChartMotion(element, page.environment);
-    const plot = document.createElement('div');
-    const view = document.createElement('div');
-    for (let toggle = 0; toggle < 5; toggle += 1) {
-      if (toggle % 2 === 0) motion.crossFade([plot], [view]);
-      else motion.crossFade([view], [plot]);
-    }
-    motion.cancelAll();
-    // Each animation was cancelled exactly once: those replaced by a newer
-    // fade were no longer tracked when everything was cancelled.
-    expect(page.animations).toHaveLength(10);
-    for (const animation of page.animations) {
-      expect(animation.cancel).toHaveBeenCalledTimes(1);
-    }
   });
 
   it('keeps a filled gap inside the plot while the y scale tweens', () => {

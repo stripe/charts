@@ -619,16 +619,6 @@
       const LOCALE = 'en-US';
       const USD = {style: 'currency', currency: 'usd', unit: 'minor'};
       const FETCHED_AT = '2026-12-01T08:00:00Z';
-      const provenance = (metric, extra = []) => ({
-        source: 'Stripe Billing',
-        fetchedAt: FETCHED_AT,
-        details: [
-          {label: 'Metric', value: metric},
-          {label: 'Period', value: 'Dec 2025 to Nov 2026'},
-          ...extra,
-          {label: 'Time zone', value: 'UTC, month start'},
-        ],
-      });
       const render = (id, spec, options) => StripeCharts.render(document.getElementById(id), {locale: LOCALE, timeZone: 'UTC', ...spec}, options);
       const withYearBefore = (label, values) => [
         {label, data: points(months, thisYear(values))},
@@ -660,7 +650,6 @@
           {label: 'Plan', comparison: true, data: points([...months, ...futureMonths], planMrr)},
         ],
         annotations: [{...PRICE_CHANGE_NOTE, series: 'MRR'}, {...BIG_WIN_NOTE, series: 'MRR'}],
-        provenance: provenance('mrr', [{label: 'Compared with', value: 'Operating plan'}]),
       });
 
       render('movements', {
@@ -675,7 +664,6 @@
           {label: 'Churn', color: '#d6336c', data: points(months, thisYear(churned))},
         ],
         annotations: [BIG_WIN_NOTE],
-        provenance: provenance('mrr_movements'),
       }, {formatYTick: signedTick});
 
       const revenueSpec = (id, title, currency, values) => {
@@ -691,7 +679,6 @@
             {label: currency.toUpperCase(), data: points(months, current)},
             {label: 'Year before', comparison: true, data: points(months, before)},
           ],
-          provenance: provenance('billed_revenue', [{label: 'Currency', value: currency.toUpperCase() + ', not converted'}]),
         });
       };
       revenueSpec('rev-usd', 'Revenue, USD', 'usd', usdRevenue);
@@ -706,7 +693,6 @@
         chart: {type: 'line', axes: {x: {labels: 'month'}}},
         series: withYearBefore('Customers', customers),
         annotations: [{...BIG_WIN_NOTE, series: 'Customers'}],
-        provenance: provenance('active_customers'),
       });
 
       render('logo-churn', {
@@ -717,7 +703,6 @@
         chart: {type: 'line', axes: {x: {labels: 'month'}}},
         series: withYearBefore('Logo churn', logoChurn),
         annotations: [{...PRICE_CHANGE_NOTE, series: 'Logo churn'}],
-        provenance: provenance('logo_churn_rate'),
       });
 
       // ---- The letter ---------------------------------------------------------

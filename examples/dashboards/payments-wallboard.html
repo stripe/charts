@@ -210,8 +210,6 @@
         --sc-tooltip-note-description-color: var(--text-secondary);
         --sc-tooltip-divider-color: #2f4472;
 
-        --sc-info-button-color: var(--text-muted);
-        --sc-info-button-hover-background: #1b2d52;
         --sc-legend-label-color: var(--text-secondary);
         --sc-legend-hover-background: #1b2d52;
         --sc-legend-hover-color: var(--text);
@@ -233,21 +231,6 @@
         --sc-error-issue-color: var(--text-secondary);
         --sc-error-path-color: var(--text);
 
-        --sc-details-panel-background: #14264a;
-        --sc-details-panel-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
-        --sc-details-heading-color: var(--text);
-        --sc-details-label-color: var(--text-secondary);
-        --sc-details-value-color: var(--text-secondary);
-        --sc-details-button-label-background: #1b2d52;
-        --sc-details-button-label-text-color: var(--text);
-        --sc-details-button-label-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-        --sc-table-header-color: var(--text-secondary);
-        --sc-table-row-header-color: var(--text-secondary);
-        --sc-table-cell-color: var(--text);
-        --sc-table-date-color: var(--text-muted);
-        --sc-table-header-background: #14264a;
-        --sc-table-header-border-color: #2f4472;
-        --sc-table-row-border-color: #243760;
       }
       .tile .sc-root {
         --sc-series-primary-0: var(--accent);
@@ -606,14 +589,6 @@
           {label: 'Last Monday', comparison: true, data: points(LAST_WEEK, volumeLastWeek)},
         ],
         annotations: [INCIDENT],
-        provenance: {
-          source: 'Stripe Data API',
-          fetchedAt: '2026-11-16T15:32:00-06:00',
-          details: [
-            {label: 'Metric', value: 'gross_volume, succeeded charges'},
-            {label: 'Window', value: 'Nov 16, 00:00 to 15:32 CT'},
-          ],
-        },
       });
 
       StripeCharts.render(document.getElementById('brands'), {

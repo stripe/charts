@@ -8,9 +8,62 @@ Stripe Charts is intended for use with the Stripe BFCM Dashboard skill.
 [API and spec reference](docs/reference.md) ·
 [React](docs/reference.md#react)
 
-## JavaScript, TypeScript, and React
+## Try it
 
-[@stripe/charts on npm](https://www.npmjs.com/package/@stripe/charts)
+Install [Stripe Charts from npm](https://www.npmjs.com/package/@stripe/charts):
+
+```sh
+npm install @stripe/charts
+```
+
+### JavaScript
+
+Render into a `<div id="chart"></div>`:
+
+```js
+import {render} from '@stripe/charts';
+
+render(document.getElementById('chart'), {
+  title: 'Orders',
+  series: [{label: 'Orders', data: [
+    {x: '2026-11-01', y: 120},
+    {x: '2026-11-02', y: 180},
+  ]}],
+});
+```
+
+### TypeScript
+
+```ts
+import {render, type ChartSpec} from '@stripe/charts';
+
+const spec: ChartSpec = {
+  title: 'Orders',
+  series: [{label: 'Orders', data: [
+    {x: '2026-11-01', y: 120},
+    {x: '2026-11-02', y: 180},
+  ]}],
+};
+
+const element = document.getElementById('chart');
+if (element) render(element, spec);
+```
+
+### React
+
+```jsx
+import {StripeChart} from '@stripe/charts/react';
+
+export function OrdersChart() {
+  return <StripeChart spec={{
+    title: 'Orders',
+    series: [{label: 'Orders', data: [
+      {x: '2026-11-01', y: 120},
+      {x: '2026-11-02', y: 180},
+    ]}],
+  }} />;
+}
+```
 
 ## Build a report
 
@@ -23,7 +76,6 @@ or a [complete recap page](examples/dashboards/sales-recap.html).
 | Compare matching periods across years | [Comparisons](docs/reference.md#comparisons-line-up-by-position) |
 | Report in the business’s time zone | [Dates and time zones](docs/reference.md#dates-and-time-zones) |
 | Explain a promotion, outage, or partial day | [Annotations](docs/reference.md#annotations-incomplete-periods-and-forecasts) |
-| Show where a number came from | [Provenance](docs/reference.md#details-view) |
 | Understand a rejected spec | [Validation](docs/reference.md#errors-and-how-to-fix-them) |
 
 Use up to 12 series and 1000 points per series. Aggregate dense data before

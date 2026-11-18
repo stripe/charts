@@ -266,27 +266,5 @@
         }
       ]
     }
-  ],
-  "provenance": {
-    "source": "Stripe Data API",
-    "fetchedAt": "2026-12-01T14:05:00Z",
-    "details": [
-      {
-        "label": "Metric",
-        "value": "successful_payments_count"
-      },
-      {
-        "label": "Period",
-        "value": "Nov 1 to Nov 30, 2026"
-      },
-      {
-        "label": "Compared with",
-        "value": "Nov 2 to Dec 1, 2025 (same weekdays)"
-      },
-      {
-        "label": "Time zone",
-        "value": "America/New_York"
-      }
-    ]
-  }
+  ]
 }

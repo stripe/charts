@@ -418,16 +418,6 @@
       const JPY = {style: 'currency', currency: 'jpy', unit: 'minor'};
       const FETCHED_AT = '2026-11-14T00:30:00Z';
       const PERIOD = '2026年8月16日〜11月13日';
-      const provenance = (metric, extra = []) => ({
-        source: 'Stripe Data API',
-        fetchedAt: FETCHED_AT,
-        details: [
-          {label: '指標', value: metric},
-          {label: '期間', value: PERIOD},
-          ...extra,
-          {label: 'タイムゾーン', value: TIME_ZONE},
-        ],
-      });
       const VS_PREVIOUS = {label: '比較対象', value: '直前の90日間（曜日を揃えて比較）'};
       const vsPrevious = (current, previous) => [
         {label: '直近90日', data: points(days, current)},
@@ -444,7 +434,6 @@
         kpi: {basis: 'total', value: sum(gmv), comparisonValue: sum(previousGmv), notation: 'compact'},
         chart: {type: 'kpi'},
         series: vsPrevious(gmv, previousGmv),
-        provenance: provenance('gross_merchandise_value', [VS_PREVIOUS]),
       });
 
       render('tile-payouts', {
@@ -454,7 +443,6 @@
         kpi: {basis: 'total', value: sum(payouts), comparisonValue: sum(previousPayouts), notation: 'compact'},
         chart: {type: 'kpi'},
         series: vsPrevious(payouts, previousPayouts),
-        provenance: provenance('payouts_paid', [VS_PREVIOUS]),
       });
 
       render('tile-dispute-rate', {
@@ -470,7 +458,6 @@
         },
         chart: {type: 'kpi'},
         series: vsPrevious(disputeRate, previousDisputeRate),
-        provenance: provenance('dispute_rate', [VS_PREVIOUS]),
       });
 
       render('tile-sellers', {
@@ -480,7 +467,6 @@
         kpi: {basis: 'latest', value: sellers[DAYS - 1], comparisonValue: previousSellers},
         chart: {type: 'kpi'},
         series: [{label: 'アクティブな出品者', data: points(days, sellers)}],
-        provenance: provenance('active_connected_accounts'),
       });
 
       // Loading, then data: the card shows a placeholder while the rows are
@@ -493,7 +479,6 @@
         kpi: {basis: 'total', value: sum(payouts), comparisonValue: sum(previousPayouts)},
         chart: {type: 'line', legend: 'show'},
         series: vsPrevious(payouts, previousPayouts),
-        provenance: provenance('payouts_paid', [VS_PREVIOUS]),
       };
       const payoutsChart = render('payouts', {
         title: payoutsSpec.title,
@@ -515,7 +500,6 @@
         format: {style: 'percent', unit: 'ratio', maximumFractionDigits: 2},
         chart: {type: 'line', legend: 'show'},
         series: vsPrevious(disputeRate, previousDisputeRate),
-        provenance: provenance('dispute_rate', [VS_PREVIOUS]),
       });
 
       // An empty result is still a result: the card says so instead of
@@ -527,15 +511,6 @@
         emptyMessage: '今週の申請はありません',
         chart: {type: 'bar'},
         series: [{label: '申請額', data: []}],
-        provenance: {
-          source: 'Stripe Data API',
-          fetchedAt: FETCHED_AT,
-          details: [
-            {label: '指標', value: 'disputes, amount ≥ ¥100,000'},
-            {label: '期間', value: '2026年11月9日〜11月13日'},
-            {label: 'タイムゾーン', value: TIME_ZONE},
-          ],
-        },
       });
 
       render('countries', {
@@ -549,15 +524,6 @@
           {label: '韓国', data: points(weeks, korea)},
           {label: '香港', data: points(weeks, hongKong)},
         ],
-        provenance: {
-          source: 'Stripe Data API',
-          fetchedAt: FETCHED_AT,
-          details: [
-            {label: '指標', value: 'gross_merchandise_value by buyer_country'},
-            {label: '期間', value: '2026年8月10日〜11月8日'},
-            {label: 'タイムゾーン', value: TIME_ZONE},
-          ],
-        },
       });
 
       const METHODS = [
@@ -601,7 +567,6 @@
           format: JPY,
           chart: {type: 'bar', stacking: 'stacked', legend: 'show'},
           series: METHODS.map(({label, values}) => ({label, data: points(methodDays, values)})),
-          provenance: provenance('gross_merchandise_value by payment_method_type'),
         },
         {
           onPointClick: (event) => {

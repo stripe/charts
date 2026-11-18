@@ -98,12 +98,6 @@ const TIME_FIELDS: Intl.DateTimeFormatOptions = {
 
 const HOUR_FIELDS: Intl.DateTimeFormatOptions = {hour: 'numeric'};
 
-const FULL_DATE_FIELDS: Intl.DateTimeFormatOptions = {
-  year: 'numeric',
-  month: 'short',
-  day: 'numeric',
-};
-
 // Intl formatters are slow to construct and a chart formats thousands of
 // values, so each locale and option set is built once.
 const numberFormatters = new Map<string, Intl.NumberFormat>();
@@ -308,8 +302,8 @@ export function formatTicks(
 
   const currencyDigits =
     format.style === 'currency'
-      ? numberFormatter(locale, numberOptions(format)).resolvedOptions()
-          .maximumFractionDigits ?? 0
+      ? (numberFormatter(locale, numberOptions(format)).resolvedOptions()
+          .maximumFractionDigits ?? 0)
       : undefined;
   // Fractional currency ticks skip compact notation, which would show a
   // lone tenth ($0.2); the full form below shows cents.
@@ -461,7 +455,7 @@ export function formatParsedDate(
 ): string {
   const isDateTime = parsed.kind === 'dateTime';
   const timeZone = isDateTime
-    ? options.timeZone ?? DEFAULTS.timeZone
+    ? (options.timeZone ?? DEFAULTS.timeZone)
     : CALENDAR_DAY_ZONE;
   const fields = isDateTime
     ? dateTimeFields(options.style, parsed.time, timeZone)
@@ -486,23 +480,4 @@ function fieldsVariant(fields: Intl.DateTimeFormatOptions): string {
   if (fields.minute) return 'minute';
   if (fields.hour) return 'hour';
   return 'day';
-}
-
-/**
- * Formats an instant with its time zone name, e.g.
- * `Nov 27, 2026, 6:00 PM UTC`. A date-only value is formatted as a date.
- * Unparseable input is returned unchanged.
- */
-export function formatDateTime(
-  iso: string,
-  locale: string = DEFAULTS.locale,
-  timeZone: string = DEFAULTS.timeZone,
-): string {
-  const parsed = parseIsoDate(iso);
-  if (!parsed) return iso;
-  const options: Intl.DateTimeFormatOptions =
-    parsed.kind === 'date'
-      ? {...FULL_DATE_FIELDS, timeZone: CALENDAR_DAY_ZONE}
-      : {...FULL_DATE_FIELDS, ...TIME_FIELDS, timeZoneName: 'short', timeZone};
-  return dateFormatter(locale, options).format(parsed.time);
 }

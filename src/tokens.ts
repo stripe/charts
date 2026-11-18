@@ -130,14 +130,6 @@ export const primitives = {
     haloOpacity: 0.2,
     markerRadius: 3,
   },
-  details: {
-    entryColumn: 160,
-    panelMinWidth: 320,
-    panelMaxWidth: 440,
-    panelMaxHeight: 480,
-    panelNarrowBelow: 320,
-    tableMinHeight: 96,
-  },
 } as const;
 
 const p = primitives;
@@ -210,6 +202,8 @@ type Text = TextToken;
  * and ratios are unitless; dashes are SVG dash arrays.
  */
 export type Tokens = {
+  /** Width of keyboard focus outlines. */
+  focusRingWidth: number;
   /** Font stacks and numeral style. */
   font: {family: string; mono: string; numeric: string};
   /**
@@ -218,7 +212,7 @@ export type Tokens = {
    * by setting these few and still override any component on its own.
    */
   color: {
-    /** Background of the tile, tooltip and details panel, and the ring that separates marks. */
+    /** Background of the tile and tooltip, and the ring that separates marks. */
     surface: string;
     /** Titles, values and other text read first. */
     textPrimary: string;
@@ -226,9 +220,9 @@ export type Tokens = {
     textSecondary: string;
     /** Tooltip dates, labels and notes. */
     textMuted: string;
-    /** The quietest text: axis labels and table dates. */
+    /** The quietest text: axis labels. */
     textSubtle: string;
-    /** Outlines of the tile and table header. */
+    /** Outlines of the tile. */
     border: string;
     /** Gridlines and the thin rules between rows and sections. */
     divider: string;
@@ -343,16 +337,6 @@ export type Tokens = {
     dividerColor: Color;
     dividerWidth: number;
   };
-  /** The info button that opens the details view. */
-  infoButton: {
-    size: number;
-    radius: number;
-    glyphSize: number;
-    color: string;
-    hoverBackground: Color;
-    gap: number;
-    focusRingWidth: number;
-  };
   /** The legend row below the plot: a button per series, and a forecast key. */
   legend: {
     minSeriesCount: number;
@@ -389,7 +373,7 @@ export type Tokens = {
    * same value drives CSS, Web Animations and frame-by-frame tweens.
    */
   motion: {
-    /** Hover affordances such as the provenance trigger. */
+    /** Hover affordances. */
     duration: string;
     easing: string;
     /** UI fades: header on first render, cross-fades. */
@@ -418,7 +402,7 @@ export type Tokens = {
      * instead of redrawing every bar each frame, which is too slow there.
      */
     denseBarCount: number;
-    /** Wait before extension elements (the provenance trigger) fade in. */
+    /** Wait before extension elements fade in. */
     extensionDelay: string;
     /** Values and y scale tweening on update. */
     updateDuration: string;
@@ -520,69 +504,6 @@ export type Tokens = {
     extensionStrokeWidth: number;
     extensionDash: string;
   };
-  /** The details view the info button opens, and the button's label. */
-  details: {
-    /** Space between the heading, the provenance list and the table. */
-    sectionGap: number;
-    /** The chart title at the top of the view. */
-    heading: Text;
-    /** Provenance and caller details: label above value. */
-    label: Text;
-    value: Text;
-    entryGap: number;
-    /** Narrowest column of label/value pairs; wider views fit more columns. */
-    entryMinWidth: number;
-    /** The panel a KPI tile opens instead of swapping its plot area. */
-    panel: {
-      background: Color;
-      radius: number;
-      padding: number;
-      shadow: string;
-      borderWidth: number;
-      borderColor: Color;
-      /** Space between the info button and the panel. */
-      offset: number;
-      /** The panel sizes to its content within these widths. */
-      minWidth: number;
-      maxWidth: number;
-      /** The tallest the panel gets; past it, only the table scrolls. */
-      maxHeight: number;
-      /** Space kept between the panel and the viewport's edges. */
-      viewportMargin: number;
-      /** Narrower than this, table cells pack tighter and dates go under values. */
-      narrowBelow: number;
-      /** The table keeps at least this height; with less room, the panel scrolls. */
-      tableMinHeight: number;
-    };
-    /** The info button's "Click for details" label, shown on hover and focus. */
-    buttonLabel: {
-      background: Color;
-      radius: number;
-      paddingX: number;
-      paddingY: number;
-      shadow: string;
-      /** Space between the button and its label. */
-      offset: number;
-      text: Text;
-    };
-  };
-  /** The data table in the details view. */
-  table: {
-    header: Text;
-    rowHeader: Text;
-    cell: Text;
-    /** A comparison value's own date, after or under the value. */
-    dateColor: Color;
-    dateGap: number;
-    cellPaddingX: number;
-    /** Horizontal cell padding in a narrow panel. */
-    compactCellPaddingX: number;
-    cellPaddingY: number;
-    headerBackground: Color;
-    headerBorderColor: Color;
-    rowBorderColor: Color;
-    borderWidth: number;
-  };
   /** The sparkline in a KPI tile. */
   sparkline: {
     /** Width beside the value... */
@@ -615,6 +536,7 @@ export type Tokens = {
 
 /** Role-based tokens. This is what render and layout code read. */
 export const tokens: Tokens = {
+  focusRingWidth: p.stroke.regular,
   font: {
     family: p.font.system,
     mono: p.font.mono,
@@ -893,15 +815,6 @@ export const tokens: Tokens = {
     dividerColor: role('divider'),
     dividerWidth: p.stroke.hairline,
   },
-  infoButton: {
-    size: p.size.iconButton,
-    radius: p.radius.medium,
-    glyphSize: p.size.icon,
-    color: p.color.gray450,
-    hoverBackground: role('fillSubtle'),
-    gap: p.space.xsmall,
-    focusRingWidth: p.stroke.regular,
-  },
   legend: {
     /** Fewer series than this are named only in the tooltip */
     minSeriesCount: 3,
@@ -1037,89 +950,6 @@ export const tokens: Tokens = {
     connectorOpacity: p.mark.halfOpacity,
     extensionStrokeWidth: p.stroke.hairline,
     extensionDash: p.mark.dashProjected,
-  },
-  details: {
-    sectionGap: p.space.large,
-    heading: text(
-      p.fontSize.small,
-      p.lineHeight.small,
-      p.fontWeight.semibold,
-      role('textPrimary'),
-    ),
-    label: text(
-      p.fontSize.small,
-      p.lineHeight.small,
-      p.fontWeight.bold,
-      p.color.gray750,
-    ),
-    value: text(
-      p.fontSize.small,
-      p.lineHeight.small,
-      p.fontWeight.regular,
-      p.color.gray750,
-    ),
-    entryGap: p.space.small,
-    entryMinWidth: p.details.entryColumn,
-    panel: {
-      background: role('surface'),
-      radius: p.radius.large,
-      padding: p.space.large,
-      shadow: p.shadow.raised,
-      // None by default, like the tooltip: the shadow sets it off. A theme
-      // on a dark or busy page can add one.
-      borderWidth: p.space.none,
-      borderColor: p.color.transparent,
-      offset: p.space.xsmall,
-      minWidth: p.details.panelMinWidth,
-      maxWidth: p.details.panelMaxWidth,
-      maxHeight: p.details.panelMaxHeight,
-      viewportMargin: p.space.small,
-      narrowBelow: p.details.panelNarrowBelow,
-      tableMinHeight: p.details.tableMinHeight,
-    },
-    buttonLabel: {
-      background: role('surface'),
-      radius: p.radius.medium,
-      paddingX: p.space.small,
-      paddingY: p.space.xxsmall,
-      shadow: p.shadow.raised,
-      offset: p.space.xsmall,
-      text: text(
-        p.fontSize.small,
-        p.lineHeight.small,
-        p.fontWeight.regular,
-        role('textPrimary'),
-      ),
-    },
-  },
-  table: {
-    header: text(
-      p.fontSize.small,
-      p.lineHeight.small,
-      p.fontWeight.semibold,
-      role('textSecondary'),
-    ),
-    rowHeader: text(
-      p.fontSize.small,
-      p.lineHeight.small,
-      p.fontWeight.regular,
-      role('textSecondary'),
-    ),
-    cell: text(
-      p.fontSize.small,
-      p.lineHeight.small,
-      p.fontWeight.regular,
-      role('textPrimary'),
-    ),
-    dateColor: role('textSubtle'),
-    dateGap: p.space.small,
-    cellPaddingX: p.space.small,
-    compactCellPaddingX: p.space.xsmall,
-    cellPaddingY: p.space.xsmall,
-    headerBackground: role('surface'),
-    headerBorderColor: role('border'),
-    rowBorderColor: role('divider'),
-    borderWidth: p.stroke.hairline,
   },
   /** A 96x56 sparkline beside the value. */
   sparkline: {

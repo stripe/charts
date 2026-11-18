@@ -35,7 +35,6 @@ export const DEFAULTS: {
   readonly xLabels: XAxisLabels;
   readonly yNotation: YAxisNotation;
   readonly incompleteMessage: string;
-  readonly details: boolean;
   /** `maximumFractionDigits` for the `"number"` style. */
   readonly numberFractionDigits: number;
   /** `maximumFractionDigits` for the `"percent"` style. */
@@ -54,7 +53,6 @@ export const DEFAULTS: {
   xLabels: 'auto',
   yNotation: 'compact',
   incompleteMessage: 'Data in this period is still being processed',
-  details: true,
   numberFractionDigits: 2,
   percentFractionDigits: 1,
 };
@@ -104,8 +102,6 @@ export type ResolvedSpec = Omit<
   incomplete: {from: string; message: string} | undefined;
   /** `annotations`, or none. */
   annotations: Annotation[];
-  /** Whether the info button and details view are offered. */
-  details: boolean;
 };
 
 /**
@@ -143,7 +139,6 @@ export function resolveSpec(spec: ChartSpec): ResolvedSpec {
     emptyMessage,
     kpi,
     annotations,
-    details,
     ...rest
   } = spec;
   const yAxis = chart?.axes?.y;
@@ -196,6 +191,5 @@ export function resolveSpec(spec: ChartSpec): ResolvedSpec {
       message: chart.incomplete.message ?? DEFAULTS.incompleteMessage,
     },
     annotations: annotations ?? [],
-    details: details ?? DEFAULTS.details,
   };
 }

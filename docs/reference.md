@@ -14,7 +14,7 @@ message naming the field, when one is missing or doesn't fit the data.
 |---|---|---|---|
 | `format.unit` | `format.style` is `"currency"` | `"minor"` or `"major"` | The Stripe API returns amounts in minor units (cents): `1999` is $19.99. Say `"minor"` and pass the API's integers unchanged, or `"major"` if you already converted them. |
 | `format.unit` | `format.style` is `"percent"` | `"ratio"` or `"percent"` | Is 2.5% given as `0.025` (`"ratio"`) or as `2.5` (`"percent"`)? |
-| `timeZone` | any `x` or `provenance.fetchedAt` is a date-time | an IANA zone, such as `"America/New_York"` | An instant can fall on different days in different zones. Name the zone the data was reported in, or `"UTC"`. Date-only data doesn't need it. |
+| `timeZone` | any `x` is a date-time | an IANA zone, such as `"America/New_York"` | An instant can fall on different days in different zones. Name the zone the data was reported in, or `"UTC"`. Date-only data doesn't need it. |
 | `kpi.basis` | there is a `kpi` | `"total"`, `"latest"`, `"average"` or `"custom"` | Says how `kpi.value` relates to the primary series: the sum, last value or mean of its actual values (forecast points are left out), or a figure computed elsewhere. For the first three the value is checked against the series, and `comparisonValue` against the first comparison series over the same slots, like periods: for `"latest"`, the comparison's value at the slot of the primary's latest actual value; for `"total"` and `"average"`, its values at the primary's actual slots. |
 
 Minor units follow the Stripe API's currency decimals:
@@ -191,7 +191,7 @@ Each is a single HTML file that loads `dist/stripe-charts.min.js` with a
 the file or serve the package directory.
 
 - [`examples/standalone.html`](../examples/standalone.html): one line chart,
-  November 26–30 against last year, with provenance.
+  November 26–30 against last year.
 - [`examples/dashboards/sales-recap.html`](../examples/dashboards/sales-recap.html):
   a Sales recap for an online retailer, with KPI cards,
   daily and hourly charts against last year, and volume by payment method as
@@ -327,7 +327,7 @@ point's value and change in the KPI, and leaving restores it.
 
 `"notation": "compact"` abbreviates the headline value, for KPI tiles and
 dense dashboards where the exact figure would crowd the card. The change,
-tooltip, axis and details table stay exact. Screen readers read the exact
+tooltip and axis stay exact. Screen readers read the exact
 value: the abbreviated text is hidden from them and the exact figure sits
 next to it as visually hidden text, and the accessible summary uses it too.
 
@@ -341,33 +341,6 @@ next to it as visually hidden text, and the accessible summary uses it too.
 ```
 
 This card reads "$3.8M +2.5%".
-
-### Details view
-
-Every chart with data has a small info button after its title. Clicking it
-(or pressing Enter or Space) opens a details view; Escape (wherever focus
-is) or the button closes it, and opening another chart's view closes the
-open one. When the details fit the plot area, the view replaces the plot in
-place. In KPI tiles and small charts it opens as a panel by the info button
-instead, sized to its content (320 to 440px wide, narrower only on screens
-too small for 320px, and at most 480px tall), placed below or above and kept
-inside the viewport; only the table scrolls, under a pinned header. One known limit: inside an ancestor with a CSS `transform` (or
-another property that creates a stacking context), the panel is still
-placed correctly, but content that comes after that ancestor can paint over
-it. Give the ancestor a higher `z-index`, or avoid transforming it, if the
-panel needs to overlap later content. It shows:
-
-- the title, then `provenance.source`, `provenance.fetchedAt` (in `timeZone`,
-  with the zone name) and the `provenance.details` pairs, when the spec has
-  provenance;
-- the data as a table: a Date column with the primary series' dates and one
-  column per series. Comparison cells show their own date before the value,
-  so in the Campaign launch row the 2025 cell reads "Nov 28 $350,100".
-
-A chart without `provenance` still has the button and the table. The button
-is left out when there is nothing to show, for example a KPI card without
-series or provenance, or a loading placeholder, and when the spec sets
-`"details": false`, for example on dense dashboard tiles.
 
 ### Loading
 
@@ -407,7 +380,7 @@ are in the TypeScript types and the JSON Schema.
 | `format.unit` | `"minor"` or `"major"` (currency); `"ratio"` or `"percent"` (percent) | required for `"currency"` and `"percent"` | How to read the numbers. See [Units and correctness](#units-and-correctness). Not allowed with `"number"`. |
 | `format.maximumFractionDigits` | integer, 0 to 20 | 2 for `"number"`, 1 for `"percent"` | Most decimals to show. Not allowed with `"currency"`: the currency decides. |
 | `locale` | string | `"en-US"` | BCP 47 language tag for number and date formatting, for example `"ja-JP"`. |
-| `timeZone` | string | required when any `x` or `provenance.fetchedAt` is a date-time; otherwise `"UTC"` | IANA time zone for date-time values, for example `"America/New_York"`. See [Dates](#dates-and-time-zones). |
+| `timeZone` | string | required when any `x` is a date-time; otherwise `"UTC"` | IANA time zone for date-time values, for example `"America/New_York"`. See [Dates](#dates-and-time-zones). |
 | `kpi` | object | none | Headline value shown above the chart. |
 | `kpi.value` | number | required in `kpi` | The headline value, in the units of `format`. |
 | `kpi.basis` | `"total"`, `"latest"`, `"average"` or `"custom"` | required in `kpi` | How `kpi.value` relates to the primary series; checked unless `"custom"`. See [Units and correctness](#units-and-correctness). |
@@ -431,13 +404,6 @@ are in the TypeScript types and the JSON Schema.
 | `series[].data[].low`, `series[].data[].high` | number | none | Forecast points only: the range, `low <= y <= high`. |
 | `series[].data[].projected` | number | none | Incomplete points of a non-comparison series only: where the unfinished period is on pace to end, same units and sign as `y`, and on bar charts at least as far from zero. `y` stays the value so far. See [Annotations, incomplete periods and forecasts](#annotations-incomplete-periods-and-forecasts). |
 | `series[].data[].y` | number or `null` | required | The value in the units of `format`, or `null` for a gap. A JSON number, not a string. |
-| `provenance` | object | none | Where the data came from, shown in the [details view](#details-view). |
-| `provenance.source` | string, 1 to 200 characters | required in `provenance` | For example `"Stripe Data API"`. |
-| `provenance.fetchedAt` | string | none | When the data was fetched: an ISO 8601 date-time with `Z` or an offset. Shown in `timeZone` with the zone name. |
-| `provenance.details` | array of up to 12 | none | Short label/value pairs, for example the metric, date range and time zone. |
-| `provenance.details[].label` | string, 1 to 200 characters | required | For example `"Metric"`. |
-| `provenance.details[].value` | string, 1 to 200 characters | required | For example `"gross_volume"`. |
-| `details` | boolean | `true` | `false` leaves out the info button, so the [details view](#details-view) (provenance, notes and the data table) can't be opened. The accessible summary is unchanged. |
 | `emptyMessage` | string, up to 200 characters | `"No data"` | Message for an empty plot, in your language, for example `"No disputes this week"`. Plain text. |
 | `annotations` | array of up to 10 | none | Markers and ranges: `label` (up to 80 characters), optional `description` (up to 200), and `at` (with optional `series`) or `from`/`to`. |
 | `loading` | boolean | `false` | `true` while the data is being fetched: the card shows a placeholder shaped by `chart.type`, and `series` and `kpi` may be omitted. Call `update` with the data to replace it. |
@@ -484,7 +450,7 @@ one bar's, as `#rgb` or `#rrggbb` hex. Prefer the default palette, and check
 custom colors for contrast against the background.
 
 **Legend.** By default (`chart.legend: "auto"`) charts with 1 or 2 series
-have no legend, because the tooltip and the details table name them, and
+have no legend, because the tooltip names them, and
 charts with 3 or more series, any forecast points or any `projected` values
 show a wrapping legend row below the plot, in series order. `"show"` always
 shows it and `"hide"` never does; KPI cards never have one. Each entry is a
@@ -495,7 +461,7 @@ toggle button:
   one; a double-click on the only shown series shows all again;
 - the last visible series can't be hidden;
 - hidden series leave the plot, the tooltip and the y axis, which re-fits
-  in the same frame; the KPI and the details table don't change;
+  in the same frame; the KPI doesn't change;
 - legend changes don't animate (`update()` and the entrance still do);
 - the choice survives `update()` for series whose labels still exist, and
   `onLegendChange` reports every change, once per press (a double-click
@@ -522,13 +488,13 @@ theme sets those and only a few fixed colors:
 
 | Role | Colors |
 |---|---|
-| `--sc-color-surface` | Tile, tooltip and details panel backgrounds, and the rings that separate marks |
+| `--sc-color-surface` | Tile and tooltip backgrounds, and the rings that separate marks |
 | `--sc-color-text-primary` | Titles, values and other text read first |
 | `--sc-color-text-secondary` | Labels and descriptions, the legend, empty and error text, annotations and the incomplete period |
 | `--sc-color-text-muted` | Tooltip dates, labels and notes |
-| `--sc-color-text-subtle` | Axis labels, table dates and the legend's forecast key |
-| `--sc-color-border` | Tile, card and table header outlines |
-| `--sc-color-divider` | Gridlines, thin rules (tooltip divider, table rows) and loading placeholder marks |
+| `--sc-color-text-subtle` | Axis labels and the legend's forecast key |
+| `--sc-color-border` | Tile and card outlines |
+| `--sc-color-divider` | Gridlines, thin rules (tooltip divider) and loading placeholder marks |
 | `--sc-color-fill-subtle` | Quiet fills: the empty-state icon, button hovers and loading placeholders |
 | `--sc-color-good`, `--sc-color-bad` | KPI changes in the good and bad direction |
 | `--sc-color-focus-ring` | Keyboard focus outlines |
@@ -550,7 +516,6 @@ theme sets those and only a few fixed colors:
   --sc-axis-baseline-color: #3d4d6a;
   --sc-crosshair-color: #8a97ab;
   --sc-series-comparison: #6b7a92;
-  --sc-info-button-color: #8a97ab;
   --sc-tooltip-tag-color: #8a97ab;
 }
 ```
@@ -590,12 +555,12 @@ fails while it is out of date.
 
 | Property | Default | Styles |
 |---|---|---|
-| `--sc-color-surface` | `#FFFFFF` | Background of the tile, tooltip and details panel, and the ring that separates marks. |
+| `--sc-color-surface` | `#FFFFFF` | Background of the tile and tooltip, and the ring that separates marks. |
 | `--sc-color-text-primary` | `#1A2C44` | Titles, values and other text read first. |
 | `--sc-color-text-secondary` | `#3C4F69` | Labels and descriptions. |
 | `--sc-color-text-muted` | `#50617A` | Tooltip dates, labels and notes. |
-| `--sc-color-text-subtle` | `#667691` | The quietest text: axis labels and table dates. |
-| `--sc-color-border` | `#D5DBE1` | Outlines of the tile and table header. |
+| `--sc-color-text-subtle` | `#667691` | The quietest text: axis labels. |
+| `--sc-color-border` | `#D5DBE1` | Outlines of the tile. |
 | `--sc-color-divider` | `#D4DEE9` | Gridlines and the thin rules between rows and sections. |
 | `--sc-color-fill-subtle` | `#F4F7FA` | Quiet fills: the empty-state icon, button hovers and loading placeholders. |
 | `--sc-color-good` | `#217005` | A change in the good direction (see `kpi.goodDirection`). |
@@ -785,18 +750,6 @@ fails while it is out of date.
 | `--sc-tooltip-divider-color` | follows `--sc-color-divider` (`#D4DEE9`) | divider color |
 | `--sc-tooltip-divider-width` | `1px` | divider width |
 
-**`infoButton`**: The info button that opens the details view.
-
-| Property | Default | Styles |
-|---|---|---|
-| `--sc-info-button-size` | `20px` | size |
-| `--sc-info-button-radius` | `6px` | radius |
-| `--sc-info-button-glyph-size` | `12px` | glyph size |
-| `--sc-info-button-color` | `#7D8BA4` | color |
-| `--sc-info-button-hover-background` | follows `--sc-color-fill-subtle` (`#F4F7FA`) | hover background |
-| `--sc-info-button-gap` | `4px` | gap |
-| `--sc-info-button-focus-ring-width` | `2px` | focus ring width |
-
 **`legend`**: The legend row below the plot: a button per series, and a forecast key.
 
 | Property | Default | Styles |
@@ -904,65 +857,6 @@ fails while it is out of date.
 | `--sc-projected-connector-opacity` | `0.5` | connector opacity |
 | `--sc-projected-extension-dash` | `3 2` | extension dash |
 
-**`details`**: The details view the info button opens, and the button's label.
-
-| Property | Default | Styles |
-|---|---|---|
-| `--sc-details-section-gap` | `16px` | Space between the heading, the provenance list and the table. |
-| `--sc-details-heading-size` | `12px` | heading, size |
-| `--sc-details-heading-line-height` | `16px` | heading, line height |
-| `--sc-details-heading-weight` | `600` | heading, weight |
-| `--sc-details-heading-color` | follows `--sc-color-text-primary` (`#1A2C44`) | heading, color |
-| `--sc-details-label-size` | `12px` | label, size |
-| `--sc-details-label-line-height` | `16px` | label, line height |
-| `--sc-details-label-weight` | `700` | label, weight |
-| `--sc-details-label-color` | `#414552` | label, color |
-| `--sc-details-value-size` | `12px` | value, size |
-| `--sc-details-value-line-height` | `16px` | value, line height |
-| `--sc-details-value-weight` | `400` | value, weight |
-| `--sc-details-value-color` | `#414552` | value, color |
-| `--sc-details-entry-gap` | `8px` | entry gap |
-| `--sc-details-entry-min-width` | `160px` | Narrowest column of label/value pairs; wider views fit more columns. |
-| `--sc-details-panel-background` | follows `--sc-color-surface` (`#FFFFFF`) | panel, background |
-| `--sc-details-panel-shadow` | `0 3px 6px rgba(0, 0, 0, 0.12), 0 7px 14px rgba(48, 49, 61, 0.08)` | panel, shadow |
-| `--sc-details-panel-border-color` | `transparent` | panel, border color |
-| `--sc-details-button-label-background` | follows `--sc-color-surface` (`#FFFFFF`) | button label, background |
-| `--sc-details-button-label-radius` | `6px` | button label, radius |
-| `--sc-details-button-label-padding-x` | `8px` | button label, padding x |
-| `--sc-details-button-label-padding-y` | `2px` | button label, padding y |
-| `--sc-details-button-label-shadow` | `0 3px 6px rgba(0, 0, 0, 0.12), 0 7px 14px rgba(48, 49, 61, 0.08)` | button label, shadow |
-| `--sc-details-button-label-offset` | `4px` | Space between the button and its label. |
-| `--sc-details-button-label-text-size` | `12px` | button label, text, size |
-| `--sc-details-button-label-text-line-height` | `16px` | button label, text, line height |
-| `--sc-details-button-label-text-weight` | `400` | button label, text, weight |
-| `--sc-details-button-label-text-color` | follows `--sc-color-text-primary` (`#1A2C44`) | button label, text, color |
-
-**`table`**: The data table in the details view.
-
-| Property | Default | Styles |
-|---|---|---|
-| `--sc-table-header-size` | `12px` | header, size |
-| `--sc-table-header-line-height` | `16px` | header, line height |
-| `--sc-table-header-weight` | `600` | header, weight |
-| `--sc-table-header-color` | follows `--sc-color-text-secondary` (`#3C4F69`) | header, color |
-| `--sc-table-row-header-size` | `12px` | row header, size |
-| `--sc-table-row-header-line-height` | `16px` | row header, line height |
-| `--sc-table-row-header-weight` | `400` | row header, weight |
-| `--sc-table-row-header-color` | follows `--sc-color-text-secondary` (`#3C4F69`) | row header, color |
-| `--sc-table-cell-size` | `12px` | cell, size |
-| `--sc-table-cell-line-height` | `16px` | cell, line height |
-| `--sc-table-cell-weight` | `400` | cell, weight |
-| `--sc-table-cell-color` | follows `--sc-color-text-primary` (`#1A2C44`) | cell, color |
-| `--sc-table-date-color` | follows `--sc-color-text-subtle` (`#667691`) | A comparison value's own date, after or under the value. |
-| `--sc-table-date-gap` | `8px` | date gap |
-| `--sc-table-cell-padding-x` | `8px` | cell padding x |
-| `--sc-table-compact-cell-padding-x` | `4px` | Horizontal cell padding in a narrow panel. |
-| `--sc-table-cell-padding-y` | `4px` | cell padding y |
-| `--sc-table-header-background` | follows `--sc-color-surface` (`#FFFFFF`) | header background |
-| `--sc-table-header-border-color` | follows `--sc-color-border` (`#D5DBE1`) | header border color |
-| `--sc-table-row-border-color` | follows `--sc-color-divider` (`#D4DEE9`) | row border color |
-| `--sc-table-border-width` | `1px` | border width |
-
 **`sparkline`**: The sparkline in a KPI tile.
 
 | Property | Default | Styles |
@@ -998,8 +892,7 @@ fails while it is out of date.
   a conversion rate of 4.12% against 3.97% shows `+3.8%`, not +0.15
   percentage points.
 - **Built-in text is English.** Numbers and dates follow `locale`, but the
-  few strings the chart adds itself (such as "No data", "Details" and the
-  details view labels) are English in this version.
+  few strings the chart adds itself (such as "No data") are English in this version.
 
 ## Dates and time zones
 
@@ -1018,7 +911,7 @@ date. You decide which days correspond by putting them at the same index.
 The dates of the first non-comparison series label the x axis and the
 tooltip header; the tooltip rows show each series' label and value, without
 dates. Each comparison point's own date is in the screen-reader announcement
-for the slot and in the details table.
+for the slot.
 
 For example, compare five-day sales campaigns that began on different dates.
 Put corresponding campaign days in the same slots:
@@ -1046,8 +939,7 @@ the bottom of the plot, with dashed boundaries at the specified dates;
 an omitted endpoint extends to the plot edge without a boundary line.
 Dates are x values of the primary series,
 written exactly as there, since series line up by position. Hovering a slot
-inside an annotation adds it to the tooltip, and the details view lists
-every annotation under "Notes".
+inside an annotation adds it to the tooltip.
 
 ```json
 {
@@ -1079,9 +971,7 @@ An incomplete point can also say where its period is on pace to end, with
 projected total. Lines draw the incomplete tail up to the projected value,
 still dotted, with a marker at the value so far; bars draw the hatched value
 so far plus an outlined extension to the projection. The tooltip reads "so
-far … · on pace for …"; the details table shows the value so far with "so
-far · on pace for $X" on the line below it (its Status column still says
-"Incomplete"), the legend gets an "On pace" key, the y axis makes room for
+far … · on pace for …"; the legend gets an "On pace" key, the y axis makes room for
 the projection, and `kpi.basis` checks use `y`, the value so far. Hovering
 an incomplete point shows the value so far in the KPI and, with `projected`,
 the change on pace (for example "+25.1% on pace"); without `projected` the
@@ -1099,8 +989,7 @@ a period that hasn't started yet.
 **Forecasts.** Points with `"forecast": true`, one run at the end of a
 series, are drawn dashed for lines and outlined for bars, with an optional
 `low`/`high` range shown as a band on lines. Tooltip rows are tagged
-"Forecast" with the range, the details table gets a Status column, and the
-legend explains the style. The `total`, `latest` and `average` KPI bases
+"Forecast" with the range, and the legend explains the style. The `total`, `latest` and `average` KPI bases
 leave forecast points out. An incomplete period must end before the
 forecast starts.
 
@@ -1148,7 +1037,6 @@ Every problem names the field path and what was expected. Common ones:
 | `series[0].data[1].projected: expected at least y (4.2) on a bar chart, since the projection extends the bar beyond the value so far; ...` | On bars, a projection only extends the value so far. For a value on pace to end lower, such as a rate, use a line chart. |
 | `series[0].data[1].low: expected at most y (2), got the number 3` | Keep `low <= y <= high`. |
 | `series[0].color: expected a hex color like "#635bff" or "#fff", got "red"` | Use `#rgb` or `#rrggbb` hex. |
-| `details: expected true or false, got "no"` | Use a JSON boolean. Close alternatives such as `showDetails` or `infoButton` are pointed to `details`. |
 | `chart.type: expected one of "line", "bar", "kpi", got "area"` | Use a supported type. |
 | `series: required unless chart.type is "kpi" or loading is true; expected an array of 1 to 12 series` | Add `series`, use `"chart": {"type": "kpi"}`, or set `loading: true` until the data arrives. |
 | `chart.stacking: only allowed when chart.type is "bar"; got chart.type "line"` | Remove `stacking`, or use a bar chart. |
@@ -1156,7 +1044,6 @@ Every problem names the field path and what was expected. Common ones:
 | `series: expected 1 to 12 items, got 0` | Give at least one series. To show "No data", pass series with empty `data` arrays. |
 | `series[0].data[0].x: expected an ISO date like "2026-11-27" or a date-time like "2026-11-27T18:00:00Z", got "Nov 27"` | Send ISO dates. Date-times need `Z` or an offset. |
 | `series[0].data[1].y: expected a finite number or null, got "338950.80"` | Send a JSON number, not a string; `null` marks a gap. |
-| `provenance.fetchedAt: expected an ISO 8601 date-time like "2026-11-27T18:00:00Z", got "2026-11-27"` | Include a time and a zone; a date alone is not accepted here. |
 | `timeZone: "Mars/Base" is not an IANA time zone this browser supports` | Use a zone the browser's `Intl` knows, such as `"America/New_York"`. The same applies to `locale` and `format.currency`. |
 
 All problems are reported at once, so a spec can be fixed in one pass.
@@ -1173,19 +1060,11 @@ All problems are reported at once, so a spec can be fixed in one pass.
 - The plot can be focused with Tab. Left and right arrow keys move between
   points, Home and End jump to the first and last, Escape hides the tooltip.
   The values at the current point are announced to screen readers.
-- The info button ("Details") is reachable with Tab and opens the details
-  view with Enter or Space. Focus moves to the view's heading; Escape closes
-  the view and returns focus to the button. The button has `aria-expanded`
-  and `aria-controls`.
-- The details view includes the data as a real `<table>`, so every value
-  can be read without the plot, including each comparison point's own date.
-- Hover is never required: the info button is always visible, and taps open
-  the details view and drive the tooltip and sparkline.
+- Taps drive the tooltip and sparkline; hover is not required.
 - All motion is turned off under `prefers-reduced-motion: reduce`.
 - Legend entries are buttons with `aria-pressed`; hiding the last visible
   series is refused with a polite announcement.
-- Annotations and the incomplete period are in the accessible summary and
-  the details view's "Notes", and forecast points are marked in the table.
+- Annotations and the incomplete period are in the accessible summary.
 - The error card uses `role="alert"`.
 
 ## Motion

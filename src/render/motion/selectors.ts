@@ -1,7 +1,6 @@
 export const HEADER = '.sc-header';
 export const KPI = '.sc-kpi';
 export const PLOT_AREA = '.sc-plot-area';
-export const DETAILS_TRIGGER = '.sc-details-trigger';
 export const DIMMED = '.sc-plot-area > svg, .sc-kpi, .sc-sparkline';
 
 export const MARKS = '.sc-marks';

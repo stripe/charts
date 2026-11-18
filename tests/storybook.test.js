@@ -1,10 +1,9 @@
 const {cleanUpCharts} = require('../stories/support/mount');
-const {takeRecords, buildCodeExamples} = require('../.storybook/code');
+const {takeRecords} = require('../.storybook/code');
 const {guidePage} = require('../stories/support/guidePage');
-const {guideFor} = require('../stories/support/guides');
 const {Overview: Units} = require('../stories/Money.stories');
 const {Overview: Validation} = require('../stories/Validation.stories');
-const {GettingStarted} = require('../stories/Intro.stories');
+const {Overview: Charts} = require('../stories/ChartsOverview.stories');
 
 afterEach(() => {
   cleanUpCharts()();
@@ -16,6 +15,12 @@ test('changing units keeps the rendered chart and copyable code in sync', () => 
   const page = Units.render();
   document.body.appendChild(page);
   const select = page.querySelector('select');
+  expect(
+    page.querySelector('.sc-guide-demo > .sc-guide-canvas .sc-root'),
+  ).not.toBeNull();
+  expect(
+    page.querySelector('.sc-guide-demo > .sc-example-code [data-sb-code]'),
+  ).not.toBeNull();
   expect(
     page.querySelector('[data-sb-code] [role="tabpanel"]').textContent,
   ).toContain('<StripeChart');
@@ -59,26 +64,48 @@ test('the validation guide can recover from the deliberately invalid example', (
   ).toContain('"unit": "minor"');
 });
 
-test('the first guide shows the live example and copyable code', () => {
-  const story = GettingStarted.render();
+test('the landing page pairs Line, Bar, and KPI with their own code', () => {
+  const story = Charts.render();
   const records = takeRecords();
-  expect(records).toHaveLength(1);
-  const examples = buildCodeExamples(records, true);
-  expect(examples[1].source).toContain(
-    'http://localhost/dist/stripe-charts.min.js',
-  );
-  expect(examples[1].source).not.toContain('cdn.jsdelivr.net');
-  const page = guidePage('Getting started', guideFor('Intro'), story, examples);
-  expect(page.querySelector('.sc-root')).not.toBeNull();
-  expect(
-    [...page.querySelectorAll('summary')].map((summary) => summary.textContent),
-  ).not.toContain('Options');
-  expect(
-    [...page.querySelectorAll('[data-sb-code] button')].map(
-      (b) => b.textContent,
-    ),
-  ).toEqual(['React', 'HTML', 'Copy']);
-  expect(
-    page.querySelector('[data-sb-code] [role="tabpanel"]').textContent,
-  ).toContain('Orders');
+  expect(records).toHaveLength(3);
+  document.body.append(guidePage('Charts', story, null));
+  const rows = [...story.querySelectorAll('section[aria-label$="example"]')];
+  expect(rows.map((row) => row.getAttribute('aria-label'))).toEqual([
+    'Line example',
+    'Bar example',
+    'KPI example',
+  ]);
+  rows.forEach((row, index) => {
+    expect(row.querySelectorAll('.sc-root')).toHaveLength(1);
+    expect(row.querySelectorAll('[data-sb-code]')).toHaveLength(1);
+    const panel = row.querySelector('[role="tabpanel"]');
+    expect(panel.textContent).toContain(
+      `"type": "${['line', 'bar', 'kpi'][index]}"`,
+    );
+    expect(
+      [...row.querySelectorAll('[role="tab"]')].map((tab) => tab.textContent),
+    ).toEqual(['React', 'HTML']);
+    row.querySelector('[data-language="javascript"]').click();
+    expect(panel.textContent).toContain(
+      'http://localhost/dist/stripe-charts.min.js',
+    );
+    expect(panel.textContent).not.toContain('cdn.jsdelivr.net');
+    expect(panel.textContent).toContain(records[index].spec.title);
+  });
 });
+
+test.each(['Line', 'Bar', 'Kpi'])(
+  '%s has one scrollable story with three valid examples',
+  (kind) => {
+    const stories = require(`../stories/${kind}.stories`);
+    expect(Object.keys(stories).filter((key) => key !== 'default')).toEqual([
+      'Overview',
+    ]);
+    const page = stories.Overview.render();
+    expect(page.querySelectorAll('.sc-root')).toHaveLength(3);
+    expect(page.querySelector('.sc-error')).toBeNull();
+    expect(page.querySelectorAll('[data-sb-code]')).toHaveLength(3);
+    expect(page.querySelectorAll('h2')).toHaveLength(3);
+    expect(page.querySelectorAll('section > p')).toHaveLength(0);
+  },
+);

@@ -31,6 +31,7 @@ export function chooseSpec(
   host.style.height = '320px';
   host.style.width = '100%';
   const code = document.createElement('div');
+  code.className = 'sc-example-code';
   let current: ReturnType<typeof render> | undefined;
   const show = (): void => {
     current?.destroy();
@@ -57,7 +58,13 @@ export function chooseSpec(
   };
   select.addEventListener('change', show);
   show();
-  page.append(controls, host, code);
+  const row = document.createElement('div');
+  row.className = 'sc-guide-demo';
+  const canvas = document.createElement('div');
+  canvas.className = 'sc-guide-canvas';
+  canvas.append(host);
+  row.append(canvas, code);
+  page.append(controls, row);
   return page;
 }
 

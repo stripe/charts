@@ -393,16 +393,6 @@
       const LOCALE = 'en-US';
       const TIME_ZONE = 'America/New_York';
       const USD = {style: 'currency', currency: 'usd', unit: 'minor'};
-      const provenance = (metric, period) => ({
-        source: 'Stripe Data API',
-        fetchedAt: FETCHED_AT,
-        details: [
-          {label: 'Metric', value: metric},
-          {label: 'Period', value: period},
-          {label: 'Compared with', value: 'Same weekdays in 2025'},
-          {label: 'Time zone', value: TIME_ZONE},
-        ],
-      });
       const WEEKEND_PERIOD = 'Nov 26 to Nov 30, 2026';
       // The tiles cover the five days, so their sparklines do too.
       const onWeekend = (values) => WEEKEND.map((i) => values[i]);
@@ -421,7 +411,6 @@
         kpi: {basis: 'total', value: t2026.volume, comparisonValue: t2025.volume, notation: 'compact'},
         chart: {type: 'kpi'},
         series: sparkline(y2026.volume, y2025.volume),
-        provenance: provenance('gross_volume', WEEKEND_PERIOD),
       });
 
       render('tile-orders', {
@@ -431,7 +420,6 @@
         kpi: {basis: 'total', value: t2026.orders, comparisonValue: t2025.orders, notation: 'compact'},
         chart: {type: 'kpi'},
         series: sparkline(y2026.orders, y2025.orders),
-        provenance: provenance('successful_payments_count', WEEKEND_PERIOD),
       });
 
       render('tile-conversion', {
@@ -442,7 +430,6 @@
         kpi: {basis: 'custom', value: t2026.conversion, comparisonValue: t2025.conversion},
         chart: {type: 'kpi'},
         series: sparkline(conversion2026, conversion2025),
-        provenance: provenance('checkout_conversion_rate', WEEKEND_PERIOD),
       });
 
       render('tile-aov', {
@@ -453,7 +440,6 @@
         kpi: {basis: 'custom', value: t2026.aov, comparisonValue: t2025.aov},
         chart: {type: 'kpi'},
         series: sparkline(orderValue2026, orderValue2025),
-        provenance: provenance('average_order_value', WEEKEND_PERIOD),
       });
 
       const STILL_SETTLING = 'Today: payments are still settling, so this day will rise.';
@@ -504,7 +490,6 @@
           {label: '2026', data: points(days2026, y2026.volume)},
           {label: '2025', comparison: true, data: points(days2025, y2025.volume)},
         ],
-        provenance: provenance('gross_volume', 'Nov 20 to Dec 3, 2026'),
       }, {onPointClick: (event) => dayDetail(event.index)});
 
       render('hourly-orders', {
@@ -518,7 +503,6 @@
           {label: '2026', data: points(hours2026, hourly2026)},
           {label: '2025', comparison: true, data: points(hours2025, hourly2025)},
         ],
-        provenance: provenance('successful_payments_count', 'Nov 27, 2026, by hour'),
       });
 
       render('payment-methods', {
@@ -532,15 +516,6 @@
           {label: 'Buy now, pay later', data: points(days2026, bnpl)},
           {label: 'Bank debits', data: points(days2026, bank)},
         ],
-        provenance: {
-          source: 'Stripe Data API',
-          fetchedAt: FETCHED_AT,
-          details: [
-            {label: 'Metric', value: 'gross_volume by payment_method_type'},
-            {label: 'Period', value: 'Nov 20 to Dec 3, 2026'},
-            {label: 'Time zone', value: TIME_ZONE},
-          ],
-        },
       });
 
 

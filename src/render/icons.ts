@@ -3,16 +3,6 @@ import {svg} from './dom';
 /** A glyph: its drawing box and path data (even-odd fill). */
 type Glyph = {viewBox: string; path: string};
 
-/** "i" in a rounded square: the trigger for the details view. */
-export const INFO_GLYPH: Glyph = {
-  viewBox: '0 0 12 12',
-  path:
-    'M3 0h6a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H3a3 3 0 0 1-3-3V3a3 3 0 0 1 3-3Z' +
-    'M3 1.5A1.5 1.5 0 0 0 1.5 3v6A1.5 1.5 0 0 0 3 10.5h6A1.5 1.5 0 0 0 10.5 9V3A1.5 1.5 0 0 0 9 1.5Z' +
-    'M5.25 5.25h1.5V9h-1.5Z' +
-    'M6 2.5a.875.875 0 1 1 0 1.75.875.875 0 0 1 0-1.75Z',
-};
-
 /** Bars on axes: the empty state. */
 export const BAR_CHART_GLYPH: Glyph = {
   viewBox: '0 0 16 16',

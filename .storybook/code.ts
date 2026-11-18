@@ -1,6 +1,6 @@
 // "Show code" support: stories record each chart they render, and the
 // preview turns the records into rendering JavaScript, or a complete HTML
-// page for the intro. Both use the specs actually rendered, so they cannot
+// page for the overview. Both use the specs actually rendered, so they cannot
 // drift from the story.
 
 import {PACKAGE_NAME} from '../src/meta';
@@ -246,7 +246,9 @@ export function buildReact(records: readonly ChartRecord[]): string {
     const steps = record.steps ?? [];
     const updates = steps.some((step) => step.kind !== 'destroy-button');
     const destroys = steps.some((step) => step.kind === 'destroy-button');
-    const declarations = [`const ${specName} = ${json(record.spec, '')};`];
+    const declarations = [
+      `const ${specName} = ${JSON.stringify(record.spec, null, 2)};`,
+    ];
     const body: string[] = [];
     const children: string[] = [];
     if (updates) {
@@ -265,7 +267,9 @@ export function buildReact(records: readonly ChartRecord[]): string {
         return;
       }
       const next = `${specName}Update${s + 1}`;
-      declarations.push(`const ${next} = ${json(step.spec, '')};`);
+      declarations.push(
+        `const ${next} = ${JSON.stringify(step.spec, null, 2)};`,
+      );
       if (step.kind === 'update-after') {
         hooks.add('useEffect');
         body.push(
@@ -316,7 +320,7 @@ export function buildReact(records: readonly ChartRecord[]): string {
         '}',
       ].join('\n'),
     );
-  return [...imports, '', ...components].join('\n\n');
+  return `${imports.join('\n')}\n\n${components.join('\n\n')}`;
 }
 
 export type CodeExample = {

@@ -219,23 +219,5 @@
         }
       ]
     }
-  ],
-  "provenance": {
-    "source": "Stripe Data API",
-    "fetchedAt": "2026-11-28T05:10:00Z",
-    "details": [
-      {
-        "label": "Metric",
-        "value": "gross_volume"
-      },
-      {
-        "label": "Granularity",
-        "value": "1 hour"
-      },
-      {
-        "label": "Time zone",
-        "value": "America/New_York"
-      }
-    ]
-  }
+  ]
 }

@@ -4,7 +4,6 @@ import {shot} from '../.storybook/shots';
 import type {ChartSpec, DataPoint} from '../src/index';
 import {addDays, curve, dates, last} from './support/data';
 import {COLUMN_WIDTH, chart, cleanUpCharts, column} from './support/mount';
-import {provenance} from './support/provenance';
 
 const HEIGHT = 400;
 const BAND_PER_MONTH = 0.035;
@@ -63,11 +62,6 @@ const mrr: ChartSpec = {
   kpi: {basis: 'latest', value: last(actual)},
   chart: {type: 'line'},
   series: [{label: 'MRR', data: mrrData}],
-  provenance: provenance({
-    metric: 'mrr',
-    period: 'Dec 2025 to Nov 2026, monthly; forecast to Feb 2027',
-    fetchedAt: '2026-11-02T08:15:00Z',
-  }),
 };
 
 /** A line with a 3-month forecast and its range band. */
@@ -113,12 +107,6 @@ export const IncompleteThenForecast: StoryObj<Args> = {
       timeZone: 'America/New_York',
       chart: {type: 'line', incomplete: {from: addDays('2026-11-01', 26)}},
       series: [week],
-      provenance: provenance({
-        metric: 'successful_payments_count',
-        period: 'Nov 1 to Nov 30, 2026, daily',
-        timeZone: 'America/New_York',
-        fetchedAt: '2026-11-27T18:00:00Z',
-      }),
     },
   },
 };

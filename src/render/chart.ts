@@ -4,7 +4,6 @@ import type {RenderOptions} from '../options';
 import type {ChartSpec} from '../spec';
 import {watchCompact} from './compact';
 import {html, visuallyHidden} from './dom';
-import {renderDetails} from './details';
 import {renderEmpty} from './empty';
 import {renderHeader} from './header';
 import {idPrefix} from './ids';
@@ -64,19 +63,11 @@ export function mountChart(
   if (resolved.loading) root.setAttribute('aria-busy', 'true');
   else root.removeAttribute('aria-busy');
 
-  const details = renderDetails(root, resolved, model, {
-    id: `${ids}-details`,
-    titleId,
-    tile,
-    motion,
-    signal: controller.signal,
-  });
   const kpi = resolved.kpi
     ? renderKpi(doc, resolved.kpi, resolved, model)
     : null;
   const header = renderHeader(doc, resolved, {
     titleId,
-    trigger: details?.trigger ?? null,
     kpi: kpi?.element ?? null,
     tile,
   });
@@ -150,8 +141,6 @@ export function mountChart(
       mountSparkline(root, resolved, model, controller.signal, hover),
     );
   }
-  // Last, so it is laid over the plot area and follows it in tab order.
-  if (details) root.appendChild(details.view);
   if (resolved.loading && !placeholder) motion.updating(root);
   return () => controller.abort();
 }

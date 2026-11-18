@@ -31,8 +31,6 @@ export type {
   NumberFormat,
   PercentFormat,
   PercentUnit,
-  Provenance,
-  ProvenanceDetail,
   Series,
   SpecIssue,
   ValidationResult,

@@ -182,22 +182,47 @@ test('multiple charts preserve their specs and React-specific tooltip content', 
   act(() => root.unmount());
 });
 
-test('React specs fold by default while JSX is highlighted and HTML stays intact', () => {
+test('React series fold by default while spec configuration and JSX stay visible', () => {
   const examples = buildCodeExamples([record], true);
   const view = codeView(examples, true);
   const folded = view.querySelector('details');
   expect(folded.open).toBe(false);
-  expect(folded.querySelector('summary').textContent).toBe(
-    'const spec = { … };',
-  );
+  expect(folded.querySelector('summary').textContent).toBe('"series": [ … ]');
   expect(
     folded.querySelector(':scope > code.language-jsx').textContent,
   ).toContain('2026-11-01');
   expect(view.querySelector('.token.keyword')).not.toBeNull();
   expect(view.querySelector('.token.tag')).not.toBeNull();
   folded.open = true;
+  expect(folded.textContent).toContain('2026-11-01');
   expect(folded.textContent).toContain('Orders');
+  expect(view.querySelector('[role="tabpanel"]').textContent).toContain(
+    'Orders',
+  );
+  expect(view.style.height).toBe('');
   view.querySelector('[data-language="javascript"]').click();
   expect(view.querySelector('details')).toBeNull();
   expect(view.querySelector('code').textContent).toBe(examples[1].source);
+});
+
+test('multiple series share one collapsed disclosure', () => {
+  const view = codeView(
+    buildCodeExamples([
+      {
+        ...record,
+        spec: {
+          ...spec,
+          series: ['Online', 'In store', 'Marketplace'].map((label) => ({
+            ...spec.series[0],
+            label,
+          })),
+        },
+      },
+    ]),
+  );
+  const folds = view.querySelectorAll('details');
+  expect(folds).toHaveLength(1);
+  expect(folds[0].open).toBe(false);
+  expect(folds[0].querySelector('summary').textContent).toBe('"series": [ … ]');
+  expect(folds[0].textContent).toContain('Marketplace');
 });

@@ -35,6 +35,8 @@ function controlButton(label: string): HTMLButtonElement {
 function highlighted(source: string): HTMLElement {
   const code = document.createElement('code');
   code.className = 'language-jsx';
+  code.style.display = 'block';
+  code.style.whiteSpace = 'pre';
   const colors: Record<string, string> = {
     keyword: '#cf222e',
     string: '#0a3069',
@@ -68,19 +70,31 @@ function highlighted(source: string): HTMLElement {
 
 function renderReact(container: HTMLElement, source: string): void {
   let offset = 0;
-  // Specs are generated JSON declarations; embedded newlines are escaped.
+  // Generated JSON puts each series array on its own indented lines.
   for (const match of source.matchAll(
-    /^const (spec\d*(?:Update\d+)?) = [\s\S]*?;(?=\n|$)/gm,
+    /^( *)"series": \[\n[\s\S]*?^\1\](,?)$/gm,
   )) {
-    container.append(highlighted(source.slice(offset, match.index)));
+    const before = source.slice(offset, match.index).replace(/\n$/, '');
+    if (before) container.append(highlighted(before));
     const details = document.createElement('details');
-    Object.assign(details.style, {margin: '0', padding: '0', border: '0'});
+    Object.assign(details.style, {
+      margin: '0',
+      padding: '0',
+      border: '0',
+      paddingLeft: `${match[1].length}ch`,
+    });
     const summary = document.createElement('summary');
     summary.style.cursor = 'pointer';
-    summary.append(highlighted(`const ${match[1]} = { … };`));
-    details.append(summary, highlighted(match[0]));
+    const label = highlighted(`"series": [ … ]${match[2]}`);
+    label.style.display = 'inline';
+    summary.append(label);
+    const expanded = match[0]
+      .split('\n')
+      .map((line) => line.slice(match[1].length))
+      .join('\n');
+    details.append(summary, highlighted(expanded));
     container.append(details);
-    offset = match.index + match[0].length;
+    offset = match.index + match[0].length + 1;
   }
   container.append(highlighted(source.slice(offset)));
 }
@@ -138,9 +152,7 @@ export function codeView(
     position: 'relative',
     display: 'flex',
     flexDirection: 'column',
-    height: inline
-      ? 'clamp(320px, 60vh, 640px)'
-      : `calc(100vh - 2 * ${FRAME_INSET})`,
+    maxHeight: inline ? '640px' : `calc(100vh - 2 * ${FRAME_INSET})`,
     minWidth: '0',
     boxSizing: 'border-box',
     background: '#f6f8fa',
@@ -208,6 +220,7 @@ export function codeView(
   function select(example: CodeExample): void {
     selected = example;
     code.replaceChildren();
+    code.style.whiteSpace = selected.language === 'react' ? 'normal' : 'pre';
     if (selected.language === 'react') {
       renderReact(code, selected.source);
     } else {

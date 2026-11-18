@@ -47,7 +47,6 @@ describe('token custom properties', () => {
     const dark = {'--sc-color-surface': '#101010'};
     expect(resolve(vars.tooltip.background, dark)).toBe('#101010');
     expect(resolve(vars.tile.background, dark)).toBe('#101010');
-    expect(resolve(vars.details.panel.background, dark)).toBe('#101010');
   });
 
   it('lets a component token override its role', () => {

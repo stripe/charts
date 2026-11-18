@@ -12,11 +12,6 @@ const valid = {
     {label: '2026', data: [{x: '2026-11-27', y: 412000.25}]},
     {label: '2025', comparison: true, data: [{x: '2025-11-28', y: 350100}]},
   ],
-  provenance: {
-    source: 'Stripe Data API',
-    fetchedAt: '2026-11-27T18:00:00Z',
-    details: [{label: 'Metric', value: 'gross_volume'}],
-  },
 };
 
 function errorsFor(spec: unknown) {
@@ -287,16 +282,6 @@ describe('validate', () => {
     ]);
   });
 
-  it('takes details as a boolean and points aliases to it', () => {
-    expect(errorsFor({...valid, showDetails: false, details: 'no'})).toEqual([
-      {
-        path: 'showDetails',
-        message: 'unexpected field "showDetails"; did you mean "details"?',
-      },
-      {path: 'details', message: 'expected true or false, got "no"'},
-    ]);
-  });
-
   it('compares the KPI with like periods of the comparison series', () => {
     const months = Array.from({length: 6}, (_, i) => `2026-0${i + 1}-01`);
     // Actuals for 4 months, then a forecast; the plan runs all 6 months.
@@ -439,10 +424,6 @@ describe('validate', () => {
       kpi: {...valid.kpi, basis: 'custom'},
       description: 1,
       series: [{label: 'x'.repeat(60), data: [{x: '2026-11-27', y: 1}]}],
-      provenance: {
-        source: 'API',
-        details: [{label: 'Metric', value: 'a'.repeat(201)}],
-      },
     });
     expect(errors).toEqual([
       {
@@ -452,10 +433,6 @@ describe('validate', () => {
       {
         path: 'format.currency',
         message: 'expected a 3-letter ISO 4217 code like "usd", got "dollars"',
-      },
-      {
-        path: 'provenance.details[0].value',
-        message: 'expected at most 200 characters, got 201',
       },
     ]);
     expect(
@@ -489,10 +466,6 @@ describe('schema.json', () => {
     expect(keys(props.series.items)).toEqual(FIELDS.series);
     expect(keys(props.series.items?.properties?.data.items)).toEqual(
       FIELDS.point,
-    );
-    expect(keys(props.provenance)).toEqual(FIELDS.provenance);
-    expect(keys(props.provenance.properties?.details.items)).toEqual(
-      FIELDS.detail,
     );
     const formats = (props.format.oneOf ?? []).map((branch) => [
       (branch.properties?.style as {const?: string}).const,
@@ -530,3 +503,20 @@ describe('validateOptions', () => {
     ]);
   });
 });
+
+test.each(['details', 'provenance'])(
+  'rejects the removed %s option',
+  (field) => {
+    expect(
+      errorsFor({
+        ...valid,
+        [field]: field === 'details' ? true : {source: 'API'},
+      }),
+    ).toEqual([
+      {
+        path: field,
+        message: expect.stringContaining(`unexpected field "${field}"`),
+      },
+    ]);
+  },
+);

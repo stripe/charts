@@ -4,7 +4,6 @@ import {shot} from '../.storybook/shots';
 import type {ChartSpec} from '../src/index';
 import {curve, dates, points, total} from './support/data';
 import {COLUMN_WIDTH, chart, cleanUpCharts, column} from './support/mount';
-import {provenance} from './support/provenance';
 
 const HEIGHT = 400;
 
@@ -14,8 +13,7 @@ type Args = {spec: ChartSpec};
  * `annotations` mark events on the chart: `at` alone draws a dashed marker
  * at a slot, `at` with `series` marks that series' point, and `from`/`to`
  * shade a range. Dates are x values of the primary series. Hovering a slot
- * inside an annotation adds it to the tooltip, and the details view lists
- * every annotation under "Notes".
+ * inside an annotation adds it to the tooltip.
  */
 const meta: Meta<Args> = {
   title: 'Features/Annotations',
@@ -138,12 +136,6 @@ export const Events: StoryObj<Args> = {
           series: '2026',
         },
       ],
-      provenance: provenance({
-        metric: 'gross_volume',
-        period: 'Nov 16 to Dec 6, 2026, daily',
-        timeZone: 'America/New_York',
-        fetchedAt: '2026-12-07T14:00:00Z',
-      }),
     },
   },
 };
@@ -173,12 +165,6 @@ export const IncompletePeriod: StoryObj<Args> = {
       kpi: {basis: 'total', value: total(daily)},
       chart: {type: 'bar', incomplete: {from: '2026-12-15'}},
       series: [daily],
-      provenance: provenance({
-        metric: 'gross_volume',
-        period: 'Dec 1 to Dec 15, 2026, daily',
-        timeZone: 'America/New_York',
-        fetchedAt: '2026-12-15T17:30:00Z',
-      }),
     },
   },
 };
@@ -207,12 +193,6 @@ function projectedSpec(type: 'line' | 'bar'): ChartSpec {
     kpi: {basis: 'latest', value: SO_FAR},
     chart: {type, incomplete: {from: '2026-12-01'}},
     series: [monthlyVolume],
-    provenance: provenance({
-      metric: 'gross_volume',
-      period: 'Jan to Dec 2026, monthly; December through Dec 15',
-      timeZone: 'America/New_York',
-      fetchedAt: '2026-12-15T17:30:00Z',
-    }),
   };
 }
 
