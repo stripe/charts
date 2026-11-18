@@ -40,7 +40,7 @@ describe('token custom properties', () => {
     expect(unresolved).toEqual([]);
     expect(resolve(vars.tooltip.background)).toBe('#FFFFFF');
     expect(resolve(vars.tooltip.label.color)).toBe('#50617A');
-    expect(resolve(vars.tooltip.padding)).toBe('16px');
+    expect(resolve(vars.tooltip.padding)).toBe('8px');
   });
 
   it('lets a role set on any ancestor recolor the components following it', () => {

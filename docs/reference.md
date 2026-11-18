@@ -680,6 +680,7 @@ fails while it is out of date.
 | `--sc-series-comparison` | `#95A4BA` | comparison |
 | `--sc-series-comparison-dash` | `6 10` | comparison dash |
 | `--sc-series-bar-group-ratio` | `0.8` | bar group ratio |
+| `--sc-series-inactive-bar-opacity` | `0.55` | inactive bar opacity |
 
 **`crosshair`**: The hover crosshair.
 
@@ -701,7 +702,7 @@ fails while it is out of date.
 |---|---|---|
 | `--sc-tooltip-background` | follows `--sc-color-surface` (`#FFFFFF`) | background |
 | `--sc-tooltip-radius` | `8px` | radius |
-| `--sc-tooltip-padding` | `16px` | padding |
+| `--sc-tooltip-padding` | `8px` | padding |
 | `--sc-tooltip-shadow` | `0 3px 6px rgba(0, 0, 0, 0.12), 0 7px 14px rgba(48, 49, 61, 0.08)` | shadow |
 | `--sc-tooltip-border-width` | `0px` | border width |
 | `--sc-tooltip-border-color` | `transparent` | border color |

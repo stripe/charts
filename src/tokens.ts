@@ -300,6 +300,7 @@ export type Tokens = {
     minBarWidth: number;
     overlayBelow: number;
     stackGap: number;
+    inactiveBarOpacity: number;
   };
   /** The hover crosshair. */
   crosshair: {color: string; width: number; dash: string};
@@ -719,6 +720,8 @@ export const tokens: Tokens = {
     overlayBelow: 3,
     /** Seam between stacked segments, in the surface color (the gap shows it). */
     stackGap: p.stroke.hairline,
+    /** Bars outside the hovered slot fade to this, so the hovered one stands out. */
+    inactiveBarOpacity: p.opacity.subdued,
   },
   crosshair: {
     color: p.color.gray500,
@@ -733,7 +736,7 @@ export const tokens: Tokens = {
   tooltip: {
     background: role('surface'),
     radius: p.radius.large,
-    padding: p.space.large,
+    padding: p.space.small,
     shadow: p.shadow.raised,
     /** No outline on the light surface; dark themes may want one. */
     borderWidth: p.space.none,

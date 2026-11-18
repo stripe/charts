@@ -130,6 +130,7 @@ const rules = [
   `.sc-line{fill:none;stroke:var(--sc-series-color);stroke-width:${v.series.strokeWidth};stroke-linecap:round;stroke-linejoin:round;}`,
   `.sc-line.sc-comparison{stroke-dasharray:${v.series.comparisonDash};}`,
   `.sc-bar{fill:var(--sc-series-color);}`,
+  `.sc-highlighting .sc-bars > :not(.sc-highlighted){opacity:${v.series.inactiveBarOpacity};}`,
   `.sc-crosshair{stroke:${v.crosshair.color};stroke-width:${v.crosshair.width};stroke-dasharray:${v.crosshair.dash};}`,
   `.sc-marker-ring{fill:${v.marker.ringColor};}`,
   `.sc-marker{fill:var(--sc-series-color);}`,

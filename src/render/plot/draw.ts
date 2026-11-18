@@ -198,16 +198,45 @@ function barMarks(
       width: rect.width,
       height: rect.height,
     });
-    bars.appendChild(point?.color ? withSeriesColor(bar, point.color) : bar);
     const overlay = barKindOverlay(doc, rect, kind, hatchId(data));
-    if (overlay) bars.appendChild(overlay);
     const range = projectedRange(model, rect.slot, seriesIndex);
     const extension =
       range &&
       projectedExtension(doc, rect, layout.y(range[0]), layout.y(range[1]));
-    if (extension) bars.appendChild(extension);
+    for (const part of [
+      point?.color ? withSeriesColor(bar, point.color) : bar,
+      overlay,
+      extension,
+    ]) {
+      if (!part) continue;
+      // Lets the hover highlight find the bar and its overlays by slot.
+      part.setAttribute(SLOT_ATTRIBUTE, String(rect.slot));
+      bars.appendChild(part);
+    }
   }
   return bars;
+}
+
+const SLOT_ATTRIBUTE = 'data-slot';
+
+/**
+ * Highlights the bars at `slot`, fading every other bar, or clears the
+ * highlight when `slot` is null. Returns whether any bar was highlighted: a
+ * slot with no bar drawn (no value, or a dense column showing another slot)
+ * leaves every bar as it is.
+ */
+function highlightBars(element: SVGSVGElement, slot: number | null): boolean {
+  const marks = element.querySelector('.sc-marks');
+  if (!marks) return false;
+  for (const part of marks.querySelectorAll('.sc-highlighted'))
+    part.classList.remove('sc-highlighted');
+  const parts =
+    slot === null
+      ? []
+      : marks.querySelectorAll(`.sc-bars > [${SLOT_ATTRIBUTE}="${slot}"]`);
+  for (const part of parts) part.classList.add('sc-highlighted');
+  marks.classList.toggle('sc-highlighting', parts.length > 0);
+  return parts.length > 0;
 }
 
 function marks(doc: Document, layout: PlotLayout, data: PlotData): SVGGElement {
@@ -413,9 +442,9 @@ export function drawPlot(
 }
 
 /**
- * Draws the crosshair at `slot` and, for lines, a ringed marker on each
- * series' value there. Bars get only the crosshair; the bar itself already
- * marks the value.
+ * Marks `slot` as hovered. Lines get the crosshair and a ringed marker on
+ * each series' value there. Bars keep full color at `slot` while the rest
+ * fade; the crosshair shows only when the slot has no bar to highlight.
  */
 export function drawHover(
   group: SVGGElement,
@@ -426,15 +455,21 @@ export function drawHover(
   const doc = group.ownerDocument;
   const {crosshair, marker} = tokens;
   const x = crisp(layout.x.center(slot), crosshair.width);
-  const children: SVGElement[] = [
-    svg(doc, 'line', {
-      class: 'sc-crosshair',
-      x1: x,
-      x2: x,
-      y1: layout.plot.top,
-      y2: layout.baselineY,
-    }),
-  ];
+  const highlighted =
+    data.chartType === 'bar' &&
+    group.ownerSVGElement !== null &&
+    highlightBars(group.ownerSVGElement, slot);
+  const children: SVGElement[] = highlighted
+    ? []
+    : [
+        svg(doc, 'line', {
+          class: 'sc-crosshair',
+          x1: x,
+          x2: x,
+          y1: layout.plot.top,
+          y2: layout.baselineY,
+        }),
+      ];
   if (data.chartType === 'line') {
     const cx = layout.x.center(slot);
     for (const index of visibleSeries(data.model)) {
@@ -475,4 +510,10 @@ export function drawHover(
     }
   }
   group.replaceChildren(...children);
+}
+
+/** Removes what {@link drawHover} drew. */
+export function clearHover(group: SVGGElement): void {
+  group.replaceChildren();
+  if (group.ownerSVGElement) highlightBars(group.ownerSVGElement, null);
 }

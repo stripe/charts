@@ -179,6 +179,30 @@ describe('render', () => {
     expect(kpi()).toBe(restingKpi);
   });
 
+  it('highlights the hovered bars and fades the rest, without a crosshair', () => {
+    render(element, {...SPEC, chart: {type: 'bar'}});
+    resizeAll(600, 300);
+    const area = plotArea(element);
+    const marks = element.querySelector('.sc-marks');
+    const highlighted = (): string[] =>
+      [...element.querySelectorAll('.sc-highlighted')].map(
+        (part) => part.getAttribute('data-slot') ?? '',
+      );
+
+    pressKey(area, 'ArrowRight');
+    expect(marks?.classList.contains('sc-highlighting')).toBe(true);
+    // The series' bar and its comparison's, both at the first slot.
+    expect(highlighted()).toEqual(['0', '0']);
+    expect(element.querySelector('.sc-crosshair')).toBeNull();
+
+    pressKey(area, 'ArrowRight');
+    expect(highlighted()).toEqual(['1', '1']);
+
+    pressKey(area, 'Escape');
+    expect(marks?.classList.contains('sc-highlighting')).toBe(false);
+    expect(highlighted()).toEqual([]);
+  });
+
   it('keeps a tapped slot after the finger lifts, until a press elsewhere', () => {
     render(element, SPEC);
     resizeAll(600, 300);

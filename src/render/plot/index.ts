@@ -19,7 +19,7 @@ import {onOutsidePress} from '../outsidePress';
 import type {ChartMotion, PlotMotion} from '../motion';
 import {resolveColors, seriesColors} from '../palette';
 import type {PlotData} from './draw';
-import {drawHover, drawPlot} from './draw';
+import {clearHover, drawHover, drawPlot} from './draw';
 import {
   fillCustomTooltip,
   fillTooltip,
@@ -243,7 +243,7 @@ export function mountPlot(
     active = null;
     filled = null;
     pinned = false;
-    hoverLayer?.replaceChildren();
+    if (hoverLayer) clearHover(hoverLayer);
     tooltip.hidden = true;
   };
 
