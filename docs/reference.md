@@ -444,11 +444,6 @@ are in the TypeScript types and the JSON Schema.
 
 ## Performance and data size
 
-The supported limits are 1000 points per series and 12 series. Timing depends
-on the browser, device, data, and enabled interactions. See the
-[benchmark harness and measurement method](../bench/README.md) to measure
-your workload; no cross-device timing guarantee is implied.
-
 - **Use reporting-sized data.** The spec allows up to 1000 points per
   series and 12 series.
 - **Aggregate before charting.** A line reads best with about one point per
@@ -475,7 +470,6 @@ your workload; no cross-device timing guarantee is implied.
 
 - **Lifecycle.** The script makes no network requests. Call `destroy()`
   when removing a chart; it removes the chart nodes, listeners, and observers.
-  The benchmark harness includes repeated render/destroy checks.
 
 ## Series colors and legend
 
