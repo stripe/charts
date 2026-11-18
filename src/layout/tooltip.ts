@@ -13,6 +13,7 @@ export type TooltipPlacement = {
   top: number;
   /** The container the tooltip must stay inside. */
   containerWidth: number;
+  containerHeight: number;
   /** The hovered markers' extent, which the tooltip must not cover; null for none. */
   avoid: VerticalRange | null;
   /** Space between the crosshair and a tooltip placed beside it. */
@@ -40,11 +41,15 @@ export type TooltipPosition = {left: number; top: number};
  * on the crosshair and kept inside the container; if that would hide the
  * hovered points, beside the crosshair (right, else left); with no room
  * beside it, centred just above the points, or below them if there is no
- * room above.
+ * room above; with no room either, back at its fixed top over the points.
+ *
+ * The tooltip never extends past the container's bottom: overflowing it can
+ * add a page scrollbar, which narrows the chart and moves the tooltip again.
  */
 export function tooltipPosition(placement: TooltipPlacement): TooltipPosition {
-  const {anchor, width, height, top, containerWidth, avoid, sideGap} =
-    placement;
+  const {anchor, width, height, containerWidth, containerHeight} = placement;
+  const {avoid, sideGap} = placement;
+  const top = Math.max(0, Math.min(placement.top, containerHeight - height));
   const left = clampedLeft(anchor, width, containerWidth);
   const covers = (atLeft: number, atTop: number): boolean =>
     avoid !== null &&
@@ -60,5 +65,7 @@ export function tooltipPosition(placement: TooltipPlacement): TooltipPosition {
   // `covers` was true, so `avoid` is set.
   const points = avoid ?? {top, bottom: top};
   const above = points.top - sideGap - height;
-  return {left, top: above >= 0 ? above : points.bottom + sideGap};
+  if (above >= 0) return {left, top: above};
+  const below = points.bottom + sideGap;
+  return {left, top: below + height <= containerHeight ? below : top};
 }

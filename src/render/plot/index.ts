@@ -221,6 +221,7 @@ export function mountPlot(
       height: tooltip.offsetHeight,
       top,
       containerWidth: root.clientWidth,
+      containerHeight: root.clientHeight,
       avoid:
         chartType === 'line'
           ? markerRange(model, slot, layout, area.offsetTop)
