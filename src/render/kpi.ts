@@ -126,7 +126,7 @@ function slotTexts(model: ChartModel, spec: ResolvedSpec): KpiText[] {
     const basis = changeBasis(point);
     return kpiText(
       point?.y ?? null,
-      comparison === -1 ? null : slot.points[comparison]?.y ?? null,
+      comparison === -1 ? null : (slot.points[comparison]?.y ?? null),
       spec,
       basis,
     );

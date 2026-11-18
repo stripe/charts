@@ -1,5 +1,5 @@
 import schema from './schema.json';
-import {FIELDS, LIMITS} from './spec';
+import {FIELDS, LIMITS, SPEC_VERSION} from './spec';
 import {validate} from './validate';
 import {validateOptions} from './validateOptions';
 
@@ -29,10 +29,16 @@ describe('validate', () => {
   it('requires the spec version, and rejects newer ones on their own', () => {
     const {version: _version, ...unversioned} = valid;
     expect(errorsFor(unversioned)).toEqual([
-      {path: 'version', message: 'required; expected 1, the spec format version'},
+      {
+        path: 'version',
+        message: 'required; expected 1, the spec format version',
+      },
     ]);
     expect(errorsFor({...valid, version: '1'})).toEqual([
-      {path: 'version', message: 'expected 1, the spec format version, got "1"'},
+      {
+        path: 'version',
+        message: 'expected 1, the spec format version, got "1"',
+      },
     ]);
     // A newer spec's other fields may be valid there, so only the version is reported.
     expect(errorsFor({...valid, version: 2, sparkline: true})).toEqual([
@@ -43,7 +49,7 @@ describe('validate', () => {
       },
     ]);
     expect(schema.required).toContain('version');
-    expect(schema.properties.version.const).toBe(1);
+    expect(schema.properties.version.const).toBe(SPEC_VERSION);
   });
 
   it('accepts twelve series and rejects a thirteenth', () => {
@@ -51,7 +57,9 @@ describe('validate', () => {
       label: `Series ${index + 1}`,
       data: [{x: '2026-10-01', y: index + 1}],
     }));
-    expect(validate({version: 1, title: 'Series palette', series}).ok).toBe(true);
+    expect(validate({version: 1, title: 'Series palette', series}).ok).toBe(
+      true,
+    );
     expect(
       errorsFor({
         version: 1,
@@ -143,7 +151,9 @@ describe('validate', () => {
   });
 
   it('does not require series while loading, and allows them on KPI tiles', () => {
-    expect(validate({version: 1, title: 'Gross volume', loading: true}).ok).toBe(true);
+    expect(
+      validate({version: 1, title: 'Gross volume', loading: true}).ok,
+    ).toBe(true);
     // A KPI chart's series, comparison included, draw a sparkline.
     expect(validate({...valid, chart: {type: 'kpi'}}).ok).toBe(true);
   });

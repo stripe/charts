@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -25,8 +25,9 @@
         --text-muted: #50617a;
         --positive: #217005;
         --negative: #c0123c;
-        --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-          Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        --font:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+          Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
           'Segoe UI Symbol';
         --gap: 16px;
       }
@@ -238,8 +239,7 @@
           <p class="eyebrow">Juniper &amp; Pine · Online store</p>
           <h1>Sales 2026</h1>
           <p class="lede">
-            November 26–30, compared with the same weekdays
-            in 2025.
+            November 26–30, compared with the same weekdays in 2025.
           </p>
         </div>
         <p class="as-of" id="as-of"></p>
@@ -254,8 +254,13 @@
 
       <h2 class="section-label">Sales</h2>
       <div class="grid">
-        <section class="panel span-8 fill"><div class="chart" id="daily-volume"></div></section>
-        <section class="panel span-4 takeaways" aria-labelledby="takeaways-title">
+        <section class="panel span-8 fill">
+          <div class="chart" id="daily-volume"></div>
+        </section>
+        <section
+          class="panel span-4 takeaways"
+          aria-labelledby="takeaways-title"
+        >
           <h2 id="takeaways-title">Takeaways</h2>
           <ul id="takeaways"></ul>
           <div class="day-detail" aria-live="polite">
@@ -268,14 +273,18 @@
 
       <h2 class="section-label">Campaign launch and payments</h2>
       <div class="grid">
-        <section class="panel span-6"><div class="chart" id="hourly-orders"></div></section>
-        <section class="panel span-6"><div class="chart" id="payment-methods"></div></section>
+        <section class="panel span-6">
+          <div class="chart" id="hourly-orders"></div>
+        </section>
+        <section class="panel span-6">
+          <div class="chart" id="payment-methods"></div>
+        </section>
       </div>
 
       <p class="footnote">
-        Days are compared by weekday: Campaign launch 2026 (Nov 27) lines up with
-        Campaign launch 2025 (Nov 28). Use the info button on any card for its
-        source, time zone and a table of the values.
+        Days are compared by weekday: Campaign launch 2026 (Nov 27) lines up
+        with Campaign launch 2025 (Nov 28). Use the info button on any card for
+        its source, time zone and a table of the values.
       </p>
     </main>
 
@@ -314,11 +323,18 @@
       // Two weeks around the weekend, Friday to Thursday, lined up by weekday:
       // index 7 is Campaign launch in both years.
       const DAYS = 14;
-      const days2026 = Array.from({length: DAYS}, (_, i) => addDays('2026-11-20', i));
-      const days2025 = Array.from({length: DAYS}, (_, i) => addDays('2025-11-21', i));
+      const days2026 = Array.from({length: DAYS}, (_, i) =>
+        addDays('2026-11-20', i),
+      );
+      const days2025 = Array.from({length: DAYS}, (_, i) =>
+        addDays('2025-11-21', i),
+      );
       const WEEKEND = [6, 7, 8, 9, 10]; // November 26–30
       const CAMPAIGN_LAUNCH = 7;
-      const lift = [1.0, 0.94, 0.88, 1.02, 1.08, 1.22, 1.55, 3.55, 2.35, 2.05, 3.1, 1.48, 1.18, 1.06];
+      const lift = [
+        1.0, 0.94, 0.88, 1.02, 1.08, 1.22, 1.55, 3.55, 2.35, 2.05, 3.1, 1.48,
+        1.18, 1.06,
+      ];
       const discounted = (i) => WEEKEND.includes(i);
 
       function year(baseVolume, baseOrderValue, baseConversion, launchBoost) {
@@ -327,9 +343,13 @@
         const sessions = [];
         lift.forEach((l, i) => {
           const boost = i === CAMPAIGN_LAUNCH ? launchBoost : 1;
-          const orderValue = baseOrderValue * (discounted(i) ? 0.93 : 1) * jitter(0.03);
-          const dayOrders = Math.round((baseVolume * l * boost * jitter(0.05)) / orderValue);
-          const conversion = baseConversion * (discounted(i) ? 1.75 : 1) * jitter(0.06);
+          const orderValue =
+            baseOrderValue * (discounted(i) ? 0.93 : 1) * jitter(0.03);
+          const dayOrders = Math.round(
+            (baseVolume * l * boost * jitter(0.05)) / orderValue,
+          );
+          const conversion =
+            baseConversion * (discounted(i) ? 1.75 : 1) * jitter(0.06);
           orders.push(dayOrders);
           volume.push(toCents(dayOrders * orderValue));
           sessions.push(Math.round(dayOrders / conversion));
@@ -348,7 +368,8 @@
         y2026[key][TODAY] = Math.round(y2026[key][TODAY] * SETTLED);
       }
 
-      const ratio = (a, b) => a.map((v, i) => Math.round((v / b[i]) * 10000) / 10000);
+      const ratio = (a, b) =>
+        a.map((v, i) => Math.round((v / b[i]) * 10000) / 10000);
       const orderValue2026 = ratio(y2026.volume, y2026.orders).map(Math.round);
       const orderValue2025 = ratio(y2025.volume, y2025.orders).map(Math.round);
       const conversion2026 = ratio(y2026.orders, y2026.sessions);
@@ -359,20 +380,28 @@
         volume: weekend(y.volume),
         orders: weekend(y.orders),
         aov: Math.round(weekend(y.volume) / weekend(y.orders)),
-        conversion: Math.round((weekend(y.orders) / weekend(y.sessions)) * 10000) / 10000,
+        conversion:
+          Math.round((weekend(y.orders) / weekend(y.sessions)) * 10000) / 10000,
       });
       const t2026 = totals(y2026);
       const t2025 = totals(y2025);
 
       // Campaign launch orders by hour, midnight to midnight Eastern (UTC-5).
-      const hourShape = [3.2, 2.0, 1.1, 0.7, 0.6, 0.8, 1.6, 2.8, 4.0, 5.2, 5.8, 5.6, 5.3, 5.0, 4.8, 4.7, 4.6, 4.8, 5.3, 6.0, 6.4, 5.9, 4.6, 3.0];
+      const hourShape = [
+        3.2, 2.0, 1.1, 0.7, 0.6, 0.8, 1.6, 2.8, 4.0, 5.2, 5.8, 5.6, 5.3, 5.0,
+        4.8, 4.7, 4.6, 4.8, 5.3, 6.0, 6.4, 5.9, 4.6, 3.0,
+      ];
       function byHour(total) {
         const weights = hourShape.map((w) => w * jitter(0.08));
         const scale = total / sum(weights);
         return weights.map((w) => Math.round(w * scale));
       }
-      const hours2026 = hourShape.map((_, h) => addHours('2026-11-27T05:00:00Z', h));
-      const hours2025 = hourShape.map((_, h) => addHours('2025-11-28T05:00:00Z', h));
+      const hours2026 = hourShape.map((_, h) =>
+        addHours('2026-11-27T05:00:00Z', h),
+      );
+      const hours2025 = hourShape.map((_, h) =>
+        addHours('2025-11-28T05:00:00Z', h),
+      );
       const hourly2026 = byHour(y2026.orders[CAMPAIGN_LAUNCH]);
       const hourly2025 = byHour(y2025.orders[CAMPAIGN_LAUNCH]);
 
@@ -382,11 +411,16 @@
         discounted(i)
           ? {cards: 0.565, wallets: 0.262, bnpl: 0.121}
           : {cards: 0.632, wallets: 0.238, bnpl: 0.079};
-      const byMethod = (key) => y2026.volume.map((v, i) => Math.round(v * shares(i)[key] * jitter(0.02)));
+      const byMethod = (key) =>
+        y2026.volume.map((v, i) =>
+          Math.round(v * shares(i)[key] * jitter(0.02)),
+        );
       const cards = byMethod('cards');
       const wallets = byMethod('wallets');
       const bnpl = byMethod('bnpl');
-      const bank = y2026.volume.map((v, i) => Math.max(0, v - cards[i] - wallets[i] - bnpl[i]));
+      const bank = y2026.volume.map((v, i) =>
+        Math.max(0, v - cards[i] - wallets[i] - bnpl[i]),
+      );
 
       // ---- Charts -----------------------------------------------------------
 
@@ -398,18 +432,30 @@
       const onWeekend = (values) => WEEKEND.map((i) => values[i]);
       const sparkline = (ys2026, ys2025) => [
         {label: '2026', data: points(onWeekend(days2026), onWeekend(ys2026))},
-        {label: '2025', comparison: true, data: points(onWeekend(days2025), onWeekend(ys2025))},
+        {
+          label: '2025',
+          comparison: true,
+          data: points(onWeekend(days2025), onWeekend(ys2025)),
+        },
       ];
       const render = (id, spec, options) =>
-        StripeCharts.render(document.getElementById(id), {locale: LOCALE, timeZone: TIME_ZONE, ...spec}, options);
-
+        StripeCharts.render(
+          document.getElementById(id),
+          {locale: LOCALE, timeZone: TIME_ZONE, ...spec},
+          options,
+        );
 
       render('tile-volume', {
         version: 1,
         title: 'Gross volume',
         description: 'November 26–30',
         format: USD,
-        kpi: {basis: 'total', value: t2026.volume, comparisonValue: t2025.volume, notation: 'compact'},
+        kpi: {
+          basis: 'total',
+          value: t2026.volume,
+          comparisonValue: t2025.volume,
+          notation: 'compact',
+        },
         chart: {type: 'kpi'},
         series: sparkline(y2026.volume, y2025.volume),
       });
@@ -419,7 +465,12 @@
         title: 'Orders',
         description: 'Successful payments',
         format: {style: 'number', maximumFractionDigits: 0},
-        kpi: {basis: 'total', value: t2026.orders, comparisonValue: t2025.orders, notation: 'compact'},
+        kpi: {
+          basis: 'total',
+          value: t2026.orders,
+          comparisonValue: t2025.orders,
+          notation: 'compact',
+        },
         chart: {type: 'kpi'},
         series: sparkline(y2026.orders, y2025.orders),
       });
@@ -430,7 +481,11 @@
         description: 'Orders per checkout session',
         format: {style: 'percent', unit: 'ratio', maximumFractionDigits: 2},
         // Orders over sessions for the five days, not an average of daily rates.
-        kpi: {basis: 'custom', value: t2026.conversion, comparisonValue: t2025.conversion},
+        kpi: {
+          basis: 'custom',
+          value: t2026.conversion,
+          comparisonValue: t2025.conversion,
+        },
         chart: {type: 'kpi'},
         series: sparkline(conversion2026, conversion2025),
       });
@@ -446,13 +501,17 @@
         series: sparkline(orderValue2026, orderValue2025),
       });
 
-      const STILL_SETTLING = 'Today: payments are still settling, so this day will rise.';
+      const STILL_SETTLING =
+        'Today: payments are still settling, so this day will rise.';
       const dayDetail = (index) => {
         const title = document.getElementById('day-title');
         const rows = document.getElementById('day-rows');
-        const date = new Intl.DateTimeFormat(LOCALE, {weekday: 'long', month: 'short', day: 'numeric', timeZone: 'UTC'}).format(
-          new Date(days2026[index] + 'T00:00:00Z'),
-        );
+        const date = new Intl.DateTimeFormat(LOCALE, {
+          weekday: 'long',
+          month: 'short',
+          day: 'numeric',
+          timeZone: 'UTC',
+        }).format(new Date(days2026[index] + 'T00:00:00Z'));
         title.textContent = date + (index === TODAY ? ' (so far)' : '');
         const lines = [
           ['Gross volume', dollars(y2026.volume[index])],
@@ -474,28 +533,45 @@
         );
       };
 
-      render('daily-volume', {
-        version: 1,
-        title: 'Gross volume by day',
-        description: 'Two weeks around the weekend, 2026 against the same weekdays in 2025',
-        format: USD,
-        kpi: {basis: 'total', value: sum(y2026.volume), comparisonValue: sum(y2025.volume)},
-        chart: {type: 'line', legend: 'show', incomplete: {from: days2026[TODAY], message: STILL_SETTLING}},
-        annotations: [
-          {label: 'Campaign launch', at: days2026[CAMPAIGN_LAUNCH]},
-          {label: 'Campaign close', at: days2026[10]},
-          {
-            label: 'Sitewide 20% off',
-            description: 'November 26–30',
-            from: days2026[6],
-            to: days2026[10],
+      render(
+        'daily-volume',
+        {
+          version: 1,
+          title: 'Gross volume by day',
+          description:
+            'Two weeks around the weekend, 2026 against the same weekdays in 2025',
+          format: USD,
+          kpi: {
+            basis: 'total',
+            value: sum(y2026.volume),
+            comparisonValue: sum(y2025.volume),
           },
-        ],
-        series: [
-          {label: '2026', data: points(days2026, y2026.volume)},
-          {label: '2025', comparison: true, data: points(days2025, y2025.volume)},
-        ],
-      }, {onPointClick: (event) => dayDetail(event.index)});
+          chart: {
+            type: 'line',
+            legend: 'show',
+            incomplete: {from: days2026[TODAY], message: STILL_SETTLING},
+          },
+          annotations: [
+            {label: 'Campaign launch', at: days2026[CAMPAIGN_LAUNCH]},
+            {label: 'Campaign close', at: days2026[10]},
+            {
+              label: 'Sitewide 20% off',
+              description: 'November 26–30',
+              from: days2026[6],
+              to: days2026[10],
+            },
+          ],
+          series: [
+            {label: '2026', data: points(days2026, y2026.volume)},
+            {
+              label: '2025',
+              comparison: true,
+              data: points(days2025, y2025.volume),
+            },
+          ],
+        },
+        {onPointClick: (event) => dayDetail(event.index)},
+      );
 
       render('hourly-orders', {
         version: 1,
@@ -503,11 +579,19 @@
         description: 'Eastern time, against Campaign launch 2025',
         format: {style: 'number', maximumFractionDigits: 0},
         // The total of the hourly bars: Campaign launch's orders, to the order.
-        kpi: {basis: 'total', value: sum(hourly2026), comparisonValue: sum(hourly2025)},
+        kpi: {
+          basis: 'total',
+          value: sum(hourly2026),
+          comparisonValue: sum(hourly2025),
+        },
         chart: {type: 'bar', legend: 'show'},
         series: [
           {label: '2026', data: points(hours2026, hourly2026)},
-          {label: '2025', comparison: true, data: points(hours2025, hourly2025)},
+          {
+            label: '2025',
+            comparison: true,
+            data: points(hours2025, hourly2025),
+          },
         ],
       });
 
@@ -516,7 +600,11 @@
         title: 'Gross volume by payment method',
         description: 'Each day of the two weeks, 2026',
         format: USD,
-        chart: {type: 'bar', stacking: 'stacked', incomplete: {from: days2026[TODAY], message: STILL_SETTLING}},
+        chart: {
+          type: 'bar',
+          stacking: 'stacked',
+          incomplete: {from: days2026[TODAY], message: STILL_SETTLING},
+        },
         series: [
           {label: 'Cards', data: points(days2026, cards)},
           {label: 'Wallets', data: points(days2026, wallets)},
@@ -525,34 +613,75 @@
         ],
       });
 
-
       // ---- Takeaways ----------------------------------------------------------
       // Written from the numbers above, the way an agent would summarize them.
       // Built with text nodes: every string is treated as text.
 
-      const money = new Intl.NumberFormat(LOCALE, {style: 'currency', currency: 'USD', maximumFractionDigits: 0});
+      const money = new Intl.NumberFormat(LOCALE, {
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: 0,
+      });
       const dollars = (amountInCents) => money.format(amountInCents / 100);
       const percent = (v, digits = 1) =>
-        new Intl.NumberFormat(LOCALE, {style: 'percent', maximumFractionDigits: digits, minimumFractionDigits: digits}).format(v);
-      const change = (now, then) => (now >= then ? '+' : '') + percent((now - then) / Math.abs(then));
+        new Intl.NumberFormat(LOCALE, {
+          style: 'percent',
+          maximumFractionDigits: digits,
+          minimumFractionDigits: digits,
+        }).format(v);
+      const change = (now, then) =>
+        (now >= then ? '+' : '') + percent((now - then) / Math.abs(then));
       const hourLabel = (iso) =>
-        new Intl.DateTimeFormat(LOCALE, {hour: 'numeric', timeZone: TIME_ZONE}).format(new Date(iso));
+        new Intl.DateTimeFormat(LOCALE, {
+          hour: 'numeric',
+          timeZone: TIME_ZONE,
+        }).format(new Date(iso));
 
       const peakHour = hourly2026.indexOf(Math.max(...hourly2026));
       const bnplWeekendShare = weekend(bnpl) / t2026.volume;
-      const bnplTypicalShare = sum(bnpl.slice(0, 6)) / sum(y2026.volume.slice(0, 6));
+      const bnplTypicalShare =
+        sum(bnpl.slice(0, 6)) / sum(y2026.volume.slice(0, 6));
 
       const takeaways = [
-        ['The weekend brought in ', {strong: dollars(t2026.volume)}, ', ',
-          {change: change(t2026.volume, t2025.volume)}, ' on the same five days last year.'],
-        ['Campaign launch was the biggest day at ', {strong: dollars(y2026.volume[CAMPAIGN_LAUNCH])},
-          ' (', {change: change(y2026.volume[CAMPAIGN_LAUNCH], y2025.volume[CAMPAIGN_LAUNCH])},
-          '). Orders peaked at ', {strong: hourLabel(hours2026[peakHour])}, ' Eastern, after a midnight rush when the sale opened.'],
-        ['More visitors bought: conversion rose to ', {strong: percent(t2026.conversion, 2)}, ' from ',
-          percent(t2025.conversion, 2), ', and each order was worth ', {strong: dollars(t2026.aov)},
-          ' on average (', {change: change(t2026.aov, t2025.aov)}, ').'],
-        ['Buy now, pay later took ', {strong: percent(bnplWeekendShare)}, ' of weekend volume, up from ',
-          percent(bnplTypicalShare), ' on the days before. Worth keeping it at the top of checkout for Cyber Week.'],
+        [
+          'The weekend brought in ',
+          {strong: dollars(t2026.volume)},
+          ', ',
+          {change: change(t2026.volume, t2025.volume)},
+          ' on the same five days last year.',
+        ],
+        [
+          'Campaign launch was the biggest day at ',
+          {strong: dollars(y2026.volume[CAMPAIGN_LAUNCH])},
+          ' (',
+          {
+            change: change(
+              y2026.volume[CAMPAIGN_LAUNCH],
+              y2025.volume[CAMPAIGN_LAUNCH],
+            ),
+          },
+          '). Orders peaked at ',
+          {strong: hourLabel(hours2026[peakHour])},
+          ' Eastern, after a midnight rush when the sale opened.',
+        ],
+        [
+          'More visitors bought: conversion rose to ',
+          {strong: percent(t2026.conversion, 2)},
+          ' from ',
+          percent(t2025.conversion, 2),
+          ', and each order was worth ',
+          {strong: dollars(t2026.aov)},
+          ' on average (',
+          {change: change(t2026.aov, t2025.aov)},
+          ').',
+        ],
+        [
+          'Buy now, pay later took ',
+          {strong: percent(bnplWeekendShare)},
+          ' of weekend volume, up from ',
+          percent(bnplTypicalShare),
+          ' on the days before. Worth keeping it at the top of checkout for Cyber Week.',
+        ],
       ];
 
       const list = document.getElementById('takeaways');
@@ -563,7 +692,8 @@
             item.append(part);
           } else {
             const emphasis = document.createElement('strong');
-            if (part.change !== undefined) emphasis.className = part.change.startsWith('+') ? 'up' : 'down';
+            if (part.change !== undefined)
+              emphasis.className = part.change.startsWith('+') ? 'up' : 'down';
             emphasis.textContent = part.strong ?? part.change;
             item.append(emphasis);
           }
@@ -575,9 +705,15 @@
 
       document.getElementById('as-of').textContent =
         'Data as of ' +
-        new Intl.DateTimeFormat(LOCALE, {month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: TIME_ZONE, timeZoneName: 'short'}).format(
-          new Date(FETCHED_AT),
-        );
+        new Intl.DateTimeFormat(LOCALE, {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+          timeZone: TIME_ZONE,
+          timeZoneName: 'short',
+        }).format(new Date(FETCHED_AT));
     </script>
   </body>
 </html>

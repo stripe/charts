@@ -35,7 +35,7 @@ function drawnValues(
 ): (number | null)[] {
   return values.map((value, index) =>
     kinds[index] === 'incomplete' && value !== null
-      ? projected[index] ?? value
+      ? (projected[index] ?? value)
       : value,
   );
 }

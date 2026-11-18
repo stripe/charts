@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -27,10 +27,12 @@
         --coral: #ff5a36;
         --mint: #0f9d73;
         --paper: #ffffff;
-        --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+        --mono:
+          ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
           'Liberation Mono', monospace;
-        --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-          Helvetica, Arial, sans-serif;
+        --sans:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+          Arial, sans-serif;
       }
       * {
         box-sizing: border-box;
@@ -56,7 +58,10 @@
         font-size: 0.93em;
         letter-spacing: -0.01em;
         white-space: nowrap;
-        background: linear-gradient(transparent 62%, rgba(255, 210, 63, 0.7) 62%);
+        background: linear-gradient(
+          transparent 62%,
+          rgba(255, 210, 63, 0.7) 62%
+        );
       }
       .fig.up {
         color: #0b7a58;
@@ -470,15 +475,21 @@
           <p class="kicker">Tessel · Monthly investor update</p>
           <h1 id="headline">November 2026</h1>
           <dl class="memo-meta">
-            <dt>To</dt><dd>Investors and advisors</dd>
-            <dt>From</dt><dd>Founder, Tessel</dd>
-            <dt>Period</dt><dd>December 2025 to November 2026</dd>
-            <dt>Data</dt><dd id="meta-data"></dd>
+            <dt>To</dt>
+            <dd>Investors and advisors</dd>
+            <dt>From</dt>
+            <dd>Founder, Tessel</dd>
+            <dt>Period</dt>
+            <dd>December 2025 to November 2026</dd>
+            <dt>Data</dt>
+            <dd id="meta-data"></dd>
           </dl>
         </div>
         <div class="band-figures" id="vitals"></div>
       </div>
-      <div class="stripe" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+      <div class="stripe" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+      </div>
     </header>
 
     <main>
@@ -500,14 +511,19 @@
             <div><div class="chart-sm" id="rev-eur"></div></div>
             <div><div class="chart-sm" id="rev-gbp"></div></div>
           </div>
-          <p class="caption">Each chart is in the currency customers are billed in, not converted. Grey bars are the same month a year earlier.</p>
+          <p class="caption">
+            Each chart is in the currency customers are billed in, not
+            converted. Grey bars are the same month a year earlier.
+          </p>
         </section>
         <section aria-label="Customers and logo churn">
           <div class="pair">
             <div><div class="chart-sm" id="customers"></div></div>
             <div><div class="chart-sm" id="logo-churn"></div></div>
           </div>
-          <p class="caption">Dashed grey lines are the same month a year earlier.</p>
+          <p class="caption">
+            Dashed grey lines are the same month a year earlier.
+          </p>
         </section>
       </div>
     </main>
@@ -522,7 +538,11 @@
 
     <footer>
       <p id="footnote"></p>
-      <p>Tessel is a made-up company and the figures are generated for this example. Use the info button on any chart for its source and a table of the values.</p>
+      <p>
+        Tessel is a made-up company and the figures are generated for this
+        example. Use the info button on any chart for its source and a table of
+        the values.
+      </p>
     </footer>
 
     <script src="../../dist/stripe-charts.min.js"></script>
@@ -546,18 +566,28 @@
       const whole = (v) => Math.round(v);
       const sum = (v) => v.reduce((t, x) => t + x, 0);
       const points = (xs, ys) => xs.map((x, i) => ({x, y: ys[i]}));
-      const monthStart = (y, m) => new Date(Date.UTC(y, m, 1)).toISOString().slice(0, 10);
+      const monthStart = (y, m) =>
+        new Date(Date.UTC(y, m, 1)).toISOString().slice(0, 10);
 
       const MONTHS = 24;
-      const allMonths = Array.from({length: MONTHS}, (_, i) => monthStart(2024, 11 + i));
+      const allMonths = Array.from({length: MONTHS}, (_, i) =>
+        monthStart(2024, 11 + i),
+      );
       const WIN = 12; // charts show the last 12 months; the first 12 are the year before
       const PRICE_CHANGE = 20; // Aug 2026
       const BIG_WIN = 22; // Oct 2026
       const BIG_WIN_MRR = 3800000; // $38,000.00 a month
 
-      const newMrr = [], expansion = [], contraction = [], churned = [], mrr = [];
-      const customers = [], newLogos = [], lostLogos = [];
-      const START_MRR = 4200000, START_CUSTOMERS = 46;
+      const newMrr = [],
+        expansion = [],
+        contraction = [],
+        churned = [],
+        mrr = [];
+      const customers = [],
+        newLogos = [],
+        lostLogos = [];
+      const START_MRR = 4200000,
+        START_CUSTOMERS = 46;
       for (let i = 0; i < MONTHS; i++) {
         const pm = i === 0 ? START_MRR : mrr[i - 1];
         const pc = i === 0 ? START_CUSTOMERS : customers[i - 1];
@@ -566,16 +596,32 @@
         const win = i === BIG_WIN ? BIG_WIN_MRR : 0;
         newMrr.push(whole(organic + win));
         newLogos.push(whole(organic / (arpa * 0.55)) + (win ? 1 : 0));
-        expansion.push(whole(pm * (0.017 + (i === PRICE_CHANGE ? 0.012 : 0) + (i > PRICE_CHANGE ? 0.004 : 0)) * jitter(0.12)));
+        expansion.push(
+          whole(
+            pm *
+              (0.017 +
+                (i === PRICE_CHANGE ? 0.012 : 0) +
+                (i > PRICE_CHANGE ? 0.004 : 0)) *
+              jitter(0.12),
+          ),
+        );
         contraction.push(-whole(pm * 0.0055 * jitter(0.2)));
-        const logoRate = (0.021 - 0.0002 * i) * (i === PRICE_CHANGE + 1 ? 1.9 : i === PRICE_CHANGE + 2 ? 1.35 : 1) * jitter(0.12);
+        const logoRate =
+          (0.021 - 0.0002 * i) *
+          (i === PRICE_CHANGE + 1 ? 1.9 : i === PRICE_CHANGE + 2 ? 1.35 : 1) *
+          jitter(0.12);
         const lost = whole(pc * logoRate);
         lostLogos.push(lost);
         churned.push(-whole(lost * arpa * 0.7));
         customers.push(pc + newLogos[i] - lost);
         mrr.push(pm + newMrr[i] + expansion[i] + contraction[i] + churned[i]);
       }
-      const logoChurn = lostLogos.map((l, i) => Math.round((l / (i === 0 ? START_CUSTOMERS : customers[i - 1])) * 10000) / 10000);
+      const logoChurn = lostLogos.map(
+        (l, i) =>
+          Math.round(
+            (l / (i === 0 ? START_CUSTOMERS : customers[i - 1])) * 10000,
+          ) / 10000,
+      );
 
       // The charts show the last 12 months; the 12 before are the year earlier.
       const months = allMonths.slice(WIN);
@@ -588,19 +634,30 @@
       // Operating plan: 6% monthly growth from November 2025, continued into
       // the forecast window.
       const FORECAST_MONTHS = 6;
-      const futureMonths = Array.from({length: FORECAST_MONTHS}, (_, k) => monthStart(2026, 11 + k));
-      const planMrr = [...months, ...futureMonths].map((_, k) => whole(mrr[WIN - 1] * Math.pow(1.06, k + 1)));
+      const futureMonths = Array.from({length: FORECAST_MONTHS}, (_, k) =>
+        monthStart(2026, 11 + k),
+      );
+      const planMrr = [...months, ...futureMonths].map((_, k) =>
+        whole(mrr[WIN - 1] * Math.pow(1.06, k + 1)),
+      );
 
       // Forecast: the organic growth of the last five months before the big
       // win (so one deal does not set the pace), easing by 3% each month, with
       // a band that widens by 2% of MRR for every month out.
-      const growthOf = (i) => (mrr[i] - (i === BIG_WIN ? BIG_WIN_MRR : 0)) / mrr[i - 1] - 1;
-      const baseGrowth = sum([last - 6, last - 5, last - 4, last - 3, last - 1].map(growthOf)) / 5;
+      const growthOf = (i) =>
+        (mrr[i] - (i === BIG_WIN ? BIG_WIN_MRR : 0)) / mrr[i - 1] - 1;
+      const baseGrowth =
+        sum([last - 6, last - 5, last - 4, last - 3, last - 1].map(growthOf)) /
+        5;
       const forecast = [];
       let carried = mrr[last];
       for (let k = 0; k < FORECAST_MONTHS; k++) {
         carried = whole(carried * (1 + baseGrowth * Math.pow(0.97, k + 1)));
-        forecast.push({y: carried, low: whole(carried * (1 - 0.02 * (k + 1))), high: whole(carried * (1 + 0.02 * (k + 1)))});
+        forecast.push({
+          y: carried,
+          low: whole(carried * (1 - 0.02 * (k + 1))),
+          high: whole(carried * (1 + 0.02 * (k + 1))),
+        });
       }
 
       // Billed revenue by currency. Euro and sterling customers are billed in
@@ -611,18 +668,31 @@
       const eurShare = (i) => 0.14 + 0.0025 * i;
       const gbpShare = (i) => 1 - usdShare(i) - eurShare(i);
       const usdRevenue = mrr.map((v, i) => whole(v * usdShare(i)));
-      const eurRevenue = mrr.map((v, i) => whole(v * eurShare(i) * EUR_PER_USD * jitter(0.01)));
-      const gbpRevenue = mrr.map((v, i) => whole(v * gbpShare(i) * GBP_PER_USD * jitter(0.01)));
+      const eurRevenue = mrr.map((v, i) =>
+        whole(v * eurShare(i) * EUR_PER_USD * jitter(0.01)),
+      );
+      const gbpRevenue = mrr.map((v, i) =>
+        whole(v * gbpShare(i) * GBP_PER_USD * jitter(0.01)),
+      );
 
       // ---- Charts -----------------------------------------------------------
 
       const LOCALE = 'en-US';
       const USD = {style: 'currency', currency: 'usd', unit: 'minor'};
       const FETCHED_AT = '2026-12-01T08:00:00Z';
-      const render = (id, spec, options) => StripeCharts.render(document.getElementById(id), {locale: LOCALE, timeZone: 'UTC', ...spec}, options);
+      const render = (id, spec, options) =>
+        StripeCharts.render(
+          document.getElementById(id),
+          {locale: LOCALE, timeZone: 'UTC', ...spec},
+          options,
+        );
       const withYearBefore = (label, values) => [
         {label, data: points(months, thisYear(values))},
-        {label: label + ', year before', comparison: true, data: points(months, priorYear(values))},
+        {
+          label: label + ', year before',
+          comparison: true,
+          data: points(months, priorYear(values)),
+        },
       ];
       const PRICE_CHANGE_NOTE = {
         at: months[PRICE_CHANGE - WIN],
@@ -639,34 +709,78 @@
       render('mrr', {
         version: 1,
         title: 'MRR against plan',
-        description: 'Month-start MRR, a six-month forecast and the plan of 6% monthly growth',
+        description:
+          'Month-start MRR, a six-month forecast and the plan of 6% monthly growth',
         format: USD,
-        kpi: {basis: 'latest', value: mrr[last], comparisonValue: planMrr[lastIn]},
+        kpi: {
+          basis: 'latest',
+          value: mrr[last],
+          comparisonValue: planMrr[lastIn],
+        },
         chart: {type: 'line', axes: {x: {labels: 'month'}}},
         series: [
           {
             label: 'MRR',
-            data: [...points(months, thisYear(mrr)), ...futureMonths.map((x, k) => ({x, forecast: true, ...forecast[k]}))],
+            data: [
+              ...points(months, thisYear(mrr)),
+              ...futureMonths.map((x, k) => ({
+                x,
+                forecast: true,
+                ...forecast[k],
+              })),
+            ],
           },
-          {label: 'Plan', comparison: true, data: points([...months, ...futureMonths], planMrr)},
+          {
+            label: 'Plan',
+            comparison: true,
+            data: points([...months, ...futureMonths], planMrr),
+          },
         ],
-        annotations: [{...PRICE_CHANGE_NOTE, series: 'MRR'}, {...BIG_WIN_NOTE, series: 'MRR'}],
+        annotations: [
+          {...PRICE_CHANGE_NOTE, series: 'MRR'},
+          {...BIG_WIN_NOTE, series: 'MRR'},
+        ],
       });
 
-      render('movements', {
-        version: 1,
-        title: 'Net new MRR',
-        description: 'What was added above zero and lost below it, each month',
-        format: USD,
-        chart: {type: 'bar', stacking: 'stacked', axes: {x: {labels: 'month'}}},
-        series: [
-          {label: 'New', color: '#0f9d73', data: points(months, thisYear(newMrr))},
-          {label: 'Expansion', color: '#7fd4b4', data: points(months, thisYear(expansion))},
-          {label: 'Contraction', color: '#f2a54a', data: points(months, thisYear(contraction))},
-          {label: 'Churn', color: '#d6336c', data: points(months, thisYear(churned))},
-        ],
-        annotations: [BIG_WIN_NOTE],
-      }, {formatYTick: signedTick});
+      render(
+        'movements',
+        {
+          version: 1,
+          title: 'Net new MRR',
+          description:
+            'What was added above zero and lost below it, each month',
+          format: USD,
+          chart: {
+            type: 'bar',
+            stacking: 'stacked',
+            axes: {x: {labels: 'month'}},
+          },
+          series: [
+            {
+              label: 'New',
+              color: '#0f9d73',
+              data: points(months, thisYear(newMrr)),
+            },
+            {
+              label: 'Expansion',
+              color: '#7fd4b4',
+              data: points(months, thisYear(expansion)),
+            },
+            {
+              label: 'Contraction',
+              color: '#f2a54a',
+              data: points(months, thisYear(contraction)),
+            },
+            {
+              label: 'Churn',
+              color: '#d6336c',
+              data: points(months, thisYear(churned)),
+            },
+          ],
+          annotations: [BIG_WIN_NOTE],
+        },
+        {formatYTick: signedTick},
+      );
 
       const revenueSpec = (id, title, currency, values) => {
         const current = thisYear(values);
@@ -676,11 +790,20 @@
           title,
           description: 'Billed in ' + currency.toUpperCase() + ', 12 months',
           format: {style: 'currency', currency, unit: 'minor'},
-          kpi: {basis: 'total', value: sum(current), comparisonValue: sum(before), notation: 'compact'},
+          kpi: {
+            basis: 'total',
+            value: sum(current),
+            comparisonValue: sum(before),
+            notation: 'compact',
+          },
           chart: {type: 'bar', axes: {x: {labels: 'month'}}},
           series: [
             {label: currency.toUpperCase(), data: points(months, current)},
-            {label: 'Year before', comparison: true, data: points(months, before)},
+            {
+              label: 'Year before',
+              comparison: true,
+              data: points(months, before),
+            },
           ],
         });
       };
@@ -693,7 +816,11 @@
         title: 'Customers',
         description: 'Active paying accounts at month start',
         format: {style: 'number', maximumFractionDigits: 0},
-        kpi: {basis: 'latest', value: customers[last], comparisonValue: customers[last - WIN]},
+        kpi: {
+          basis: 'latest',
+          value: customers[last],
+          comparisonValue: customers[last - WIN],
+        },
         chart: {type: 'line', axes: {x: {labels: 'month'}}},
         series: withYearBefore('Customers', customers),
         annotations: [{...BIG_WIN_NOTE, series: 'Customers'}],
@@ -704,7 +831,12 @@
         title: 'Logo churn',
         description: 'Accounts lost as a share of last month’s accounts',
         format: {style: 'percent', unit: 'ratio', maximumFractionDigits: 2},
-        kpi: {basis: 'latest', value: logoChurn[last], comparisonValue: logoChurn[last - WIN], goodDirection: 'down'},
+        kpi: {
+          basis: 'latest',
+          value: logoChurn[last],
+          comparisonValue: logoChurn[last - WIN],
+          goodDirection: 'down',
+        },
         chart: {type: 'line', axes: {x: {labels: 'month'}}},
         series: withYearBefore('Logo churn', logoChurn),
         annotations: [{...PRICE_CHANGE_NOTE, series: 'Logo churn'}],
@@ -715,15 +847,34 @@
       // treated as text. A part is a string, or {fig, tone?} for a figure.
 
       const money = (cents, currency = 'USD', digits = 0) =>
-        new Intl.NumberFormat(LOCALE, {style: 'currency', currency, maximumFractionDigits: digits, minimumFractionDigits: digits}).format(cents / 100);
+        new Intl.NumberFormat(LOCALE, {
+          style: 'currency',
+          currency,
+          maximumFractionDigits: digits,
+          minimumFractionDigits: digits,
+        }).format(cents / 100);
       const compact = (cents, currency = 'USD') =>
-        new Intl.NumberFormat(LOCALE, {style: 'currency', currency, notation: 'compact', maximumFractionDigits: 1}).format(cents / 100);
+        new Intl.NumberFormat(LOCALE, {
+          style: 'currency',
+          currency,
+          notation: 'compact',
+          maximumFractionDigits: 1,
+        }).format(cents / 100);
       const percent = (v, digits = 1) =>
-        new Intl.NumberFormat(LOCALE, {style: 'percent', minimumFractionDigits: digits, maximumFractionDigits: digits}).format(v);
-      const signed = (v, digits = 1) => (v >= 0 ? '+' : '−') + percent(Math.abs(v), digits);
+        new Intl.NumberFormat(LOCALE, {
+          style: 'percent',
+          minimumFractionDigits: digits,
+          maximumFractionDigits: digits,
+        }).format(v);
+      const signed = (v, digits = 1) =>
+        (v >= 0 ? '+' : '−') + percent(Math.abs(v), digits);
       const count = (v) => new Intl.NumberFormat(LOCALE).format(v);
       const monthName = (iso, long = true) =>
-        new Intl.DateTimeFormat(LOCALE, {month: long ? 'long' : 'short', year: 'numeric', timeZone: 'UTC'}).format(new Date(iso));
+        new Intl.DateTimeFormat(LOCALE, {
+          month: long ? 'long' : 'short',
+          year: 'numeric',
+          timeZone: 'UTC',
+        }).format(new Date(iso));
       const fig = (text, tone) => ({fig: text, tone});
 
       const write = (parent, parts) => {
@@ -754,7 +905,12 @@
       const peakMonth = months[thisYear(logoChurn).indexOf(peakChurn)];
       const grossAdds = year(newMrr) + year(expansion);
       const grossLosses = -(year(contraction) + year(churned));
-      const nrrAnnual = 1 + (sum(expansion.slice(-WIN)) + sum(contraction.slice(-WIN)) + sum(churned.slice(-WIN))) / mrr[last - WIN];
+      const nrrAnnual =
+        1 +
+        (sum(expansion.slice(-WIN)) +
+          sum(contraction.slice(-WIN)) +
+          sum(churned.slice(-WIN))) /
+          mrr[last - WIN];
       const nrrRounded = Math.round(nrrAnnual * 1000) / 1000;
       const eurNow = eurShare(last);
       const eurThen = eurShare(last - WIN);
@@ -765,8 +921,16 @@
       const vitals = [
         ['MRR', money(mrr[last]), signed(mrrGrowth, 0) + ' on a year ago'],
         ['Against plan', signed(planGap), 'plan is ' + money(planMrr[lastIn])],
-        ['Net new MRR', money(net(last)), 'in ' + monthName(months[lastIn], false)],
-        ['Customers', count(customers[last]), '+' + count(customersAdded) + ' in 12 months'],
+        [
+          'Net new MRR',
+          money(net(last)),
+          'in ' + monthName(months[lastIn], false),
+        ],
+        [
+          'Customers',
+          count(customers[last]),
+          '+' + count(customersAdded) + ' in 12 months',
+        ],
       ];
       const vitalsNode = document.getElementById('vitals');
       for (const [label, value, note] of vitals) {
@@ -785,47 +949,102 @@
         element('h2', 'The letter'),
         element('p', 'Hi all,'),
         element('p', [
-          'November closed with ', fig(money(mrr[last])), ' of MRR, ', fig(signed(mrrGrowth, 0), 'up'),
-          ' on a year ago and ', fig(percent(Math.abs(planGap)), planGap < 0 ? 'down' : 'up'),
+          'November closed with ',
+          fig(money(mrr[last])),
+          ' of MRR, ',
+          fig(signed(mrrGrowth, 0), 'up'),
+          ' on a year ago and ',
+          fig(percent(Math.abs(planGap)), planGap < 0 ? 'down' : 'up'),
           planGap < 0
             ? ' behind the plan we set last November, even with the largest deal in our history.'
-            : ' ahead of the plan we set last November. Without the October deal we would be ' + percent(Math.abs((mrr[last] - BIG_WIN_MRR) / planMrr[lastIn] - 1)) + (mrr[last] - BIG_WIN_MRR < planMrr[lastIn] ? ' behind it.' : ' ahead of it.'),
+            : ' ahead of the plan we set last November. Without the October deal we would be ' +
+              percent(
+                Math.abs((mrr[last] - BIG_WIN_MRR) / planMrr[lastIn] - 1),
+              ) +
+              (mrr[last] - BIG_WIN_MRR < planMrr[lastIn]
+                ? ' behind it.'
+                : ' ahead of it.'),
         ]),
 
         heading('Where growth came from'),
         element('p', [
-          'Over twelve months we added ', fig(money(grossAdds)), ' of MRR from new customers and upgrades and lost ',
-          fig(money(grossLosses)), ' to downgrades and cancellations: net new MRR of ', fig(money(grossAdds - grossLosses)),
-          '. Trailing net revenue retention is ', fig(percent(nrrAnnual, 1)), ', so ',
-          nrrRounded > 1 ? 'the existing base grows' : nrrRounded < 1 ? 'the existing base shrinks slightly' : 'the existing base holds flat',
+          'Over twelve months we added ',
+          fig(money(grossAdds)),
+          ' of MRR from new customers and upgrades and lost ',
+          fig(money(grossLosses)),
+          ' to downgrades and cancellations: net new MRR of ',
+          fig(money(grossAdds - grossLosses)),
+          '. Trailing net revenue retention is ',
+          fig(percent(nrrAnnual, 1)),
+          ', so ',
+          nrrRounded > 1
+            ? 'the existing base grows'
+            : nrrRounded < 1
+              ? 'the existing base shrinks slightly'
+              : 'the existing base holds flat',
           ' before we sell anything new.',
         ]),
         element('p', [
-          'In ', monthName(months[BIG_WIN - WIN], false), ' a logistics company signed on an annual plan worth ', fig(money(BIG_WIN_MRR)),
-          ' a month: ', fig(percent(bigWinShare, 0)), ' of that month’s new MRR. Without it, net new MRR would have been ',
-          fig(money(net(BIG_WIN) - BIG_WIN_MRR)), ' rather than ', fig(money(net(BIG_WIN))), '.',
+          'In ',
+          monthName(months[BIG_WIN - WIN], false),
+          ' a logistics company signed on an annual plan worth ',
+          fig(money(BIG_WIN_MRR)),
+          ' a month: ',
+          fig(percent(bigWinShare, 0)),
+          ' of that month’s new MRR. Without it, net new MRR would have been ',
+          fig(money(net(BIG_WIN) - BIG_WIN_MRR)),
+          ' rather than ',
+          fig(money(net(BIG_WIN))),
+          '.',
         ]),
 
         heading('The pricing change'),
         element('p', [
-          'In ', monthName(PRICE_CHANGE_NOTE.at, false), ' we raised per-seat prices and introduced annual plans. Expansion MRR rose and has stayed higher, but logo churn peaked at ',
-          fig(percent(peakChurn, 1), 'down'), ' in ', monthName(peakMonth, false), ' before settling at ', fig(percent(logoChurn[last], 1), 'up'),
+          'In ',
+          monthName(PRICE_CHANGE_NOTE.at, false),
+          ' we raised per-seat prices and introduced annual plans. Expansion MRR rose and has stayed higher, but logo churn peaked at ',
+          fig(percent(peakChurn, 1), 'down'),
+          ' in ',
+          monthName(peakMonth, false),
+          ' before settling at ',
+          fig(percent(logoChurn[last], 1), 'up'),
           ' in November. I would make the same call, with a gentler rollout for the smallest accounts.',
         ]),
 
         heading('Customers and currencies'),
         element('p', [
-          'We have ', fig(count(customers[last])), ' paying customers, ', fig('+' + count(customersAdded)), ' in twelve months. Euro billing is now ',
-          fig(percent(eurNow, 0)), ' of MRR, up from ', fig(percent(eurThen, 0)), ' a year ago, and sterling ',
-          fig(percent(gbpShare(last), 0)), '. Each chart on the right is in the currency customers pay in, so no exchange rate moves the lines.',
+          'We have ',
+          fig(count(customers[last])),
+          ' paying customers, ',
+          fig('+' + count(customersAdded)),
+          ' in twelve months. Euro billing is now ',
+          fig(percent(eurNow, 0)),
+          ' of MRR, up from ',
+          fig(percent(eurThen, 0)),
+          ' a year ago, and sterling ',
+          fig(percent(gbpShare(last), 0)),
+          '. Each chart on the right is in the currency customers pay in, so no exchange rate moves the lines.',
         ]),
 
         heading('What I expect next'),
         element('p', [
-          'If growth continues to ease as it has, MRR reaches about ', fig(compact(final.y)), ' by ', monthName(futureMonths[FORECAST_MONTHS - 1], false),
-          ' (range ', fig(compact(final.low)), ' to ', fig(compact(final.high)), '), against ', fig(compact(planFinal)), ' on plan. The forecast leaves the one-off win out of its growth rate.',
+          'If growth continues to ease as it has, MRR reaches about ',
+          fig(compact(final.y)),
+          ' by ',
+          monthName(futureMonths[FORECAST_MONTHS - 1], false),
+          ' (range ',
+          fig(compact(final.low)),
+          ' to ',
+          fig(compact(final.high)),
+          '), against ',
+          fig(compact(planFinal)),
+          ' on plan. The forecast leaves the one-off win out of its growth rate.',
         ]),
-        element('p', 'Thank you for the introductions and the straight answers this year.', 'sign'),
+        element(
+          'p',
+          'Thank you for the introductions and the straight answers this year.',
+          'sign',
+        ),
         element('p', 'Founder, Tessel'),
       );
 
@@ -834,15 +1053,31 @@
       const asks = [
         [
           'Introductions in the euro zone',
-          ['Euro billing grew from ', fig(percent(eurThen, 0)), ' to ', fig(percent(eurNow, 0)), ' of MRR with no local sales. Five introductions to finance leads at mid-sized German or Dutch companies would test whether that holds with outbound.'],
+          [
+            'Euro billing grew from ',
+            fig(percent(eurThen, 0)),
+            ' to ',
+            fig(percent(eurNow, 0)),
+            ' of MRR with no local sales. Five introductions to finance leads at mid-sized German or Dutch companies would test whether that holds with outbound.',
+          ],
         ],
         [
           'A head of sales, by spring',
-          ['New customers brought ', fig(money(year(newMrr))), ' of MRR this year and I closed almost every deal myself. One deal was ', fig(percent(bigWinShare, 0)), ' of a month; I want a second person who can close the next one.'],
+          [
+            'New customers brought ',
+            fig(money(year(newMrr))),
+            ' of MRR this year and I closed almost every deal myself. One deal was ',
+            fig(percent(bigWinShare, 0)),
+            ' of a month; I want a second person who can close the next one.',
+          ],
         ],
         [
           'Notes on pricing and churn',
-          ['Logo churn peaked at ', fig(percent(peakChurn, 1)), ' after the pricing change. If you have moved a base from seats to usage, thirty minutes on what you would do for small accounts would help.'],
+          [
+            'Logo churn peaked at ',
+            fig(percent(peakChurn, 1)),
+            ' after the pricing change. If you have moved a base from seats to usage, thirty minutes on what you would do for small accounts would help.',
+          ],
         ],
       ];
       const askList = document.getElementById('asks');
@@ -855,13 +1090,31 @@
       }
 
       document.getElementById('headline').textContent =
-        'November 2026: ' + percent(Math.abs(planGap), 1) + (planGap < 0 ? ' behind plan' : ' ahead of plan') + ', ' + signed(mrrGrowth, 0) + ' on the year';
+        'November 2026: ' +
+        percent(Math.abs(planGap), 1) +
+        (planGap < 0 ? ' behind plan' : ' ahead of plan') +
+        ', ' +
+        signed(mrrGrowth, 0) +
+        ' on the year';
       document.getElementById('meta-data').textContent =
         'Stripe Billing, as of ' +
-        new Intl.DateTimeFormat(LOCALE, {month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'UTC', timeZoneName: 'short'}).format(new Date(FETCHED_AT));
+        new Intl.DateTimeFormat(LOCALE, {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+          timeZone: 'UTC',
+          timeZoneName: 'short',
+        }).format(new Date(FETCHED_AT));
       document.getElementById('movements-caption').textContent =
-        'Contraction is small: ' + money(-year(contraction)) + ' over the year, ' + percent(year(contraction) / (year(contraction) + year(churned)), 0) +
-        ' of the ' + money(grossLosses) + ' lost, so its amber sliver is hard to see next to churn in red.';
+        'Contraction is small: ' +
+        money(-year(contraction)) +
+        ' over the year, ' +
+        percent(year(contraction) / (year(contraction) + year(churned)), 0) +
+        ' of the ' +
+        money(grossLosses) +
+        ' lost, so its amber sliver is hard to see next to churn in red.';
       document.getElementById('mrr-caption').textContent =
         'The shaded dashed line is the forecast and its range; the grey dashed line is the plan.';
       document.getElementById('footnote').textContent =

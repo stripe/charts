@@ -14,6 +14,7 @@ import {
 } from '../../layout/segments';
 import {tokens} from '../../tokens';
 import {svg} from '../dom';
+import {MARKS, SERIES_ATTRIBUTE} from '../motion/selectors';
 import {seriesDrawOrder, withSeriesColor} from '../series';
 import {annotationMarkers, annotationRanges} from './annotations';
 import {
@@ -174,6 +175,8 @@ function projectedRange(
     : null;
 }
 
+const SLOT_ATTRIBUTE = 'data-slot';
+
 /**
  * A series' bars. A point's own color (a bar chart's `data[].color`)
  * overrides the series color on that bar alone. A bar on pace for more
@@ -203,6 +206,9 @@ function barMarks(
     const extension =
       range &&
       projectedExtension(doc, rect, layout.y(range[0]), layout.y(range[1]));
+    // A bar with no height (a value of 0) shows nothing to highlight, so
+    // its slot is marked with the crosshair, like a slot with no value.
+    const visible = rect.height > 0 || Boolean(extension);
     for (const part of [
       point?.color ? withSeriesColor(bar, point.color) : bar,
       overlay,
@@ -210,23 +216,37 @@ function barMarks(
     ]) {
       if (!part) continue;
       // Lets the hover highlight find the bar and its overlays by slot.
-      part.setAttribute(SLOT_ATTRIBUTE, String(rect.slot));
+      if (visible) part.setAttribute(SLOT_ATTRIBUTE, String(rect.slot));
       bars.appendChild(part);
     }
   }
   return bars;
 }
 
-const SLOT_ATTRIBUTE = 'data-slot';
+/**
+ * Whether the hovered slot's bars are highlighted by fading the rest. Not
+ * when slots are narrower than a pixel: only one slot per pixel column draws
+ * a bar, so the highlight would come and go as the pointer moves. Nor when
+ * thin bars of several series overlay one another: faded, the ones behind
+ * would show through the ones in front.
+ */
+function highlightsBars(layout: PlotLayout, data: PlotData): boolean {
+  if (data.chartType !== 'bar') return false;
+  if (!layout.overlayBars) return true;
+  return (
+    layout.x.step >= 1 &&
+    (data.model.stacked || visibleSeries(data.model).length <= 1)
+  );
+}
 
 /**
  * Highlights the bars at `slot`, fading every other bar, or clears the
  * highlight when `slot` is null. Returns whether any bar was highlighted: a
- * slot with no bar drawn (no value, or a dense column showing another slot)
- * leaves every bar as it is.
+ * slot with no bar to see (no value, or a value of 0) leaves every bar as
+ * it is.
  */
 function highlightBars(element: SVGSVGElement, slot: number | null): boolean {
-  const marks = element.querySelector('.sc-marks');
+  const marks = element.querySelector(MARKS);
   if (!marks) return false;
   for (const part of marks.querySelectorAll('.sc-highlighted'))
     part.classList.remove('sc-highlighted');
@@ -281,7 +301,7 @@ function marks(doc: Document, layout: PlotLayout, data: PlotData): SVGGElement {
           );
     // Lets the entrance animate each series on its own, whatever the
     // drawing order.
-    mark.setAttribute('data-series', String(index));
+    mark.setAttribute(SERIES_ATTRIBUTE, String(index));
     group.appendChild(withSeriesColor(mark, data.colors[index]));
   }
   return group;
@@ -444,7 +464,8 @@ export function drawPlot(
 /**
  * Marks `slot` as hovered. Lines get the crosshair and a ringed marker on
  * each series' value there. Bars keep full color at `slot` while the rest
- * fade; the crosshair shows only when the slot has no bar to highlight.
+ * fade; the crosshair shows instead when the slot has no bar to highlight
+ * or the bars are too dense for it (see {@link highlightsBars}).
  */
 export function drawHover(
   group: SVGGElement,
@@ -456,9 +477,11 @@ export function drawHover(
   const {crosshair, marker} = tokens;
   const x = crisp(layout.x.center(slot), crosshair.width);
   const highlighted =
-    data.chartType === 'bar' &&
     group.ownerSVGElement !== null &&
-    highlightBars(group.ownerSVGElement, slot);
+    highlightBars(
+      group.ownerSVGElement,
+      highlightsBars(layout, data) ? slot : null,
+    );
   const children: SVGElement[] = highlighted
     ? []
     : [

@@ -3,7 +3,14 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  {ignores: ['dist/**', 'storybook-static/**', 'node_modules/**', 'coverage/**']},
+  {
+    ignores: [
+      'dist/**',
+      'storybook-static/**',
+      'node_modules/**',
+      'coverage/**',
+    ],
+  },
   js.configs.recommended,
   {
     files: ['**/*.js', '**/*.mjs'],
@@ -13,11 +20,16 @@ export default tseslint.config(
   {
     files: ['**/*.ts'],
     extends: [tseslint.configs.recommended],
-    languageOptions: {globals: {...globals.browser, ...globals.node, ...globals.jest}},
+    languageOptions: {
+      globals: {...globals.browser, ...globals.node, ...globals.jest},
+    },
     rules: {
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-non-null-assertion': 'error',
-      '@typescript-eslint/no-unused-vars': ['error', {ignoreRestSiblings: true}],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {ignoreRestSiblings: true},
+      ],
       'no-console': 'error',
     },
   },

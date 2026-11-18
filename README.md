@@ -26,10 +26,15 @@ import {render} from '@stripe/charts';
 render(document.getElementById('chart'), {
   version: 1,
   title: 'Orders',
-  series: [{label: 'Orders', data: [
-    {x: '2026-11-01', y: 120},
-    {x: '2026-11-02', y: 180},
-  ]}],
+  series: [
+    {
+      label: 'Orders',
+      data: [
+        {x: '2026-11-01', y: 120},
+        {x: '2026-11-02', y: 180},
+      ],
+    },
+  ],
 });
 ```
 
@@ -41,10 +46,15 @@ import {render, type ChartSpec} from '@stripe/charts';
 const spec: ChartSpec = {
   version: 1,
   title: 'Orders',
-  series: [{label: 'Orders', data: [
-    {x: '2026-11-01', y: 120},
-    {x: '2026-11-02', y: 180},
-  ]}],
+  series: [
+    {
+      label: 'Orders',
+      data: [
+        {x: '2026-11-01', y: 120},
+        {x: '2026-11-02', y: 180},
+      ],
+    },
+  ],
 };
 
 const element = document.getElementById('chart');
@@ -57,14 +67,23 @@ if (element) render(element, spec);
 import {StripeChart} from '@stripe/charts/react';
 
 export function OrdersChart() {
-  return <StripeChart spec={{
-    version: 1,
-    title: 'Orders',
-    series: [{label: 'Orders', data: [
-      {x: '2026-11-01', y: 120},
-      {x: '2026-11-02', y: 180},
-    ]}],
-  }} />;
+  return (
+    <StripeChart
+      spec={{
+        version: 1,
+        title: 'Orders',
+        series: [
+          {
+            label: 'Orders',
+            data: [
+              {x: '2026-11-01', y: 120},
+              {x: '2026-11-02', y: 180},
+            ],
+          },
+        ],
+      }}
+    />
+  );
 }
 ```
 
@@ -73,13 +92,13 @@ export function OrdersChart() {
 Start with the [reporting examples](examples/)
 or a [complete recap page](examples/dashboards/sales-recap.html).
 
-| Need | Guide |
-| --- | --- |
-| Amounts straight from the Stripe API | [Money and units](docs/reference.md#units-and-correctness) |
-| Compare matching periods across years | [Comparisons](docs/reference.md#comparisons-line-up-by-position) |
-| Report in the business’s time zone | [Dates and time zones](docs/reference.md#dates-and-time-zones) |
+| Need                                        | Guide                                                                         |
+| ------------------------------------------- | ----------------------------------------------------------------------------- |
+| Amounts straight from the Stripe API        | [Money and units](docs/reference.md#units-and-correctness)                    |
+| Compare matching periods across years       | [Comparisons](docs/reference.md#comparisons-line-up-by-position)              |
+| Report in the business’s time zone          | [Dates and time zones](docs/reference.md#dates-and-time-zones)                |
 | Explain a promotion, outage, or partial day | [Annotations](docs/reference.md#annotations-incomplete-periods-and-forecasts) |
-| Understand a rejected spec | [Validation](docs/reference.md#errors-and-how-to-fix-them) |
+| Understand a rejected spec                  | [Validation](docs/reference.md#errors-and-how-to-fix-them)                    |
 
 Use up to 12 series and 1000 points per series. Aggregate dense data before
 charting.

@@ -67,7 +67,7 @@ export function pointEvent(
     index: slot,
     series,
     seriesLabel:
-      seriesIndex === null ? null : model.series[seriesIndex]?.label ?? null,
+      seriesIndex === null ? null : (model.series[seriesIndex]?.label ?? null),
     x: primary?.x ?? '',
     nativeEvent,
   };

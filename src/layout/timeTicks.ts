@@ -12,12 +12,7 @@ export type TimeUnit = 'hour' | 'day' | 'week' | 'month' | 'year';
  * year (`Feb 2027`), `"year"` the year alone (`2027`).
  */
 export type TickLabelKind =
-  | 'time'
-  | 'date'
-  | 'dateYear'
-  | 'month'
-  | 'monthYear'
-  | 'year';
+  'time' | 'date' | 'dateYear' | 'month' | 'monthYear' | 'year';
 
 /** A tick before it is labelled. */
 export type XTick = {time: number; kind: TickLabelKind};

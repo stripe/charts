@@ -3,7 +3,7 @@ import {layoutOffsetX} from './dom';
 function element(rect: {left: number; width: number}, offsetWidth: number) {
   const el = document.createElement('div');
   el.getBoundingClientRect = () =>
-    ({left: rect.left, width: rect.width} as DOMRect);
+    ({left: rect.left, width: rect.width}) as DOMRect;
   Object.defineProperty(el, 'offsetWidth', {value: offsetWidth});
   return el;
 }

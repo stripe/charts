@@ -266,7 +266,9 @@ function main() {
   const start = readme.indexOf(START);
   const end = readme.indexOf(END);
   if (start < 0 || end < start) {
-    process.stderr.write(`docs/reference.md has no ${START} ... ${END} block\n`);
+    process.stderr.write(
+      `docs/reference.md has no ${START} ... ${END} block\n`,
+    );
     process.exit(1);
   }
   const table = buildTable();

@@ -5,7 +5,11 @@ describe('render', () => {
     const element = document.createElement('div');
     let error: unknown;
     try {
-      render(element, {version: 1, title: 'Gross volume', chart: {type: 'pie'}});
+      render(element, {
+        version: 1,
+        title: 'Gross volume',
+        chart: {type: 'pie'},
+      });
     } catch (caught) {
       error = caught;
     }

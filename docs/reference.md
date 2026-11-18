@@ -10,20 +10,20 @@ really the last day's value, is worse than no chart. So the spec asks you to
 say what the numbers mean in four places, and rejects the spec, with a
 message naming the field, when one is missing or doesn't fit the data.
 
-| Field | Required when | Values | Why |
-|---|---|---|---|
-| `format.unit` | `format.style` is `"currency"` | `"minor"` or `"major"` | The Stripe API returns amounts in minor units (cents): `1999` is $19.99. Say `"minor"` and pass the API's integers unchanged, or `"major"` if you already converted them. |
-| `format.unit` | `format.style` is `"percent"` | `"ratio"` or `"percent"` | Is 2.5% given as `0.025` (`"ratio"`) or as `2.5` (`"percent"`)? |
-| `timeZone` | any `x` is a date-time | an IANA zone, such as `"America/New_York"` | An instant can fall on different days in different zones. Name the zone the data was reported in, or `"UTC"`. Date-only data doesn't need it. |
-| `kpi.basis` | there is a `kpi` | `"total"`, `"latest"`, `"average"` or `"custom"` | Says how `kpi.value` relates to the primary series: the sum, last value or mean of its actual values (forecast points are left out), or a figure computed elsewhere. For the first three the value is checked against the series, and `comparisonValue` against the first comparison series over the same slots, like periods: for `"latest"`, the comparison's value at the slot of the primary's latest actual value; for `"total"` and `"average"`, its values at the primary's actual slots. |
+| Field         | Required when                  | Values                                           | Why                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ------------- | ------------------------------ | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `format.unit` | `format.style` is `"currency"` | `"minor"` or `"major"`                           | The Stripe API returns amounts in minor units (cents): `1999` is $19.99. Say `"minor"` and pass the API's integers unchanged, or `"major"` if you already converted them.                                                                                                                                                                                                                                                                                                                        |
+| `format.unit` | `format.style` is `"percent"`  | `"ratio"` or `"percent"`                         | Is 2.5% given as `0.025` (`"ratio"`) or as `2.5` (`"percent"`)?                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `timeZone`    | any `x` is a date-time         | an IANA zone, such as `"America/New_York"`       | An instant can fall on different days in different zones. Name the zone the data was reported in, or `"UTC"`. Date-only data doesn't need it.                                                                                                                                                                                                                                                                                                                                                    |
+| `kpi.basis`   | there is a `kpi`               | `"total"`, `"latest"`, `"average"` or `"custom"` | Says how `kpi.value` relates to the primary series: the sum, last value or mean of its actual values (forecast points are left out), or a figure computed elsewhere. For the first three the value is checked against the series, and `comparisonValue` against the first comparison series over the same slots, like periods: for `"latest"`, the comparison's value at the slot of the primary's latest actual value; for `"total"` and `"average"`, its values at the primary's actual slots. |
 
 Minor units follow the Stripe API's currency decimals:
 
-| Currency | Minor-unit decimals | `1999` with `"unit": "minor"` |
-|---|---|---|
-| USD, EUR and most others | 2 | $19.99 |
-| JPY and other zero-decimal currencies | 0 | ¥1,999 |
-| KWD, BHD, JOD, OMR, TND | 3 | KWD 1.999 |
+| Currency                              | Minor-unit decimals | `1999` with `"unit": "minor"` |
+| ------------------------------------- | ------------------- | ----------------------------- |
+| USD, EUR and most others              | 2                   | $19.99                        |
+| JPY and other zero-decimal currencies | 0                   | ¥1,999                        |
+| KWD, BHD, JOD, OMR, TND               | 3                   | KWD 1.999                     |
 
 ISK and UGX follow Stripe's special case and use 2. `kpi.basis` checks allow
 a small rounding tolerance: 0.5% of the expected value, or one displayed unit,
@@ -52,14 +52,14 @@ throws a `TypeError`.
 The optional third argument holds the JavaScript-only parts: callbacks and
 formatters. The spec stays plain JSON.
 
-| Option | Called with | Use |
-|---|---|---|
-| `onPointClick(event)` | the clicked slot | Click a slot, or press Enter on the focused plot. Shows a pointer cursor. |
-| `onPointHover(event)` | the hovered or focused slot, or `null` on leave | Sync other UI with the chart. |
-| `onLegendChange(state)` | `{hidden: string[]}`, the hidden series' labels | Remember the reader's legend choices. |
-| `renderTooltip(context)` | the slot, its default `title` and its `annotations` | Return a `Node` (inserted as is), a string (shown as text) or `null` (the default tooltip). The box, placement and screen reader announcement stay. |
-| `formatYTick(value, label)` | the tick value and the default label | Return the label to show. |
-| `formatXTick(x, label)` | the tick's x and the default label | Return the label to show. |
+| Option                      | Called with                                         | Use                                                                                                                                                 |
+| --------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `onPointClick(event)`       | the clicked slot                                    | Click a slot, or press Enter on the focused plot. Shows a pointer cursor.                                                                           |
+| `onPointHover(event)`       | the hovered or focused slot, or `null` on leave     | Sync other UI with the chart.                                                                                                                       |
+| `onLegendChange(state)`     | `{hidden: string[]}`, the hidden series' labels     | Remember the reader's legend choices.                                                                                                               |
+| `renderTooltip(context)`    | the slot, its default `title` and its `annotations` | Return a `Node` (inserted as is), a string (shown as text) or `null` (the default tooltip). The box, placement and screen reader announcement stay. |
+| `formatYTick(value, label)` | the tick value and the default label                | Return the label to show.                                                                                                                           |
+| `formatXTick(x, label)`     | the tick's x and the default label                  | Return the label to show.                                                                                                                           |
 
 A point event has the slot `index`, the primary series' `x`, every visible
 series at the slot (`label`, its own `x`, `y` in major units, `formatted`,
@@ -157,20 +157,20 @@ export function GrossVolume() {
 }
 ```
 
-| Prop | Type | Description |
-|---|---|---|
-| `spec` | `ChartSpec` | Required. The chart to draw. Compared by serialized value, including object key order, so an inline object literal with the same serialization does not redraw it; a changed spec updates the chart in place. Unserializable specs are compared by identity. |
-| `style` | `CSSProperties` | Inline style for the container `div`. Line and bar charts fill the container, so give it a height. |
-| `className` | `string` | Class name for the container `div`. |
-| `id` | `string` | `id` for the container `div`. |
-| `onError` | `(error: SpecError) => void` | Called when validation fails on mount or when the serialized spec or set of callback options changes, with the same `{path, message}` list as `validate` in `error.errors`. An unchanged invalid spec can be reported again. |
-| `ref` | `Ref<HTMLDivElement>` | Forwarded to the container `div`. |
-| `onPointClick` | `(event: PointEvent) => void` | Called when a day is clicked, or Enter is pressed on the focused plot. The plot shows a pointer cursor while it is set. |
-| `onPointHover` | `(event: PointEvent \| null) => void` | Called as the hovered (or keyboard-focused) day changes; `null` on leave. |
-| `onLegendChange` | `(state: {hidden: string[]}) => void` | Called when the legend shows or hides a series. |
-| `renderTooltip` | `(context: TooltipContext) => ReactNode` | Replaces the tooltip's contents with React content, rendered through a portal, so your components and context work inside it. The chart keeps the box, its placement and its screen reader announcement. Return `null` for the default tooltip. |
-| `formatYTick` | `(value: number, defaultLabel: string) => string` | Rewrites a y-axis label. |
-| `formatXTick` | `(x: string, defaultLabel: string) => string` | Rewrites an x-axis label. |
+| Prop             | Type                                              | Description                                                                                                                                                                                                                                                  |
+| ---------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `spec`           | `ChartSpec`                                       | Required. The chart to draw. Compared by serialized value, including object key order, so an inline object literal with the same serialization does not redraw it; a changed spec updates the chart in place. Unserializable specs are compared by identity. |
+| `style`          | `CSSProperties`                                   | Inline style for the container `div`. Line and bar charts fill the container, so give it a height.                                                                                                                                                           |
+| `className`      | `string`                                          | Class name for the container `div`.                                                                                                                                                                                                                          |
+| `id`             | `string`                                          | `id` for the container `div`.                                                                                                                                                                                                                                |
+| `onError`        | `(error: SpecError) => void`                      | Called when validation fails on mount or when the serialized spec or set of callback options changes, with the same `{path, message}` list as `validate` in `error.errors`. An unchanged invalid spec can be reported again.                                 |
+| `ref`            | `Ref<HTMLDivElement>`                             | Forwarded to the container `div`.                                                                                                                                                                                                                            |
+| `onPointClick`   | `(event: PointEvent) => void`                     | Called when a day is clicked, or Enter is pressed on the focused plot. The plot shows a pointer cursor while it is set.                                                                                                                                      |
+| `onPointHover`   | `(event: PointEvent \| null) => void`             | Called as the hovered (or keyboard-focused) day changes; `null` on leave.                                                                                                                                                                                    |
+| `onLegendChange` | `(state: {hidden: string[]}) => void`             | Called when the legend shows or hides a series.                                                                                                                                                                                                              |
+| `renderTooltip`  | `(context: TooltipContext) => ReactNode`          | Replaces the tooltip's contents with React content, rendered through a portal, so your components and context work inside it. The chart keeps the box, its placement and its screen reader announcement. Return `null` for the default tooltip.              |
+| `formatYTick`    | `(value: number, defaultLabel: string) => string` | Rewrites a y-axis label.                                                                                                                                                                                                                                     |
+| `formatXTick`    | `(x: string, defaultLabel: string) => string`     | Rewrites an x-axis label.                                                                                                                                                                                                                                    |
 
 The component renders one `div` and draws the chart into it after mount; it
 is removed on unmount. Rendering twice under `StrictMode` leaves one chart.
@@ -225,16 +225,27 @@ charts.
   "kpi": {"basis": "total", "value": 179431180, "comparisonValue": 156955125},
   "chart": {"type": "line"},
   "series": [
-    {"label": "2026", "data": [
-      {"x": "2026-11-26", "y": 28641025}, {"x": "2026-11-27", "y": 41200025},
-      {"x": "2026-11-28", "y": 33895080}, {"x": "2026-11-29", "y": 30122040},
-      {"x": "2026-11-30", "y": 45573010}
-    ]},
-    {"label": "2025", "comparison": true, "data": [
-      {"x": "2025-11-27", "y": 25180000}, {"x": "2025-11-28", "y": 35010000},
-      {"x": "2025-11-29", "y": 29740050}, {"x": "2025-11-30", "y": 26895000},
-      {"x": "2025-12-01", "y": 40130075}
-    ]}
+    {
+      "label": "2026",
+      "data": [
+        {"x": "2026-11-26", "y": 28641025},
+        {"x": "2026-11-27", "y": 41200025},
+        {"x": "2026-11-28", "y": 33895080},
+        {"x": "2026-11-29", "y": 30122040},
+        {"x": "2026-11-30", "y": 45573010}
+      ]
+    },
+    {
+      "label": "2025",
+      "comparison": true,
+      "data": [
+        {"x": "2025-11-27", "y": 25180000},
+        {"x": "2025-11-28", "y": 35010000},
+        {"x": "2025-11-29", "y": 29740050},
+        {"x": "2025-11-30", "y": 26895000},
+        {"x": "2025-12-01", "y": 40130075}
+      ]
+    }
   ]
 }
 ```
@@ -252,16 +263,27 @@ The comparison series is drawn as a muted dashed line under the primary one.
   "kpi": {"basis": "total", "value": 22300, "comparisonValue": 20283},
   "chart": {"type": "bar"},
   "series": [
-    {"label": "2026", "data": [
-      {"x": "2026-11-26", "y": 3412}, {"x": "2026-11-27", "y": 5208},
-      {"x": "2026-11-28", "y": 4110}, {"x": "2026-11-29", "y": 3694},
-      {"x": "2026-11-30", "y": 5876}
-    ]},
-    {"label": "2025", "comparison": true, "data": [
-      {"x": "2025-11-27", "y": 3050}, {"x": "2025-11-28", "y": 4710},
-      {"x": "2025-11-29", "y": 3820}, {"x": "2025-11-30", "y": 3402},
-      {"x": "2025-12-01", "y": 5301}
-    ]}
+    {
+      "label": "2026",
+      "data": [
+        {"x": "2026-11-26", "y": 3412},
+        {"x": "2026-11-27", "y": 5208},
+        {"x": "2026-11-28", "y": 4110},
+        {"x": "2026-11-29", "y": 3694},
+        {"x": "2026-11-30", "y": 5876}
+      ]
+    },
+    {
+      "label": "2025",
+      "comparison": true,
+      "data": [
+        {"x": "2025-11-27", "y": 3050},
+        {"x": "2025-11-28", "y": 4710},
+        {"x": "2025-11-29", "y": 3820},
+        {"x": "2025-11-30", "y": 3402},
+        {"x": "2025-12-01", "y": 5301}
+      ]
+    }
   ]
 }
 ```
@@ -288,9 +310,27 @@ for how many bars stay readable.
   "format": {"style": "currency", "currency": "usd", "unit": "major"},
   "chart": {"type": "bar", "stacking": "stacked"},
   "series": [
-    {"label": "Charges", "data": [{"x": "2026-11-27", "y": 412000}, {"x": "2026-11-28", "y": 338950}]},
-    {"label": "Refunds", "data": [{"x": "2026-11-27", "y": -45320}, {"x": "2026-11-28", "y": -30510}]},
-    {"label": "Disputes", "data": [{"x": "2026-11-27", "y": -14420}, {"x": "2026-11-28", "y": -7460}]}
+    {
+      "label": "Charges",
+      "data": [
+        {"x": "2026-11-27", "y": 412000},
+        {"x": "2026-11-28", "y": 338950}
+      ]
+    },
+    {
+      "label": "Refunds",
+      "data": [
+        {"x": "2026-11-27", "y": -45320},
+        {"x": "2026-11-28", "y": -30510}
+      ]
+    },
+    {
+      "label": "Disputes",
+      "data": [
+        {"x": "2026-11-27", "y": -14420},
+        {"x": "2026-11-28", "y": -7460}
+      ]
+    }
   ]
 }
 ```
@@ -327,12 +367,20 @@ point's value and change in the KPI, and leaving restores it.
   "format": {"style": "currency", "currency": "usd", "unit": "major"},
   "kpi": {"basis": "latest", "value": 294470, "comparisonValue": 238630},
   "chart": {"type": "kpi"},
-  "series": [{"label": "MRR", "data": [
-    {"x": "2026-10-26", "y": 238630}, {"x": "2026-10-27", "y": 251200},
-    {"x": "2026-10-28", "y": 262900}, {"x": "2026-10-29", "y": 270400},
-    {"x": "2026-10-30", "y": 281150}, {"x": "2026-10-31", "y": 288020},
-    {"x": "2026-11-01", "y": 294470}
-  ]}]
+  "series": [
+    {
+      "label": "MRR",
+      "data": [
+        {"x": "2026-10-26", "y": 238630},
+        {"x": "2026-10-27", "y": 251200},
+        {"x": "2026-10-28", "y": 262900},
+        {"x": "2026-10-29", "y": 270400},
+        {"x": "2026-10-30", "y": 281150},
+        {"x": "2026-10-31", "y": 288020},
+        {"x": "2026-11-01", "y": 294470}
+      ]
+    }
+  ]
 }
 ```
 
@@ -349,7 +397,12 @@ next to it as visually hidden text, and the accessible summary uses it too.
   "version": 1,
   "title": "New ARR",
   "format": {"style": "currency", "currency": "usd", "unit": "major"},
-  "kpi": {"basis": "custom", "value": 3798040, "comparisonValue": 3705405, "notation": "compact"},
+  "kpi": {
+    "basis": "custom",
+    "value": 3798040,
+    "comparisonValue": 3705405,
+    "notation": "compact"
+  },
   "chart": {"type": "kpi"}
 }
 ```
@@ -385,44 +438,44 @@ Unknown fields are rejected, so a typo is reported instead of silently
 ignored. Paths use `[]` for "each item of the array". The same descriptions
 are in the TypeScript types and the JSON Schema.
 
-| Field | Type | Default | Description |
-|---|---|---|---|
-| `version` | `1` | required | The spec format version. See [Spec versions](#spec-versions). |
-| `title` | string, 1 to 200 characters | required | Card title shown at the top. |
-| `description` | string, up to 500 characters | none | One-line subtitle under the title. |
-| `format` | object | `{"style": "number"}` | How values (KPI, axis ticks, tooltip) are formatted. Chosen by `format.style`. |
-| `format.style` | `"number"`, `"currency"` or `"percent"` | required in `format` | `"number"` for plain numbers, `"currency"` for money, `"percent"` for ratios (0.25 is 25%). |
-| `format.currency` | string | required for `"currency"` | Three-letter ISO 4217 code, any case: `"usd"`, `"JPY"`. Only allowed with `"currency"`. |
-| `format.unit` | `"minor"` or `"major"` (currency); `"ratio"` or `"percent"` (percent) | required for `"currency"` and `"percent"` | How to read the numbers. See [Units and correctness](#units-and-correctness). Not allowed with `"number"`. |
-| `format.maximumFractionDigits` | integer, 0 to 20 | 2 for `"number"`, 1 for `"percent"` | Most decimals to show. Not allowed with `"currency"`: the currency decides. |
-| `locale` | string | `"en-US"` | BCP 47 language tag for number and date formatting, for example `"ja-JP"`. |
-| `timeZone` | string | required when any `x` is a date-time; otherwise `"UTC"` | IANA time zone for date-time values, for example `"America/New_York"`. See [Dates](#dates-and-time-zones). |
-| `kpi` | object | none | Headline value shown above the chart. |
-| `kpi.value` | number | required in `kpi` | The headline value, in the units of `format`. |
-| `kpi.basis` | `"total"`, `"latest"`, `"average"` or `"custom"` | required in `kpi` | How `kpi.value` relates to the primary series; checked unless `"custom"`. See [Units and correctness](#units-and-correctness). |
-| `kpi.comparisonValue` | number | none | Value to compare against. The change is shown as a signed percentage; omitted when this is missing or 0. |
-| `kpi.notation` | `"standard"` or `"compact"` | `"standard"` | How the KPI value is written: in full (`$294,470`) or abbreviated as the locale does (`$294K`, `$3.8M`, `￥2.6億`, `3,8 Mio. €`; some locales, such as `de-DE`, don't abbreviate thousands). Values under 1,000 and percentages are always written in full. |
-| `kpi.goodDirection` | `"up"` or `"down"` | `"up"` | Which way a change is good, for its color: `"down"` for churn, refund or dispute rates, so a fall shows green. Applies to the KPI, the hover KPI and the sparkline. |
-| `chart` | object | `{"type": "line"}` | Chart options. |
-| `chart.type` | `"line"`, `"bar"` or `"kpi"` | required in `chart` | `"kpi"` draws only the headline value, with no plot. |
-| `chart.legend` | `"auto"`, `"show"` or `"hide"` | `"auto"` | When the legend shows. See [Series colors and legend](#series-colors-and-legend). |
-| `chart.axes` | object | none | Axis label settings. See [Axes](#axes). |
-| `chart.incomplete` | `{from, message?}` | none | Marks the slots from `from` (a primary x) to the end as not final yet. See [Annotations, incomplete periods and forecasts](#annotations-incomplete-periods-and-forecasts). |
-| `chart.stacking` | `"grouped"` or `"stacked"` | `"grouped"` | How bar series share a slot: side by side, or stacked (positive values up from zero, negative values down). Only allowed when `chart.type` is `"bar"`; comparison series can't be stacked. |
-| `series` | array of 1 to 12 | required unless `chart.type` is `"kpi"` or `loading` is `true` | The series to plot. Put the primary series first. |
-| `series[].label` | string, 1 to 200 characters | required | Series name, shown in the tooltip and the chart's accessible summary. |
-| `series[].color` | `#rgb` or `#rrggbb` | palette | The series' color for its marks, legend, tooltip and sparkline. |
-| `series[].comparison` | boolean | `false` | `true` draws the series in the muted comparison style, for example last year. |
-| `series[].data` | array of up to 1000 | required | Points in display order. May be empty. |
-| `series[].data[].x` | string | required | `"YYYY-MM-DD"` for a calendar day, or an ISO 8601 date-time with `Z` or an offset, for example `"2026-11-27T18:00:00Z"`. |
-| `series[].data[].color` | `#rgb` or `#rrggbb` | the series color | Bar charts only: this bar's color. |
-| `series[].data[].forecast` | boolean | `false` | `true` for a forecast; forecast points run to the end of the series. |
-| `series[].data[].low`, `series[].data[].high` | number | none | Forecast points only: the range, `low <= y <= high`. |
-| `series[].data[].projected` | number | none | Incomplete points of a non-comparison series only: where the unfinished period is on pace to end, same units and sign as `y`, and on bar charts at least as far from zero. `y` stays the value so far. See [Annotations, incomplete periods and forecasts](#annotations-incomplete-periods-and-forecasts). |
-| `series[].data[].y` | number or `null` | required | The value in the units of `format`, or `null` for a gap. A JSON number, not a string. |
-| `emptyMessage` | string, up to 200 characters | `"No data"` | Message for an empty plot, in your language, for example `"No disputes this week"`. Plain text. |
-| `annotations` | array of up to 10 | none | Markers and ranges: `label` (up to 80 characters), optional `description` (up to 200), and `at` (with optional `series`) or `from`/`to`. |
-| `loading` | boolean | `false` | `true` while the data is being fetched: the card shows a placeholder shaped by `chart.type`, and `series` and `kpi` may be omitted. Call `update` with the data to replace it. |
+| Field                                         | Type                                                                  | Default                                                        | Description                                                                                                                                                                                                                                                                                                |
+| --------------------------------------------- | --------------------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `version`                                     | `1`                                                                   | required                                                       | The spec format version. See [Spec versions](#spec-versions).                                                                                                                                                                                                                                              |
+| `title`                                       | string, 1 to 200 characters                                           | required                                                       | Card title shown at the top.                                                                                                                                                                                                                                                                               |
+| `description`                                 | string, up to 500 characters                                          | none                                                           | One-line subtitle under the title.                                                                                                                                                                                                                                                                         |
+| `format`                                      | object                                                                | `{"style": "number"}`                                          | How values (KPI, axis ticks, tooltip) are formatted. Chosen by `format.style`.                                                                                                                                                                                                                             |
+| `format.style`                                | `"number"`, `"currency"` or `"percent"`                               | required in `format`                                           | `"number"` for plain numbers, `"currency"` for money, `"percent"` for ratios (0.25 is 25%).                                                                                                                                                                                                                |
+| `format.currency`                             | string                                                                | required for `"currency"`                                      | Three-letter ISO 4217 code, any case: `"usd"`, `"JPY"`. Only allowed with `"currency"`.                                                                                                                                                                                                                    |
+| `format.unit`                                 | `"minor"` or `"major"` (currency); `"ratio"` or `"percent"` (percent) | required for `"currency"` and `"percent"`                      | How to read the numbers. See [Units and correctness](#units-and-correctness). Not allowed with `"number"`.                                                                                                                                                                                                 |
+| `format.maximumFractionDigits`                | integer, 0 to 20                                                      | 2 for `"number"`, 1 for `"percent"`                            | Most decimals to show. Not allowed with `"currency"`: the currency decides.                                                                                                                                                                                                                                |
+| `locale`                                      | string                                                                | `"en-US"`                                                      | BCP 47 language tag for number and date formatting, for example `"ja-JP"`.                                                                                                                                                                                                                                 |
+| `timeZone`                                    | string                                                                | required when any `x` is a date-time; otherwise `"UTC"`        | IANA time zone for date-time values, for example `"America/New_York"`. See [Dates](#dates-and-time-zones).                                                                                                                                                                                                 |
+| `kpi`                                         | object                                                                | none                                                           | Headline value shown above the chart.                                                                                                                                                                                                                                                                      |
+| `kpi.value`                                   | number                                                                | required in `kpi`                                              | The headline value, in the units of `format`.                                                                                                                                                                                                                                                              |
+| `kpi.basis`                                   | `"total"`, `"latest"`, `"average"` or `"custom"`                      | required in `kpi`                                              | How `kpi.value` relates to the primary series; checked unless `"custom"`. See [Units and correctness](#units-and-correctness).                                                                                                                                                                             |
+| `kpi.comparisonValue`                         | number                                                                | none                                                           | Value to compare against. The change is shown as a signed percentage; omitted when this is missing or 0.                                                                                                                                                                                                   |
+| `kpi.notation`                                | `"standard"` or `"compact"`                                           | `"standard"`                                                   | How the KPI value is written: in full (`$294,470`) or abbreviated as the locale does (`$294K`, `$3.8M`, `￥2.6億`, `3,8 Mio. €`; some locales, such as `de-DE`, don't abbreviate thousands). Values under 1,000 and percentages are always written in full.                                                |
+| `kpi.goodDirection`                           | `"up"` or `"down"`                                                    | `"up"`                                                         | Which way a change is good, for its color: `"down"` for churn, refund or dispute rates, so a fall shows green. Applies to the KPI, the hover KPI and the sparkline.                                                                                                                                        |
+| `chart`                                       | object                                                                | `{"type": "line"}`                                             | Chart options.                                                                                                                                                                                                                                                                                             |
+| `chart.type`                                  | `"line"`, `"bar"` or `"kpi"`                                          | required in `chart`                                            | `"kpi"` draws only the headline value, with no plot.                                                                                                                                                                                                                                                       |
+| `chart.legend`                                | `"auto"`, `"show"` or `"hide"`                                        | `"auto"`                                                       | When the legend shows. See [Series colors and legend](#series-colors-and-legend).                                                                                                                                                                                                                          |
+| `chart.axes`                                  | object                                                                | none                                                           | Axis label settings. See [Axes](#axes).                                                                                                                                                                                                                                                                    |
+| `chart.incomplete`                            | `{from, message?}`                                                    | none                                                           | Marks the slots from `from` (a primary x) to the end as not final yet. See [Annotations, incomplete periods and forecasts](#annotations-incomplete-periods-and-forecasts).                                                                                                                                 |
+| `chart.stacking`                              | `"grouped"` or `"stacked"`                                            | `"grouped"`                                                    | How bar series share a slot: side by side, or stacked (positive values up from zero, negative values down). Only allowed when `chart.type` is `"bar"`; comparison series can't be stacked.                                                                                                                 |
+| `series`                                      | array of 1 to 12                                                      | required unless `chart.type` is `"kpi"` or `loading` is `true` | The series to plot. Put the primary series first.                                                                                                                                                                                                                                                          |
+| `series[].label`                              | string, 1 to 200 characters                                           | required                                                       | Series name, shown in the tooltip and the chart's accessible summary.                                                                                                                                                                                                                                      |
+| `series[].color`                              | `#rgb` or `#rrggbb`                                                   | palette                                                        | The series' color for its marks, legend, tooltip and sparkline.                                                                                                                                                                                                                                            |
+| `series[].comparison`                         | boolean                                                               | `false`                                                        | `true` draws the series in the muted comparison style, for example last year.                                                                                                                                                                                                                              |
+| `series[].data`                               | array of up to 1000                                                   | required                                                       | Points in display order. May be empty.                                                                                                                                                                                                                                                                     |
+| `series[].data[].x`                           | string                                                                | required                                                       | `"YYYY-MM-DD"` for a calendar day, or an ISO 8601 date-time with `Z` or an offset, for example `"2026-11-27T18:00:00Z"`.                                                                                                                                                                                   |
+| `series[].data[].color`                       | `#rgb` or `#rrggbb`                                                   | the series color                                               | Bar charts only: this bar's color.                                                                                                                                                                                                                                                                         |
+| `series[].data[].forecast`                    | boolean                                                               | `false`                                                        | `true` for a forecast; forecast points run to the end of the series.                                                                                                                                                                                                                                       |
+| `series[].data[].low`, `series[].data[].high` | number                                                                | none                                                           | Forecast points only: the range, `low <= y <= high`.                                                                                                                                                                                                                                                       |
+| `series[].data[].projected`                   | number                                                                | none                                                           | Incomplete points of a non-comparison series only: where the unfinished period is on pace to end, same units and sign as `y`, and on bar charts at least as far from zero. `y` stays the value so far. See [Annotations, incomplete periods and forecasts](#annotations-incomplete-periods-and-forecasts). |
+| `series[].data[].y`                           | number or `null`                                                      | required                                                       | The value in the units of `format`, or `null` for a gap. A JSON number, not a string.                                                                                                                                                                                                                      |
+| `emptyMessage`                                | string, up to 200 characters                                          | `"No data"`                                                    | Message for an empty plot, in your language, for example `"No disputes this week"`. Plain text.                                                                                                                                                                                                            |
+| `annotations`                                 | array of up to 10                                                     | none                                                           | Markers and ranges: `label` (up to 80 characters), optional `description` (up to 200), and `at` (with optional `series`) or `from`/`to`.                                                                                                                                                                   |
+| `loading`                                     | boolean                                                               | `false`                                                        | `true` while the data is being fetched: the card shows a placeholder shaped by `chart.type`, and `series` and `kpi` may be omitted. Call `update` with the data to replace it.                                                                                                                             |
 
 ### Spec versions
 
@@ -434,6 +487,11 @@ format it was written for. New optional fields don't change it.
 A spec whose version is newer than the package supports is rejected with only
 that one issue, since its other fields may be valid in the newer format:
 upgrade the package to render it.
+
+In TypeScript, `version` has the literal type `1`. A spec built in a variable
+with no `ChartSpec` annotation gets `version: number`, which `ChartSpec` (and
+so the React `spec` prop) rejects: annotate the variable, or write
+`version: specVersion`.
 
 ## Performance and data size
 
@@ -458,7 +516,8 @@ upgrade the package to render it.
       StripeCharts.render(entry.target, specs[entry.target.id]);
     }
   });
-  for (const element of document.querySelectorAll('.chart')) observer.observe(element);
+  for (const element of document.querySelectorAll('.chart'))
+    observer.observe(element);
   ```
 
 - **Lifecycle.** The script makes no network requests. Call `destroy()`
@@ -513,19 +572,18 @@ overrides them.
 Most component colors follow one of eleven semantic roles, `--sc-color-*`, so a
 theme sets those and only a few fixed colors:
 
-| Role | Colors |
-|---|---|
-| `--sc-color-surface` | Tile and tooltip backgrounds, and the rings that separate marks |
-| `--sc-color-text-primary` | Titles, values and other text read first |
-| `--sc-color-text-secondary` | Labels and descriptions, the legend, empty and error text, annotations and the incomplete period |
-| `--sc-color-text-muted` | Tooltip dates, labels and notes |
-| `--sc-color-text-subtle` | Axis labels and the legend's forecast key |
-| `--sc-color-border` | Tile and card outlines |
-| `--sc-color-divider` | Gridlines, thin rules (tooltip divider) and loading placeholder marks |
-| `--sc-color-fill-subtle` | Quiet fills: the empty-state icon, button hovers and loading placeholders |
-| `--sc-color-good`, `--sc-color-bad` | KPI changes in the good and bad direction |
-| `--sc-color-focus-ring` | Keyboard focus outlines |
-
+| Role                                | Colors                                                                                           |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `--sc-color-surface`                | Tile and tooltip backgrounds, and the rings that separate marks                                  |
+| `--sc-color-text-primary`           | Titles, values and other text read first                                                         |
+| `--sc-color-text-secondary`         | Labels and descriptions, the legend, empty and error text, annotations and the incomplete period |
+| `--sc-color-text-muted`             | Tooltip dates, labels and notes                                                                  |
+| `--sc-color-text-subtle`            | Axis labels and the legend's forecast key                                                        |
+| `--sc-color-border`                 | Tile and card outlines                                                                           |
+| `--sc-color-divider`                | Gridlines, thin rules (tooltip divider) and loading placeholder marks                            |
+| `--sc-color-fill-subtle`            | Quiet fills: the empty-state icon, button hovers and loading placeholders                        |
+| `--sc-color-good`, `--sc-color-bad` | KPI changes in the good and bad direction                                                        |
+| `--sc-color-focus-ring`             | Keyboard focus outlines                                                                          |
 
 ```css
 /* A dark theme for every chart on the page */
@@ -568,6 +626,7 @@ custom colors for contrast against the background. After changing tokens,
 regenerate the table with `node scripts/theming-table.js --write`; the build
 fails while it is out of date.
 
+<!-- prettier-ignore-start -->
 <!-- theming-table:start (generated by scripts/theming-table.js) -->
 
 **`font`**: Font stacks and numeral style.
@@ -898,6 +957,7 @@ fails while it is out of date.
 | `--sc-sparkline-halo-opacity` | `0.2` | halo opacity |
 
 <!-- theming-table:end -->
+<!-- prettier-ignore-end -->
 
 ## Formatting
 
@@ -945,12 +1005,12 @@ For example, compare five-day sales campaigns that began on different dates.
 Put corresponding campaign days in the same slots:
 
 | Index | 2026 (`series[0]`) | 2025 (`series[1]`, `comparison: true`) |
-|---|---|---|
-| 0 | `2026-11-26` | `2025-11-27` |
-| 1 | `2026-11-27` | `2025-11-28` |
-| 2 | `2026-11-28` | `2025-11-29` |
-| 3 | `2026-11-29` | `2025-11-30` |
-| 4 | `2026-11-30` | `2025-12-01` |
+| ----- | ------------------ | -------------------------------------- |
+| 0     | `2026-11-26`       | `2025-11-27`                           |
+| 1     | `2026-11-27`       | `2025-11-28`                           |
+| 2     | `2026-11-28`       | `2025-11-29`                           |
+| 3     | `2026-11-29`       | `2025-11-30`                           |
+| 4     | `2026-11-30`       | `2025-12-01`                           |
 
 Hovering index 1 shows a tooltip headed "Nov 27" with a row for 2026 and a
 row for 2025 (which is Nov 28, 2025). Series may have different lengths; the
@@ -975,11 +1035,18 @@ inside an annotation adds it to the tooltip.
   "title": "Gross volume",
   "format": {"style": "currency", "currency": "usd", "unit": "minor"},
   "chart": {"type": "line"},
-  "series": [{"label": "2026", "data": [
-    {"x": "2026-11-26", "y": 28641025}, {"x": "2026-11-27", "y": 41200025},
-    {"x": "2026-11-28", "y": 33895080}, {"x": "2026-11-29", "y": 30122040},
-    {"x": "2026-11-30", "y": 45573010}
-  ]}],
+  "series": [
+    {
+      "label": "2026",
+      "data": [
+        {"x": "2026-11-26", "y": 28641025},
+        {"x": "2026-11-27", "y": 41200025},
+        {"x": "2026-11-28", "y": 33895080},
+        {"x": "2026-11-29", "y": 30122040},
+        {"x": "2026-11-30", "y": 45573010}
+      ]
+    }
+  ],
   "annotations": [
     {"label": "Campaign launch", "at": "2026-11-27"},
     {"label": "Campaign close", "at": "2026-11-30"},
@@ -1031,11 +1098,11 @@ forecast starts.
 
 `chart.axes` adjusts the labels without callbacks:
 
-| Field | Values | Default |
-|---|---|---|
-| `chart.axes.x.labels` | `"auto"`, `"day"`, `"month"`, `"year"` or `"time"` | `"auto"`: picks hours, days, weeks, months or years from the data |
-| `chart.axes.y.notation` | `"compact"` (`$300K`) or `"standard"` (`$300,000`) | `"compact"`, exact enough to tell every tick apart |
-| `chart.axes.y.maximumFractionDigits` | integer, 0 to 20 | chosen per axis |
+| Field                                | Values                                             | Default                                                           |
+| ------------------------------------ | -------------------------------------------------- | ----------------------------------------------------------------- |
+| `chart.axes.x.labels`                | `"auto"`, `"day"`, `"month"`, `"year"` or `"time"` | `"auto"`: picks hours, days, weeks, months or years from the data |
+| `chart.axes.y.notation`              | `"compact"` (`$300K`) or `"standard"` (`$300,000`) | `"compact"`, exact enough to tell every tick apart                |
+| `chart.axes.y.maximumFractionDigits` | integer, 0 to 20                                   | chosen per axis                                                   |
 
 Labels are still thinned to fit, and never collide. For anything else, use
 the `formatYTick` and `formatXTick` [render options](#render-options).
@@ -1044,38 +1111,38 @@ the `formatYTick` and `formatXTick` [render options](#render-options).
 
 Every problem names the field path and what was expected. Common ones:
 
-| Message | Fix |
-|---|---|
-| `version: required; expected 1, the spec format version` | Add `"version": 1`. |
-| `version: spec version 2 is newer than this package supports (up to 1); upgrade @stripe/charts to render it` | Upgrade the package. The spec was written for a newer format. |
-| `title: required; expected a non-empty string` | Add a `title`. |
-| `subtitle: unexpected field "subtitle"; did you mean "description"?` | Rename the field. Misspellings and common alternatives get a suggestion, for example `date` -> `x`, `value` -> `y`, `type` -> `chart.type`. |
-| `format.currency: required when format.style is "currency"; expected an ISO 4217 code like "usd"` | Add `currency`. |
-| `format.maximumFractionDigits: unexpected field "maximumFractionDigits"; not allowed for currencies; the currency decides the decimals` | Remove it; currency amounts use the currency's decimals. |
-| `format.unit: required for currency; Stripe API amounts are in minor units (1999 = $19.99), so use "minor" for those, or "major" if the values are already converted` | Add `"unit": "minor"` for amounts straight from the Stripe API. |
-| `format.unit: required for percent; use "ratio" if 0.025 means 2.5%, or "percent" if 2.5 means 2.5%` | Add the unit your numbers use. |
-| `format.unit: expected one of "minor", "major", got "cents"; did you mean "minor"?` | Use one of the listed values. |
-| `kpi.basis: required; expected how kpi.value relates to the primary series: "total" (its sum), "latest" (its last value), "average" (its mean), or "custom" for a figure computed elsewhere` | Add the basis that describes how you computed `kpi.value`. |
-| `kpi.value: expected about 412000.25 for basis "total" (the sum of series[0]'s actual values), got the number 300000; fix the value, pick the basis that matches it, or use "custom" for a figure computed differently` | The KPI and the series disagree. Fix whichever is wrong, or use `"custom"` if the KPI is computed another way. |
-| `kpi.comparisonValue: expected about 6 for basis "latest" (series[1]'s value at slot 1, where series[0]'s latest actual value is), got the number 9; ...` | The comparison is checked at the same slot as the primary's latest actual value (for `"total"` and `"average"`, over the primary's actual slots), so a plan or a longer last-year series past that point doesn't count. |
-| `timeZone: required because series[0].data[0].x is a date-time; expected the IANA time zone the data was reported in, like "America/New_York", or "UTC" if its times are UTC` | Add `timeZone`. |
-| `kpi.notation: expected one of "standard", "compact", got "short"; did you mean "compact"?` | Use `"compact"` to abbreviate or `"standard"` for the full value. |
-| `annotations[0].at: expected an x value of the primary series, written exactly as there (series line up by position), got "2026-11-29"; nearest are "2026-11-28", ...` | Use one of the primary series' own x values. The same applies to `from`, `to` and `chart.incomplete.from`. |
-| `annotations[0]: expected "at" for a marker, or "from" and/or "to" for a shaded range` | Give the annotation a place. |
-| `series[0].data[1].forecast: expected true: forecast points must run to the end of the series, ...` | Put every forecast point after the actual ones. |
-| `series[0].data[0].projected: only for points inside chart.incomplete (from "2026-12-02"); this point is final, so leave out "projected"` | Only unfinished points can carry a projection. Without `chart.incomplete`, set its `from` to the first unfinished x. Comparison series and forecast points can't have one either. |
-| `series[0].data[1].projected: expected the same sign as y (30), since the projection extends the value so far` | Keep `projected` on the same side of zero as `y`, and give the point a `y`. |
-| `series[0].data[1].projected: expected at least y (4.2) on a bar chart, since the projection extends the bar beyond the value so far; ...` | On bars, a projection only extends the value so far. For a value on pace to end lower, such as a rate, use a line chart. |
-| `series[0].data[1].low: expected at most y (2), got the number 3` | Keep `low <= y <= high`. |
-| `series[0].color: expected a hex color like "#635bff" or "#fff", got "red"` | Use `#rgb` or `#rrggbb` hex. |
-| `chart.type: expected one of "line", "bar", "kpi", got "area"` | Use a supported type. |
-| `series: required unless chart.type is "kpi" or loading is true; expected an array of 1 to 12 series` | Add `series`, use `"chart": {"type": "kpi"}`, or set `loading: true` until the data arrives. |
-| `chart.stacking: only allowed when chart.type is "bar"; got chart.type "line"` | Remove `stacking`, or use a bar chart. |
-| `series[1].comparison: comparison series can't be stacked; use chart.stacking "grouped" or remove "comparison"` | Group the bars, or drop `comparison`. |
-| `series: expected 1 to 12 items, got 0` | Give at least one series. To show "No data", pass series with empty `data` arrays. |
-| `series[0].data[0].x: expected an ISO date like "2026-11-27" or a date-time like "2026-11-27T18:00:00Z", got "Nov 27"` | Send ISO dates. Date-times need `Z` or an offset. |
-| `series[0].data[1].y: expected a finite number or null, got "338950.80"` | Send a JSON number, not a string; `null` marks a gap. |
-| `timeZone: "Mars/Base" is not an IANA time zone this browser supports` | Use a zone the browser's `Intl` knows, such as `"America/New_York"`. The same applies to `locale` and `format.currency`. |
+| Message                                                                                                                                                                                                                 | Fix                                                                                                                                                                                                                     |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `version: required; expected 1, the spec format version`                                                                                                                                                                | Add `"version": 1`.                                                                                                                                                                                                     |
+| `version: spec version 2 is newer than this package supports (up to 1); upgrade @stripe/charts to render it`                                                                                                            | Upgrade the package. The spec was written for a newer format.                                                                                                                                                           |
+| `title: required; expected a non-empty string`                                                                                                                                                                          | Add a `title`.                                                                                                                                                                                                          |
+| `subtitle: unexpected field "subtitle"; did you mean "description"?`                                                                                                                                                    | Rename the field. Misspellings and common alternatives get a suggestion, for example `date` -> `x`, `value` -> `y`, `type` -> `chart.type`.                                                                             |
+| `format.currency: required when format.style is "currency"; expected an ISO 4217 code like "usd"`                                                                                                                       | Add `currency`.                                                                                                                                                                                                         |
+| `format.maximumFractionDigits: unexpected field "maximumFractionDigits"; not allowed for currencies; the currency decides the decimals`                                                                                 | Remove it; currency amounts use the currency's decimals.                                                                                                                                                                |
+| `format.unit: required for currency; Stripe API amounts are in minor units (1999 = $19.99), so use "minor" for those, or "major" if the values are already converted`                                                   | Add `"unit": "minor"` for amounts straight from the Stripe API.                                                                                                                                                         |
+| `format.unit: required for percent; use "ratio" if 0.025 means 2.5%, or "percent" if 2.5 means 2.5%`                                                                                                                    | Add the unit your numbers use.                                                                                                                                                                                          |
+| `format.unit: expected one of "minor", "major", got "cents"; did you mean "minor"?`                                                                                                                                     | Use one of the listed values.                                                                                                                                                                                           |
+| `kpi.basis: required; expected how kpi.value relates to the primary series: "total" (its sum), "latest" (its last value), "average" (its mean), or "custom" for a figure computed elsewhere`                            | Add the basis that describes how you computed `kpi.value`.                                                                                                                                                              |
+| `kpi.value: expected about 412000.25 for basis "total" (the sum of series[0]'s actual values), got the number 300000; fix the value, pick the basis that matches it, or use "custom" for a figure computed differently` | The KPI and the series disagree. Fix whichever is wrong, or use `"custom"` if the KPI is computed another way.                                                                                                          |
+| `kpi.comparisonValue: expected about 6 for basis "latest" (series[1]'s value at slot 1, where series[0]'s latest actual value is), got the number 9; ...`                                                               | The comparison is checked at the same slot as the primary's latest actual value (for `"total"` and `"average"`, over the primary's actual slots), so a plan or a longer last-year series past that point doesn't count. |
+| `timeZone: required because series[0].data[0].x is a date-time; expected the IANA time zone the data was reported in, like "America/New_York", or "UTC" if its times are UTC`                                           | Add `timeZone`.                                                                                                                                                                                                         |
+| `kpi.notation: expected one of "standard", "compact", got "short"; did you mean "compact"?`                                                                                                                             | Use `"compact"` to abbreviate or `"standard"` for the full value.                                                                                                                                                       |
+| `annotations[0].at: expected an x value of the primary series, written exactly as there (series line up by position), got "2026-11-29"; nearest are "2026-11-28", ...`                                                  | Use one of the primary series' own x values. The same applies to `from`, `to` and `chart.incomplete.from`.                                                                                                              |
+| `annotations[0]: expected "at" for a marker, or "from" and/or "to" for a shaded range`                                                                                                                                  | Give the annotation a place.                                                                                                                                                                                            |
+| `series[0].data[1].forecast: expected true: forecast points must run to the end of the series, ...`                                                                                                                     | Put every forecast point after the actual ones.                                                                                                                                                                         |
+| `series[0].data[0].projected: only for points inside chart.incomplete (from "2026-12-02"); this point is final, so leave out "projected"`                                                                               | Only unfinished points can carry a projection. Without `chart.incomplete`, set its `from` to the first unfinished x. Comparison series and forecast points can't have one either.                                       |
+| `series[0].data[1].projected: expected the same sign as y (30), since the projection extends the value so far`                                                                                                          | Keep `projected` on the same side of zero as `y`, and give the point a `y`.                                                                                                                                             |
+| `series[0].data[1].projected: expected at least y (4.2) on a bar chart, since the projection extends the bar beyond the value so far; ...`                                                                              | On bars, a projection only extends the value so far. For a value on pace to end lower, such as a rate, use a line chart.                                                                                                |
+| `series[0].data[1].low: expected at most y (2), got the number 3`                                                                                                                                                       | Keep `low <= y <= high`.                                                                                                                                                                                                |
+| `series[0].color: expected a hex color like "#635bff" or "#fff", got "red"`                                                                                                                                             | Use `#rgb` or `#rrggbb` hex.                                                                                                                                                                                            |
+| `chart.type: expected one of "line", "bar", "kpi", got "area"`                                                                                                                                                          | Use a supported type.                                                                                                                                                                                                   |
+| `series: required unless chart.type is "kpi" or loading is true; expected an array of 1 to 12 series`                                                                                                                   | Add `series`, use `"chart": {"type": "kpi"}`, or set `loading: true` until the data arrives.                                                                                                                            |
+| `chart.stacking: only allowed when chart.type is "bar"; got chart.type "line"`                                                                                                                                          | Remove `stacking`, or use a bar chart.                                                                                                                                                                                  |
+| `series[1].comparison: comparison series can't be stacked; use chart.stacking "grouped" or remove "comparison"`                                                                                                         | Group the bars, or drop `comparison`.                                                                                                                                                                                   |
+| `series: expected 1 to 12 items, got 0`                                                                                                                                                                                 | Give at least one series. To show "No data", pass series with empty `data` arrays.                                                                                                                                      |
+| `series[0].data[0].x: expected an ISO date like "2026-11-27" or a date-time like "2026-11-27T18:00:00Z", got "Nov 27"`                                                                                                  | Send ISO dates. Date-times need `Z` or an offset.                                                                                                                                                                       |
+| `series[0].data[1].y: expected a finite number or null, got "338950.80"`                                                                                                                                                | Send a JSON number, not a string; `null` marks a gap.                                                                                                                                                                   |
+| `timeZone: "Mars/Base" is not an IANA time zone this browser supports`                                                                                                                                                  | Use a zone the browser's `Intl` knows, such as `"America/New_York"`. The same applies to `locale` and `format.currency`.                                                                                                |
 
 All problems are reported at once, so a spec can be fixed in one pass.
 

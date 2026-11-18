@@ -124,7 +124,7 @@ export function interpolateModel(
         const scale = hiding ? 1 - t : t;
         return {
           ...point,
-          y: (hiding ? old?.y ?? point.y : point.y) * scale,
+          y: (hiding ? (old?.y ?? point.y) : point.y) * scale,
           projected: point.projected === null ? null : point.projected * scale,
         };
       }

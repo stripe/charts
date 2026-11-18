@@ -292,9 +292,10 @@ export function layoutXAxis(input: XAxisInput): XLabel[] {
       crossesYears && !starts.some(isNewYear) ? 'dateYear' : 'date';
     const ticks: XTick[] = [
       {time: first.time, kind: firstKind},
-      ...starts.map(
-        (time): XTick => ({time, kind: isNewYear(time) ? 'year' : 'date'}),
-      ),
+      ...starts.map((time): XTick => ({
+        time,
+        kind: isNewYear(time) ? 'year' : 'date',
+      })),
     ];
     const labels = place(ticks, timed, input);
     return fits(labels, 0, input) ? labels : null;

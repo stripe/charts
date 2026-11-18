@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -30,8 +30,9 @@
         --good: #4ade80;
         --warn: #fbbf24;
         --bad: #fb7185;
-        --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-          Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        --font:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+          Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
           'Segoe UI Symbol';
         --gap: 12px;
         color-scheme: dark;
@@ -230,7 +231,6 @@
         --sc-error-title-color: var(--text);
         --sc-error-issue-color: var(--text-secondary);
         --sc-error-path-color: var(--text);
-
       }
       .tile .sc-root {
         --sc-series-primary-0: var(--accent);
@@ -417,9 +417,15 @@
       <div class="tile" id="tile-transit" style="--accent: #a78bfa"></div>
       <div class="tile" id="tile-disputes" style="--accent: #fbbf24"></div>
 
-      <section class="panel span-7 volume"><div class="chart" id="volume"></div></section>
-      <section class="panel span-5 brands"><div class="chart" id="brands"></div></section>
-      <section class="panel span-7 reasons"><div class="chart" id="reasons"></div></section>
+      <section class="panel span-7 volume">
+        <div class="chart" id="volume"></div>
+      </section>
+      <section class="panel span-5 brands">
+        <div class="chart" id="brands"></div>
+      </section>
+      <section class="panel span-7 reasons">
+        <div class="chart" id="reasons"></div>
+      </section>
       <section class="panel span-5 payouts" aria-labelledby="payouts-title">
         <h2 id="payouts-title">Recent large payouts</h2>
         <p class="note">Over $25,000, newest first</p>
@@ -469,23 +475,55 @@
       };
 
       // Successful payments per hour, and their amounts in cents.
-      const paymentsToday = [112, 68, 41, 28, 22, 35, 74, 168, 312, 436, 590, 861, 1043, 918, 512, 402];
-      const paymentsLastWeek = [104, 71, 45, 30, 25, 38, 70, 159, 298, 420, 571, 832, 1011, 934, 707, 372];
-      const volumeToday = [296534, 193615, 115778, 75080, 60472, 95755, 206641, 475582, 822520, 1141421, 1677968, 2351541, 2944846, 2396521, 1400171, 1130437];
-      const volumeLastWeek = [299280, 204153, 118163, 79013, 71098, 107011, 195827, 428708, 828340, 1167560, 1583233, 2208417, 2760624, 2540656, 1988397, 1074540];
+      const paymentsToday = [
+        112, 68, 41, 28, 22, 35, 74, 168, 312, 436, 590, 861, 1043, 918, 512,
+        402,
+      ];
+      const paymentsLastWeek = [
+        104, 71, 45, 30, 25, 38, 70, 159, 298, 420, 571, 832, 1011, 934, 707,
+        372,
+      ];
+      const volumeToday = [
+        296534, 193615, 115778, 75080, 60472, 95755, 206641, 475582, 822520,
+        1141421, 1677968, 2351541, 2944846, 2396521, 1400171, 1130437,
+      ];
+      const volumeLastWeek = [
+        299280, 204153, 118163, 79013, 71098, 107011, 195827, 428708, 828340,
+        1167560, 1583233, 2208417, 2760624, 2540656, 1988397, 1074540,
+      ];
 
       // Share of attempts that were approved, overall and by card brand.
-      const rateToday = [0.9533, 0.9502, 0.9561, 0.9444, 0.9588, 0.9484, 0.9517, 0.9531, 0.9491, 0.9518, 0.9514, 0.9529, 0.9522, 0.9556, 0.8734, 0.9443];
-      const rateLastWeek = [0.9519, 0.9492, 0.9422, 0.964, 0.9382, 0.9531, 0.9578, 0.948, 0.9537, 0.9544, 0.9475, 0.9515, 0.9554, 0.9524, 0.9557, 0.9489];
+      const rateToday = [
+        0.9533, 0.9502, 0.9561, 0.9444, 0.9588, 0.9484, 0.9517, 0.9531, 0.9491,
+        0.9518, 0.9514, 0.9529, 0.9522, 0.9556, 0.8734, 0.9443,
+      ];
+      const rateLastWeek = [
+        0.9519, 0.9492, 0.9422, 0.964, 0.9382, 0.9531, 0.9578, 0.948, 0.9537,
+        0.9544, 0.9475, 0.9515, 0.9554, 0.9524, 0.9557, 0.9489,
+      ];
       const brandRates = {
-        Visa: [0.9567, 0.9515, 0.9665, 0.9492, 0.9631, 0.958, 0.9567, 0.9621, 0.9564, 0.9612, 0.9568, 0.9571, 0.9611, 0.9659, 0.8625, 0.9467],
-        Mastercard: [0.9588, 0.9684, 0.9573, 0.9519, 0.9693, 0.9414, 0.9593, 0.9525, 0.9507, 0.9504, 0.9527, 0.9588, 0.9512, 0.956, 0.8417, 0.9445],
-        'American Express': [0.9324, 0.9179, 0.9178, 0.9222, 0.9364, 0.9288, 0.9288, 0.932, 0.9304, 0.9286, 0.9345, 0.9334, 0.9279, 0.9319, 0.9273, 0.9355],
-        Discover: [0.9509, 0.9376, 0.9584, 0.9325, 0.9415, 0.9517, 0.9398, 0.9439, 0.9385, 0.946, 0.9472, 0.9449, 0.9485, 0.9418, 0.9343, 0.9451],
+        Visa: [
+          0.9567, 0.9515, 0.9665, 0.9492, 0.9631, 0.958, 0.9567, 0.9621, 0.9564,
+          0.9612, 0.9568, 0.9571, 0.9611, 0.9659, 0.8625, 0.9467,
+        ],
+        Mastercard: [
+          0.9588, 0.9684, 0.9573, 0.9519, 0.9693, 0.9414, 0.9593, 0.9525,
+          0.9507, 0.9504, 0.9527, 0.9588, 0.9512, 0.956, 0.8417, 0.9445,
+        ],
+        'American Express': [
+          0.9324, 0.9179, 0.9178, 0.9222, 0.9364, 0.9288, 0.9288, 0.932, 0.9304,
+          0.9286, 0.9345, 0.9334, 0.9279, 0.9319, 0.9273, 0.9355,
+        ],
+        Discover: [
+          0.9509, 0.9376, 0.9584, 0.9325, 0.9415, 0.9517, 0.9398, 0.9439,
+          0.9385, 0.946, 0.9472, 0.9449, 0.9485, 0.9418, 0.9343, 0.9451,
+        ],
       };
       // Declined attempts per hour by reason.
       const declines = {
-        'Insufficient funds': [2, 1, 1, 1, 0, 1, 2, 3, 6, 8, 11, 16, 18, 17, 11, 9],
+        'Insufficient funds': [
+          2, 1, 1, 1, 0, 1, 2, 3, 6, 8, 11, 16, 18, 17, 11, 9,
+        ],
         'Do not honor': [2, 2, 1, 1, 0, 1, 2, 3, 7, 9, 11, 17, 18, 16, 12, 10],
         'Suspected fraud': [1, 1, 0, 0, 1, 0, 0, 2, 3, 4, 7, 8, 14, 8, 5, 3],
         'Issuer timeout': [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 46, 2],
@@ -494,20 +532,72 @@
       // Daily balances for the last 14 days and the 14 before them.
       const DAYS = days('2026-11-03', 14);
       const PRIOR_DAYS = days('2026-10-20', 14);
-      const inTransit = [113576017, 142099025, 138156802, 137266094, 137017914, 112737425, 117393998, 130079024, 134275788, 139185934, 140202030, 108468730, 129234075, 131868058];
-      const inTransitPrior = [114441924, 109126641, 120842330, 111198891, 107660604, 121063641, 141718202, 137018094, 135606504, 113877127, 126467200, 116067306, 111906581, 109247332];
-      const openDisputes = [35, 33, 30, 32, 38, 29, 29, 36, 31, 34, 34, 32, 40, 30];
-      const openDisputesPrior = [34, 30, 34, 29, 39, 38, 35, 32, 39, 35, 39, 38, 34, 33];
+      const inTransit = [
+        113576017, 142099025, 138156802, 137266094, 137017914, 112737425,
+        117393998, 130079024, 134275788, 139185934, 140202030, 108468730,
+        129234075, 131868058,
+      ];
+      const inTransitPrior = [
+        114441924, 109126641, 120842330, 111198891, 107660604, 121063641,
+        141718202, 137018094, 135606504, 113877127, 126467200, 116067306,
+        111906581, 109247332,
+      ];
+      const openDisputes = [
+        35, 33, 30, 32, 38, 29, 29, 36, 31, 34, 34, 32, 40, 30,
+      ];
+      const openDisputesPrior = [
+        34, 30, 34, 29, 39, 38, 35, 32, 39, 35, 39, 38, 34, 33,
+      ];
 
       const PAYOUTS = [
-        {time: '15:21', name: 'Casa Verde Kitchens', bank: 'Chase •• 4821', amount: 4821055, status: 'transit'},
-        {time: '15:04', name: 'Noodle Theory Group', bank: 'Wells Fargo •• 0377', amount: 3906210, status: 'transit'},
-        {time: '14:48', name: 'Bao & Bun Holdings', bank: 'Citibank •• 6190', amount: 3355000, status: 'transit'},
-        {time: '14:12', name: 'Harbor Street Pizza Co.', bank: 'Bank of America •• 2254', amount: 2988740, status: 'pending'},
-        {time: '13:37', name: 'Green Bowl Collective', bank: 'US Bank •• 9013', amount: 2764325, status: 'transit'},
-        {time: '12:55', name: 'Saffron & Salt', bank: 'Chase •• 7742', amount: 2640980, status: 'paid'},
+        {
+          time: '15:21',
+          name: 'Casa Verde Kitchens',
+          bank: 'Chase •• 4821',
+          amount: 4821055,
+          status: 'transit',
+        },
+        {
+          time: '15:04',
+          name: 'Noodle Theory Group',
+          bank: 'Wells Fargo •• 0377',
+          amount: 3906210,
+          status: 'transit',
+        },
+        {
+          time: '14:48',
+          name: 'Bao & Bun Holdings',
+          bank: 'Citibank •• 6190',
+          amount: 3355000,
+          status: 'transit',
+        },
+        {
+          time: '14:12',
+          name: 'Harbor Street Pizza Co.',
+          bank: 'Bank of America •• 2254',
+          amount: 2988740,
+          status: 'pending',
+        },
+        {
+          time: '13:37',
+          name: 'Green Bowl Collective',
+          bank: 'US Bank •• 9013',
+          amount: 2764325,
+          status: 'transit',
+        },
+        {
+          time: '12:55',
+          name: 'Saffron & Salt',
+          bank: 'Chase •• 7742',
+          amount: 2640980,
+          status: 'paid',
+        },
       ];
-      const STATUS_LABEL = {transit: 'In transit', pending: 'Pending', paid: 'Paid'};
+      const STATUS_LABEL = {
+        transit: 'In transit',
+        pending: 'Pending',
+        paid: 'Paid',
+      };
 
       function tile(id, spec) {
         return StripeCharts.render(document.getElementById(id), {
@@ -529,7 +619,11 @@
         },
         series: [
           {label: 'Today', data: points(TODAY, paymentsToday)},
-          {label: 'Last Monday', comparison: true, data: points(LAST_WEEK, paymentsLastWeek)},
+          {
+            label: 'Last Monday',
+            comparison: true,
+            data: points(LAST_WEEK, paymentsLastWeek),
+          },
         ],
       });
 
@@ -541,7 +635,11 @@
         kpi: {basis: 'custom', value: 0.9443, comparisonValue: 0.9525},
         series: [
           {label: 'Today', data: points(TODAY, rateToday)},
-          {label: 'Last Monday', comparison: true, data: points(LAST_WEEK, rateLastWeek)},
+          {
+            label: 'Last Monday',
+            comparison: true,
+            data: points(LAST_WEEK, rateLastWeek),
+          },
         ],
       });
 
@@ -557,7 +655,11 @@
         },
         series: [
           {label: 'Last 14 days', data: points(DAYS, inTransit)},
-          {label: 'Prior 14 days', comparison: true, data: points(PRIOR_DAYS, inTransitPrior)},
+          {
+            label: 'Prior 14 days',
+            comparison: true,
+            data: points(PRIOR_DAYS, inTransitPrior),
+          },
         ],
       });
 
@@ -573,7 +675,11 @@
         },
         series: [
           {label: 'Last 14 days', data: points(DAYS, openDisputes)},
-          {label: 'Prior 14 days', comparison: true, data: points(PRIOR_DAYS, openDisputesPrior)},
+          {
+            label: 'Prior 14 days',
+            comparison: true,
+            data: points(PRIOR_DAYS, openDisputesPrior),
+          },
         ],
       });
 
@@ -591,7 +697,11 @@
         chart: {type: 'line', incomplete: INCOMPLETE},
         series: [
           {label: 'Today', data: points(TODAY, volumeToday)},
-          {label: 'Last Monday', comparison: true, data: points(LAST_WEEK, volumeLastWeek)},
+          {
+            label: 'Last Monday',
+            comparison: true,
+            data: points(LAST_WEEK, volumeLastWeek),
+          },
         ],
         annotations: [INCIDENT],
       });
@@ -616,7 +726,12 @@
         description: 'Declined attempts per hour, stacked',
         format: COUNT,
         timeZone: TIME_ZONE,
-        chart: {type: 'bar', stacking: 'stacked', legend: 'show', incomplete: INCOMPLETE},
+        chart: {
+          type: 'bar',
+          stacking: 'stacked',
+          legend: 'show',
+          incomplete: INCOMPLETE,
+        },
         series: Object.entries(declines).map(([label, counts]) => ({
           label,
           data: points(TODAY, counts),
@@ -624,7 +739,10 @@
         annotations: [INCIDENT],
       });
 
-      const money = new Intl.NumberFormat('en-US', {style: 'currency', currency: 'USD'});
+      const money = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+      });
       const list = document.getElementById('payout-list');
       function cell(tag, className, text) {
         const node = document.createElement(tag);
@@ -634,7 +752,12 @@
       }
       const head = document.createElement('li');
       head.className = 'head';
-      head.append(cell('span', '', 'Time'), cell('span', '', 'Merchant'), cell('span', '', 'Amount'), cell('span', '', 'Status'));
+      head.append(
+        cell('span', '', 'Time'),
+        cell('span', '', 'Merchant'),
+        cell('span', '', 'Amount'),
+        cell('span', '', 'Status'),
+      );
       list.append(head);
       for (const payout of PAYOUTS) {
         const row = document.createElement('li');

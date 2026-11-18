@@ -204,7 +204,7 @@ export class Checker {
     }
     const suggestion =
       typeof value === 'string'
-        ? aliases?.[value.toLowerCase()] ?? closestMatch(value, options)
+        ? (aliases?.[value.toLowerCase()] ?? closestMatch(value, options))
         : undefined;
     const expected = `one of ${quoteList(options)}`;
     const base =

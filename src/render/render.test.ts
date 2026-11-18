@@ -205,6 +205,95 @@ describe('render', () => {
     expect(highlighted()).toEqual([]);
   });
 
+  describe('bar hover', () => {
+    const bars = (
+      ys: readonly (number | null)[],
+      labels: readonly string[] = ['Orders'],
+    ): ChartSpec => ({
+      version: 1,
+      title: 'Orders',
+      chart: {type: 'bar'},
+      series: labels.map((label) => ({
+        label,
+        data: ys.map((y, index) => ({
+          x: new Date(Date.UTC(2024, 0, 1 + index)).toISOString().slice(0, 10),
+          y,
+        })),
+      })),
+    });
+    // Read from the document each time: a redraw replaces the marks.
+    const hover = (): {highlighted: string[]; crosshair: boolean} => ({
+      highlighted: [...element.querySelectorAll('.sc-highlighted')].map(
+        (part) => part.getAttribute('data-slot') ?? '',
+      ),
+      crosshair: element.querySelector('.sc-crosshair') !== null,
+    });
+    const fading = (): boolean =>
+      element.querySelector('.sc-highlighting') !== null;
+
+    it('marks a slot with no bar to see with the crosshair', () => {
+      render(element, bars([0, 5, null, 3]));
+      resizeAll(600, 300);
+      const area = plotArea(element);
+
+      // A value of 0 draws a bar with no height.
+      pressKey(area, 'ArrowRight');
+      expect(hover()).toEqual({highlighted: [], crosshair: true});
+      expect(fading()).toBe(false);
+
+      pressKey(area, 'ArrowRight');
+      expect(hover()).toEqual({highlighted: ['1'], crosshair: false});
+
+      pressKey(area, 'ArrowRight');
+      expect(hover()).toEqual({highlighted: [], crosshair: true});
+      expect(fading()).toBe(false);
+    });
+
+    it('keeps the highlight when the plot is redrawn at a new size', () => {
+      render(element, bars([4, 5, 3]));
+      resizeAll(600, 300);
+      pressKey(plotArea(element), 'ArrowRight');
+      const before = element.querySelector('.sc-marks');
+
+      resizeAll(500, 280);
+      expect(element.querySelector('.sc-marks')).not.toBe(before);
+      expect(hover()).toEqual({highlighted: ['0'], crosshair: false});
+      expect(fading()).toBe(true);
+    });
+
+    it.each([
+      // Under a pixel per slot, most slots have no bar of their own.
+      ['slots narrower than a pixel', 900, ['Orders']],
+      // Thin bars of several series are drawn on top of one another.
+      ['overlaid series', 150, ['Online', 'In store', 'Phone']],
+    ])('uses the crosshair alone for %s', (_name, days, labels) => {
+      render(
+        element,
+        bars(
+          Array.from({length: days}, (_, index) => 10 + ((index * 7) % 13)),
+          labels,
+        ),
+      );
+      resizeAll(400, 300);
+      const area = plotArea(element);
+      for (let step = 0; step < 12; step += 1) {
+        pressKey(area, 'ArrowRight');
+        expect(hover()).toEqual({highlighted: [], crosshair: true});
+        expect(fading()).toBe(false);
+      }
+    });
+
+    it('still highlights thin bars that do not overlap', () => {
+      render(
+        element,
+        bars(Array.from({length: 200}, (_, index) => 10 + ((index * 7) % 13))),
+      );
+      resizeAll(400, 300);
+      pressKey(plotArea(element), 'ArrowRight');
+      expect(hover()).toEqual({highlighted: ['0'], crosshair: false});
+    });
+  });
+
   it('keeps a tapped slot after the finger lifts, until a press elsewhere', () => {
     render(element, SPEC);
     resizeAll(600, 300);
@@ -297,7 +386,10 @@ describe('render', () => {
     const after = jest.fn();
     const chart = render(element, SPEC, {onPointClick: before});
     resizeAll(600, 300);
-    chart.update({version: 1, title: 'Gross volume', loading: true}, {onPointClick: after});
+    chart.update(
+      {version: 1, title: 'Gross volume', loading: true},
+      {onPointClick: after},
+    );
     resizeAll(600, 300);
     const area = plotArea(element);
     pressKey(area, 'ArrowRight');

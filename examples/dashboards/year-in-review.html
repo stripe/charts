@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -27,10 +27,12 @@
         --ink-faint: #6f6155;
         --rule: #d9cfbe;
         --accent: #b4471f;
-        --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia,
+        --serif:
+          'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia,
           'Times New Roman', serif;
-        --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-          Helvetica, Arial, sans-serif;
+        --sans:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+          Arial, sans-serif;
       }
       * {
         box-sizing: border-box;
@@ -229,7 +231,9 @@
       .js .reveal {
         opacity: 0;
         transform: translateY(16px);
-        transition: opacity 600ms ease-out, transform 600ms ease-out;
+        transition:
+          opacity 600ms ease-out,
+          transform 600ms ease-out;
       }
       .js .reveal.in {
         opacity: 1;
@@ -291,8 +295,8 @@
         <span class="chapter">One &middot; Revenue</span>
         <h2>Every month beat last year, and October was the best yet</h2>
         <p class="dropcap">
-          Take any month of 2026 and set it beside the same month of 2025: it
-          is ahead, all eleven of them. The shop closed October at
+          Take any month of 2026 and set it beside the same month of 2025: it is
+          ahead, all eleven of them. The shop closed October at
           <span class="num" data-v="oct26"></span>, up
           <span class="num" data-v="octGrowth"></span> on October 2025 and the
           best full month of 2026.
@@ -308,23 +312,24 @@
           <span class="big" data-v="ytd26"></span>
           <span class="cap">
             taken from January through November 16, against
-            <span class="num" data-v="ytd25"></span> in the same period of
-            2025.
+            <span class="num" data-v="ytd25"></span> in the same period of 2025.
           </span>
         </blockquote>
         <figure>
           <div class="chart" id="revenue"></div>
           <figcaption>
-            Revenue by month. November is still open: the line stops at
-            the $83,610 taken so far (the marker) and its dotted tail runs to
-            where the month is on pace to end. 2025 shows its full November.
-            The shaded stretch is the early-bird sale.
+            Revenue by month. November is still open: the line stops at the
+            $83,610 taken so far (the marker) and its dotted tail runs to where
+            the month is on pace to end. 2025 shows its full November. The
+            shaded stretch is the early-bird sale.
           </figcaption>
         </figure>
         <p>
           November so far stands at <span class="num" data-v="novMtd"></span>,
-          up <span class="num" data-v="novMtdGrowth"></span> on the same sixteen days last year, before Campaign launch has happened. Last year
-          the first sixteen days made up <span class="num" data-v="novShare25"></span>
+          up <span class="num" data-v="novMtdGrowth"></span> on the same sixteen
+          days last year, before Campaign launch has happened. Last year the
+          first sixteen days made up
+          <span class="num" data-v="novShare25"></span>
           of the month. At that pace November finishes near
           <span class="num" data-v="novProjected"></span>.
         </p>
@@ -358,11 +363,11 @@
         <span class="chapter">Three &middot; Trust</span>
         <h2>Fewer refunds, and far fewer disputes</h2>
         <p>
-          Customers asked for their money back less often as the year went
-          on. The refund rate averaged
+          Customers asked for their money back less often as the year went on.
+          The refund rate averaged
           <span class="num" data-v="refundAvg26"></span> of payments this year,
-          against <span class="num" data-v="refundAvg25"></span> in 2025, and
-          it has not been above <span class="num" data-v="refundMax26"></span>
+          against <span class="num" data-v="refundAvg25"></span> in 2025, and it
+          has not been above <span class="num" data-v="refundMax26"></span>
           in any month.
         </p>
         <blockquote class="stat">
@@ -392,8 +397,8 @@
         <p>
           A typical order was <span class="num" data-v="aovJan"></span> in
           January and <span class="num" data-v="aovOct"></span> in October, a
-          rise of <span class="num" data-v="aovGrowth"></span>. It moves with the
-          subscription share in chapter two, which is the pattern you would
+          rise of <span class="num" data-v="aovGrowth"></span>. It moves with
+          the subscription share in chapter two, which is the pattern you would
           expect when regulars take the larger bag.
         </p>
         <figure>
@@ -408,22 +413,23 @@
         <span class="chapter">Five &middot; Checkout</span>
         <h2>Apple Pay is gaining on cards</h2>
         <p>
-          Cards still carry most payments, <span class="num" data-v="cardsNov"></span>
+          Cards still carry most payments,
+          <span class="num" data-v="cardsNov"></span>
           so far in November, but their share has fallen from
           <span class="num" data-v="cardsJan"></span> in January. Most of it
           went to Apple Pay, which grew from
           <span class="num" data-v="appleJan"></span> to
           <span class="num" data-v="appleNov"></span>. Google Pay rose from
           <span class="num" data-v="googleJan"></span> to
-          <span class="num" data-v="googleNov"></span>, while bank debit
-          drifted from <span class="num" data-v="achJan"></span> to
+          <span class="num" data-v="googleNov"></span>, while bank debit drifted
+          from <span class="num" data-v="achJan"></span> to
           <span class="num" data-v="achNov"></span>.
         </p>
         <figure>
           <div class="chart" id="methods"></div>
           <figcaption>
-            Share of payments by payment method. Cards dominate, so click
-            Cards in the legend to hide them and the wallets fill the chart;
+            Share of payments by payment method. Cards dominate, so click Cards
+            in the legend to hide them and the wallets fill the chart;
             double-click a name to look at one method alone.
           </figcaption>
         </figure>
@@ -431,30 +437,39 @@
 
       <section class="reveal">
         <span class="chapter">Six &middot; Ahead</span>
-        <h2>The next three months should bring in about <span data-v="forecastTotalShort"></span></h2>
+        <h2>
+          The next three months should bring in about
+          <span data-v="forecastTotalShort"></span>
+        </h2>
         <p>
           If the rest of the year keeps pace, the shop should take about
-          <span class="num" data-v="forecastTotal"></span> from December through February, between <span class="num" data-v="forecastLow"></span>
-          and <span class="num" data-v="forecastHigh"></span>. The same three
-          months a year earlier brought <span class="num" data-v="priorTotal"></span>.
+          <span class="num" data-v="forecastTotal"></span> from December through
+          February, between <span class="num" data-v="forecastLow"></span> and
+          <span class="num" data-v="forecastHigh"></span>. The same three months
+          a year earlier brought <span class="num" data-v="priorTotal"></span>.
         </p>
         <figure>
           <div class="chart" id="forecast"></div>
           <figcaption>
             Dashed segments are forecasts and the band is the likely range.
-            November is still open, so its marker shows the month so far and
-            the dotted tail where it is on pace to end.
+            November is still open, so its marker shows the month so far and the
+            dotted tail where it is on pace to end.
           </figcaption>
         </figure>
         <div class="method">
           <p>
-            <strong>How the numbers ahead work.</strong> November's
-            projection takes the revenue so far and divides it by the share of
-            the month that last year's first sixteen days made up
-            (<span class="num" data-v="novShare25"></span>). Each forecast month is the same
-            month of last year multiplied by this year's growth over January
-            through October (<span class="num" data-v="growthFactor"></span>),
-            with a range of seven percent either side. Neither knows about a
+            <strong>How the numbers ahead work.</strong> November's projection
+            takes the revenue so far and divides it by the share of the month
+            that last year's first sixteen days made up (<span
+              class="num"
+              data-v="novShare25"
+            ></span
+            >). Each forecast month is the same month of last year multiplied by
+            this year's growth over January through October (<span
+              class="num"
+              data-v="growthFactor"
+            ></span
+            >), with a range of seven percent either side. Neither knows about a
             promotion you have not told it about.
           </p>
         </div>
@@ -533,13 +548,16 @@
       const subscriptionRevenue = revenue2026.map((v, i) =>
         Math.round(v * subscriptionShare[i]),
       );
-      const oneTimeRevenue = revenue2026.map((v, i) => v - subscriptionRevenue[i]);
+      const oneTimeRevenue = revenue2026.map(
+        (v, i) => v - subscriptionRevenue[i],
+      );
 
       // ---- Helpers ----------------------------------------------------------
       const sum = (values) => values.reduce((total, v) => total + v, 0);
       const mean = (values) => sum(values) / values.length;
       const pad = (n) => String(n + 1).padStart(2, '0');
-      const monthStart = (year, i) => `${year + Math.floor(i / 12)}-${pad(i % 12)}-01`;
+      const monthStart = (year, i) =>
+        `${year + Math.floor(i / 12)}-${pad(i % 12)}-01`;
       const dated = (year, values, from = 0) =>
         values.map((y, i) => ({x: monthStart(year, from + i), y}));
 
@@ -564,7 +582,8 @@
       const ytd25 = sum(revenue2025.slice(0, 10)) + NOV_2025_MTD;
 
       // The forecast: last year's month times this year's growth so far.
-      const growthFactor = sum(revenue2026.slice(0, 10)) / sum(revenue2025.slice(0, 10));
+      const growthFactor =
+        sum(revenue2026.slice(0, 10)) / sum(revenue2025.slice(0, 10));
       const novShare25 = NOV_2025_MTD / revenue2025[10];
       const novProjected = Math.round(revenue2026[10] / novShare25);
       const novSubsProjected = Math.round(novProjected * subscriptionShare[10]);
@@ -617,7 +636,9 @@
       };
       // Claims in the prose that the data has to back up.
       console.assert(
-        revenue2026.every((v, i) => i === 10 ? v > NOV_2025_MTD : v > revenue2025[i]),
+        revenue2026.every((v, i) =>
+          i === 10 ? v > NOV_2025_MTD : v > revenue2025[i],
+        ),
         'every month should beat last year',
       );
       console.assert(
@@ -626,7 +647,10 @@
       );
       console.assert(
         revenue2026[3] / revenue2026[2] >
-          Math.max(revenue2026[4] / revenue2026[3], revenue2026[5] / revenue2026[4]),
+          Math.max(
+            revenue2026[4] / revenue2026[3],
+            revenue2026[5] / revenue2026[4],
+          ),
         'April should be the biggest step of the spring',
       );
       for (const element of document.querySelectorAll('[data-v]')) {
@@ -655,7 +679,8 @@
         revenue: {
           version: 1,
           title: 'Revenue by month',
-          description: 'Payments taken through November 16, against the same days of 2025',
+          description:
+            'Payments taken through November 16, against the same days of 2025',
           timeZone: TIME_ZONE,
           format: FORMAT_USD,
           // 2025's November is the full month, so the KPI compares the same days.
@@ -757,7 +782,11 @@
           description: 'Revenue per paid order',
           timeZone: TIME_ZONE,
           format: FORMAT_USD,
-          kpi: {basis: 'latest', value: aov2026[10], comparisonValue: aov2025[10]},
+          kpi: {
+            basis: 'latest',
+            value: aov2026[10],
+            comparisonValue: aov2025[10],
+          },
           chart: {type: 'line', axes: monthAxis, incomplete: {from: NOV}},
           series: [
             {label: '2026', data: dated(2026, aov2026)},
@@ -770,7 +799,12 @@
           description: 'Share of payments by method',
           timeZone: TIME_ZONE,
           format: rate(1),
-          chart: {type: 'line', legend: 'show', axes: monthAxis, incomplete: {from: NOV}},
+          chart: {
+            type: 'line',
+            legend: 'show',
+            axes: monthAxis,
+            incomplete: {from: NOV},
+          },
           series: [
             {label: 'Apple Pay', data: dated(2026, apple)},
             {label: 'Cards', data: dated(2026, cards)},
@@ -781,7 +815,8 @@
         forecast: {
           version: 1,
           title: 'Revenue, next three months',
-          description: 'June to November so far, then a forecast with its range',
+          description:
+            'June to November so far, then a forecast with its range',
           timeZone: TIME_ZONE,
           format: FORMAT_USD,
           chart: {type: 'line', axes: monthAxis, incomplete: {from: NOV}},
